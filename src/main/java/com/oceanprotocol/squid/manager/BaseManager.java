@@ -12,10 +12,11 @@ import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.EncryptionException;
+import com.oceanprotocol.squid.exceptions.TokenApproveException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.helpers.EthereumHelper;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
@@ -24,11 +25,16 @@ import com.oceanprotocol.squid.models.service.AuthorizationService;
 import com.oceanprotocol.squid.models.service.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +42,8 @@ import java.util.List;
  * Abstract class for the Managers
  */
 public abstract class BaseManager {
+
+    protected static final Logger log = LogManager.getLogger(BaseManager.class);
 
     private KeeperService keeperService;
     private AquariusService aquariusService;
@@ -139,6 +147,35 @@ public abstract class BaseManager {
         String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.metadata.base.encryptedFiles);
         return DDO.fromJSON(new TypeReference<ArrayList<AssetMetadata.File>>() {
         }, jsonFiles);
+    }
+
+    public boolean tokenApprove(OceanToken tokenContract, String spenderAddress, String price) throws TokenApproveException {
+
+        String checksumAddress = Keys.toChecksumAddress(spenderAddress);
+
+        try {
+
+            TransactionReceipt receipt = tokenContract.approve(
+                    checksumAddress,
+                    new BigInteger(price)
+            ).send();
+
+            if (!receipt.getStatus().equals("0x1")) {
+                String msg = "The Status received is not valid executing Token Approve: " + receipt.getStatus();
+                log.error(msg);
+                throw new TokenApproveException(msg);
+            }
+
+            log.debug("Token Approve transactionReceipt OK ");
+            return true;
+
+        } catch (Exception e) {
+
+            String msg = "Error executing Token Approve ";
+            log.error(msg + ": " + e.getMessage());
+            throw new TokenApproveException(msg, e);
+        }
+
     }
 
 

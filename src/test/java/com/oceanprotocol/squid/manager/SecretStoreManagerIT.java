@@ -9,7 +9,7 @@ import com.oceanprotocol.secretstore.auth.ConsumerWorker;
 import com.oceanprotocol.secretstore.auth.PublisherWorker;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
-import com.oceanprotocol.squid.helpers.StringsHelper;
+import com.oceanprotocol.common.helpers.StringsHelper;
 import com.oceanprotocol.squid.models.DID;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;

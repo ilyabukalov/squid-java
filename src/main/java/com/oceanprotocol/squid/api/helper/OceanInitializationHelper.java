@@ -10,7 +10,7 @@ import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.api.config.OceanConfig;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.*;
 import org.web3j.crypto.CipherException;
 

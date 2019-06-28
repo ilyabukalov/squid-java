@@ -5,10 +5,10 @@
 
 package com.oceanprotocol.squid.external;
 
-import com.oceanprotocol.squid.helpers.HttpHelper;
-import com.oceanprotocol.squid.helpers.HttpHelper.DownloadResult;
-import com.oceanprotocol.squid.helpers.StringsHelper;
-import com.oceanprotocol.squid.models.HttpResponse;
+import com.oceanprotocol.common.helpers.HttpHelper;
+import com.oceanprotocol.common.helpers.HttpHelper.DownloadResult;
+import com.oceanprotocol.common.helpers.StringsHelper;
+import com.oceanprotocol.common.models.HttpResponse;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;

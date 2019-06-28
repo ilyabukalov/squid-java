@@ -3,7 +3,7 @@ package com.oceanprotocol.squid.core.sla;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.squid.api.OceanAPI;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;

@@ -25,6 +25,8 @@
         <final-name>squid</final-name>
 
         <web3j.version>4.1.1</web3j.version>
+        <common-utils.version>0.0.3</common-utils.version>
+
         <ocean.keeper.version>0.10.3</ocean.keeper.version>
         <ocean.secretstore.version>0.1.4</ocean.secretstore.version>
         <eddsa.version>0.3.0</eddsa.version>
@@ -440,6 +442,13 @@
             <artifactId>keeper-contracts</artifactId>
             <version>${ocean.keeper.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.oceanprotocol</groupId>
+            <artifactId>common-utils</artifactId>
+            <version>${common-utils.version}</version>
+        </dependency>
+
         <!-- Crypto libraries -->
         <dependency>
             <groupId>net.i2p.crypto</groupId>
