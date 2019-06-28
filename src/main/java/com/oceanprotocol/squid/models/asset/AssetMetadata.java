@@ -10,7 +10,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.squid.models.CustomDateDeserializer;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Metadata;
 
@@ -66,11 +68,11 @@ public class AssetMetadata extends Metadata {
         public String description;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-        @JsonProperty
+        @JsonDeserialize(using = CustomDateDeserializer.class)
         public Date dateCreated;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-        @JsonProperty
+        @JsonDeserialize(using = CustomDateDeserializer.class)
         public Date datePublished;
 
         @JsonProperty

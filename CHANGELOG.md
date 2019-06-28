@@ -1,6 +1,10 @@
 History
 =======
 
+0.6.1 (June, 2019)
+-------------------------
+* Allowed different formats of date from Aquarius
+
 0.6.0 (June, 2019)
 -------------------------
 * Transactions locally signed using Raw Transactions

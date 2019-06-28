@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.oceanprotocol</groupId>
     <artifactId>squid</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
     <packaging>jar</packaging>
     <name>Java client library for Ocean Protocol</name>
     <url>https://github.com/oceanprotocol/squid-java</url>
