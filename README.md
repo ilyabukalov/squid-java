@@ -42,7 +42,7 @@ Typically in Maven you can add squid-java as a dependency:
 <dependency>
   <groupId>com.oceanprotocol</groupId>
   <artifactId>squid-java</artifactId>
-  <version>0.5.1</version>
+  <version>0.6.2</version>
 </dependency>
 ```
 

@@ -1,6 +1,10 @@
 History
 =======
 
+0.6.2 (July, 2019)
+-------------------------
+* Common utils are moved to an external library https://github.com/oceanprotocol/common-utils-java
+
 0.6.1 (June, 2019)
 -------------------------
 * Allowed different formats of date from Aquarius
