@@ -1,8 +1,8 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.service.Agreement;
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +44,7 @@ public class ConditionsManager extends BaseManager {
      */
     public Boolean lockReward(String agreementId, BigInteger amount) throws Exception {
         try {
-            getKeeperService().tokenApprove(tokenContract, lockRewardCondition.getContractAddress(), amount.toString());
+            tokenApprove(tokenContract, lockRewardCondition.getContractAddress(), amount.toString());
             TransactionReceipt txReceipt = lockRewardCondition.fulfill(EncodingHelper.hexStringToBytes(agreementId),
                     Keys.toChecksumAddress(escrowReward.getContractAddress()),
                     amount).send();

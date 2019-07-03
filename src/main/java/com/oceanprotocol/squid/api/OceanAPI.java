@@ -15,7 +15,7 @@ import com.oceanprotocol.squid.api.impl.*;
 import com.oceanprotocol.squid.exceptions.InitializationException;
 import com.oceanprotocol.squid.exceptions.InvalidConfiguration;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.*;
 import com.oceanprotocol.squid.models.Account;
 import com.typesafe.config.Config;

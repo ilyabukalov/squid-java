@@ -12,10 +12,10 @@ import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.exceptions.*;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.squid.external.BrizoService;
-import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
-import com.oceanprotocol.squid.helpers.EthereumHelper;
-import com.oceanprotocol.squid.helpers.UrlHelper;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
+import com.oceanprotocol.common.helpers.UrlHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
@@ -303,7 +303,7 @@ public class OceanManager extends BaseManager {
                             return Flowable.empty();
                         else {
                             log.debug("Received AgreementCreated Event with Id: " + eventServiceAgreementId);
-                            getKeeperService().tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), ddo.metadata.base.price);
+                            tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), ddo.metadata.base.price);
                             BigInteger balance = this.tokenContract.balanceOf(getMainAccount().address).send();
                             if (balance.compareTo(new BigInteger(ddo.metadata.base.price)) < 0) {
                                 log.warn("Consumer account does not have sufficient token balance to fulfill the " +

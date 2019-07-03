@@ -2,8 +2,8 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.exceptions.ConditionNotFoundException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.service.AccessService;
 import com.oceanprotocol.squid.models.service.Agreement;

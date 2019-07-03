@@ -5,7 +5,7 @@ import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.squid.api.OceanAPI;
 import com.oceanprotocol.squid.api.config.OceanConfig;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;

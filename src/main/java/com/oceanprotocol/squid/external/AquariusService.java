@@ -7,10 +7,10 @@ package com.oceanprotocol.squid.external;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.exceptions.DDOException;
-import com.oceanprotocol.squid.helpers.HttpHelper;
+import com.oceanprotocol.common.helpers.HttpHelper;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.HttpResponse;
+import com.oceanprotocol.common.models.HttpResponse;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
