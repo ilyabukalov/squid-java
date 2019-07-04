@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AuthorizationService;

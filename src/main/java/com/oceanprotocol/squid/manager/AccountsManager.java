@@ -7,7 +7,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.Balance;
 import org.apache.logging.log4j.LogManager;
@@ -26,16 +26,17 @@ import java.util.List;
  */
 public class AccountsManager extends BaseManager {
 
-    private static final Logger log= LogManager.getLogger(AccountsManager.class);
+    private static final Logger log = LogManager.getLogger(AccountsManager.class);
 
-    private AccountsManager(KeeperService keeperService, AquariusService aquariusService){
+    private AccountsManager(KeeperService keeperService, AquariusService aquariusService) {
         super(keeperService, aquariusService);
     }
 
     /**
      * Given the KeeperService and AquariusService, returns a new instance of AccountsManager
      * using them as attributes
-     * @param keeperService Keeper Dto
+     *
+     * @param keeperService   Keeper Dto
      * @param aquariusService Provider Dto
      * @return AccountsManager
      */
@@ -44,11 +45,11 @@ public class AccountsManager extends BaseManager {
     }
 
 
-
     /**
      * Returns the list of ethereum accounts registered in the Keeper node
      * If getBalance is true, get the ethereum and ocean balance of each account
-     * @return  List of accounts
+     *
+     * @return List of accounts
      * @throws EthereumException if the EVM throws an exception
      */
     public List<Account> getAccounts() throws EthereumException {
@@ -73,6 +74,7 @@ public class AccountsManager extends BaseManager {
 
     /**
      * Given an account returns a Balance object with the Ethereum and Ocean balance
+     *
      * @param accountAddress account
      * @return Balance
      * @throws EthereumException if the EVM throws an exception
@@ -86,6 +88,7 @@ public class AccountsManager extends BaseManager {
 
     /**
      * Given an account returns the Ethereum balance
+     *
      * @param accountAddress account
      * @return ethereum balance
      * @throws EthereumException if the EVM throws an exception
@@ -96,7 +99,7 @@ public class AccountsManager extends BaseManager {
                     .getWeb3()
                     .ethGetBalance(accountAddress, DefaultBlockParameterName.LATEST).send()
                     .getBalance();
-        } catch (Exception ex)  {
+        } catch (Exception ex) {
             String msg = "Unable to get account(" + accountAddress + ") Ocean balance";
             log.error(msg + ": " + ex.getMessage());
             throw new EthereumException(msg, ex);
@@ -107,14 +110,15 @@ public class AccountsManager extends BaseManager {
      * Given an account returns the Ocean balance
      * Contract: OceanToken
      * Method: balanceOf
+     *
      * @param accountAddress account
      * @return ocean balance
      * @throws EthereumException if the EVM throws an exception
      */
     public BigInteger getOceanAccountBalance(String accountAddress) throws EthereumException {
-        try{
+        try {
             return tokenContract.balanceOf(accountAddress).send();
-        } catch (Exception ex)  {
+        } catch (Exception ex) {
             String msg = "Unable to get account(" + accountAddress + ") Ocean balance";
             log.error(msg + ": " + ex.getMessage());
             throw new EthereumException(msg, ex);
@@ -126,14 +130,15 @@ public class AccountsManager extends BaseManager {
      * Requests Ocean Tokens from the Dispenser Smart Contract
      * Contract: OceanMarket
      * Method: requestTokens
+     *
      * @param amount amount of tokens requests
      * @return TransactionReceipt
      * @throws EthereumException if the EVM throws an exception
      */
     public TransactionReceipt requestTokens(BigInteger amount) throws EthereumException {
-        try{
+        try {
             return dispenser.requestTokens(amount).send();
-        } catch (Exception ex)  {
+        } catch (Exception ex) {
             String msg = "Unable request tokens " + amount.toString();
             log.error(msg + ": " + ex.getMessage());
             throw new EthereumException(msg, ex);
@@ -142,15 +147,16 @@ public class AccountsManager extends BaseManager {
 
     /**
      * Transfer tokens from one account to the receiver address
+     *
      * @param receiverAccount Address of the transfer receiver
-     * @param amount Amount of tokens to transfer
+     * @param amount          Amount of tokens to transfer
      * @return TransactionReceipt tx receipt
      * @throws EthereumException if the EVM throws an exception
      */
     public TransactionReceipt transfer(String receiverAccount, BigInteger amount) throws EthereumException {
-        try{
+        try {
             return tokenContract.transfer(receiverAccount, amount).send();
-        } catch (Exception ex)  {
+        } catch (Exception ex) {
             String msg = "Unable transfer tokens " + amount.toString();
             log.error(msg + ": " + ex.getMessage());
             throw new EthereumException(msg, ex);

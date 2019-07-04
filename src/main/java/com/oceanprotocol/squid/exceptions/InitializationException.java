@@ -8,7 +8,7 @@ package com.oceanprotocol.squid.exceptions;
 /**
  * Business Exception related with issues during the Initialization of the API
  */
-public class InitializationException extends OceanException{
+public class InitializationException extends OceanException {
 
     public InitializationException(String message, Throwable e) {
         super(message, e);

@@ -8,7 +8,7 @@ package com.oceanprotocol.squid.exceptions;
 /**
  * Business Exception related with DDOs issues
  */
-public class DDOException extends OceanException{
+public class DDOException extends OceanException {
 
     public DDOException(String message, Throwable e) {
         super(message, e);

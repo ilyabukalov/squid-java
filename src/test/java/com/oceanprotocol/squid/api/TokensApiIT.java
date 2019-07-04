@@ -42,12 +42,12 @@ public class TokensApiIT {
     @Test
     public void transfer() throws Exception {
 
-        String receiverAddress= config.getString("account.parity.address2");
-        String receiverPasswd= config.getString("account.parity.password2");
+        String receiverAddress= config.getString("account.parity.address");
+        String receiverPasswd= config.getString("account.parity.password");
 
         Account receiverAccount= new Account(receiverAddress, receiverPasswd);
 
-
+        oceanAPI.getTokensAPI().request(BigInteger.ONE);
         Balance balanceBefore = oceanAPI.getAccountsAPI().balance(receiverAccount);
         assertNotNull(balanceBefore);
 

@@ -2,7 +2,7 @@
   "type": "Access",
   "templateId": "",
   "serviceDefinitionId": "1",
-  "serviceEndpoint": "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}",
+  "serviceEndpoint": "http://localhost:8030/api/v1/brizo/services/consume",
   "purchaseEndpoint": "http://localhost:8030/api/v1/brizo/services/access/initialize",
   "name": "dataAssetAccessServiceAgreement",
   "description": "",
@@ -150,5 +150,4 @@
       }
     ]
   }
-
 }

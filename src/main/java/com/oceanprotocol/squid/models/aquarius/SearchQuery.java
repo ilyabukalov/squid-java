@@ -18,13 +18,13 @@ import java.util.Map;
 public class SearchQuery extends AbstractModel implements FromJsonToModel {
 
     @JsonIgnore
-    private static final int DEFAULT_OFFSET= 100;
+    private static final int DEFAULT_OFFSET = 100;
 
     @JsonIgnore
-    private static final int DEFAULT_PAGE= 0;
+    private static final int DEFAULT_PAGE = 1;
 
     @JsonIgnore
-    private static final int DEFAULT_SORT= 1;
+    private static final int DEFAULT_SORT = 1;
 
     @JsonProperty
     public int offset;
@@ -33,7 +33,7 @@ public class SearchQuery extends AbstractModel implements FromJsonToModel {
     public int page;
 
     @JsonProperty
-    public Map<String, Object> query= new HashMap<>();
+    public Map<String, Object> query = new HashMap<>();
 
     @JsonProperty
     public Sort sort;
@@ -43,33 +43,33 @@ public class SearchQuery extends AbstractModel implements FromJsonToModel {
         public int value;
 
         public Sort() {
-            value= 1;
+            value = 1;
         }
 
-        public Sort(int sort)   {
-            this.value= sort;
+        public Sort(int sort) {
+            this.value = sort;
         }
     }
 
     public SearchQuery() {
-        this.offset= DEFAULT_OFFSET;
-        this.page= DEFAULT_PAGE;
-        this.sort= new Sort();
+        this.offset = DEFAULT_OFFSET;
+        this.page = DEFAULT_PAGE;
+        this.sort = new Sort();
     }
 
     public SearchQuery(HashMap<String, Object> params) {
         this(params, DEFAULT_OFFSET, DEFAULT_PAGE, DEFAULT_SORT);
     }
 
-    public SearchQuery(Map<String, Object> params, int offset, int page, int sort)  {
-        this.query= params;
-        this.offset= offset;
-        this.page= page;
-        this.sort= new Sort(sort);
+    public SearchQuery(Map<String, Object> params, int offset, int page, int sort) {
+        this.query = params;
+        this.offset = offset;
+        this.page = page;
+        this.sort = new Sort(sort);
 
     }
 
-    public void addQueryParam(String field, Object value)   {
+    public void addQueryParam(String field, Object value) {
         this.query.put(field, value);
     }
 

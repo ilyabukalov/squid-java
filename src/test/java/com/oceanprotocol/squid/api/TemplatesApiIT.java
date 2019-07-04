@@ -7,7 +7,7 @@ package com.oceanprotocol.squid.api;
 
 import com.oceanprotocol.keeper.contracts.TemplateStoreManager;
 import com.oceanprotocol.squid.exceptions.EthereumException;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.service.template.TemplateSEA;
 import com.typesafe.config.Config;
@@ -46,9 +46,11 @@ public class TemplatesApiIT {
                 config.getString("keeper.url"),
                 oceanAPI.getMainAccount().getAddress(),
                 oceanAPI.getMainAccount().getPassword(),
-                config.getString("account.parity.file"),
+                config.getString("account.parity.file2"),
                 BigInteger.valueOf(config.getLong("keeper.gasLimit")),
-                BigInteger.valueOf(config.getLong("keeper.gasPrice"))
+                BigInteger.valueOf(config.getLong("keeper.gasPrice")),
+                config.getInt("keeper.tx.attempts"),
+                config.getLong("keeper.tx.sleepDuration")
                 );
 
         templateStoreManager= ManagerHelper.deployTemplateStoreManager(keeper);

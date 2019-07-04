@@ -7,7 +7,7 @@ package com.oceanprotocol.squid.core.sla.functions;
 
 import com.oceanprotocol.keeper.contracts.LockRewardCondition;
 import com.oceanprotocol.squid.exceptions.LockRewardFulfillException;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,14 +18,15 @@ import java.math.BigInteger;
 
 public class FulfillLockReward {
 
-    private static final Logger log= LogManager.getLogger(FulfillLockReward.class);
+    private static final Logger log = LogManager.getLogger(FulfillLockReward.class);
 
     /**
      * Executes a fulfill function of a LockReward Condition
-     * @param lockRewardCondition  LockRewardCondition contract
-     * @param serviceAgreementId the service agreement id
+     *
+     * @param lockRewardCondition LockRewardCondition contract
+     * @param serviceAgreementId  the service agreement id
      * @param escrowRewardAddress the address of the EscrowReward Contract
-     * @param assetInfo basic info of the asset
+     * @param assetInfo           basic info of the asset
      * @return a flag that indicates if the function was executed correctly
      * @throws LockRewardFulfillException LockRewardFulfillException
      */
@@ -41,15 +42,15 @@ public class FulfillLockReward {
             String escrowRewardAddressChecksum = Keys.toChecksumAddress(escrowRewardAddress);
             serviceId = EncodingHelper.hexStringToBytes(serviceAgreementId);
 
-            log.debug("service Agreement String: " + serviceAgreementId );
+            log.debug("service Agreement String: " + serviceAgreementId);
             log.debug("serviceID Bytes:" + serviceId);
             log.debug("EscrowRewardAddress: " + escrowRewardAddressChecksum);
-            log.debug("Price: " + BigInteger.valueOf(assetInfo.getPrice()));
+            log.debug("Price: " + assetInfo.getPrice());
 
-            TransactionReceipt receipt= lockRewardCondition.fulfill(
+            TransactionReceipt receipt = lockRewardCondition.fulfill(
                     serviceId,
                     escrowRewardAddressChecksum,
-                    BigInteger.valueOf(assetInfo.getPrice())
+                    new BigInteger(assetInfo.getPrice())
             ).send();
 
             if (!receipt.getStatus().equals("0x1")) {
@@ -64,7 +65,7 @@ public class FulfillLockReward {
         } catch (Exception e) {
 
             String msg = "Error executing LockRewardCondition.Fulfill for serviceAgreement " + serviceAgreementId;
-            log.error(msg+ ": " + e.getMessage());
+            log.error(msg + ": " + e.getMessage());
             throw new LockRewardFulfillException(msg, e);
         }
 

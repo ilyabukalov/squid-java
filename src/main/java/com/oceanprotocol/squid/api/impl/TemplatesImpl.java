@@ -20,6 +20,7 @@ public class TemplatesImpl implements TemplatesAPI {
 
     /**
      * Constructor
+     *
      * @param templatesManager the templatesManager
      */
     public TemplatesImpl(TemplatesManager templatesManager) {

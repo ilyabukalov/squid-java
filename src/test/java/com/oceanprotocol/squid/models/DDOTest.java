@@ -87,12 +87,12 @@ public class DDOTest {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {
         }, DDO_JSON_CONTENT);
 
-        assertEquals("https://w3id.org/future-method/v1", ddo.context);
+        assertEquals("https://w3id.org/did/v1", ddo.context);
         assertEquals("did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf", ddo.id.toString());
         assertEquals(3, ddo.publicKeys.size());
         assertTrue(ddo.publicKeys.get(0).id.startsWith("did:op:b6e2eb5eff1a093ced9826315d5a4ef6c5b5c8bd3c49890ee284231d7e1d0aaa"));
 
-        assertEquals(2, ddo.authentication.size());
+        assertEquals(1, ddo.authentication.size());
         assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"));
 
         assertEquals(2, ddo.services.size());
@@ -111,12 +111,12 @@ public class DDOTest {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {
         }, DDO_JSON_AUTH_CONTENT);
 
-        assertEquals("https://w3id.org/future-method/v1", ddo.context);
+        assertEquals("https://w3id.org/did/v1", ddo.context);
         assertEquals("did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf", ddo.id.toString());
         assertEquals(3, ddo.publicKeys.size());
         assertTrue(ddo.publicKeys.get(0).id.startsWith("did:op:b6e2eb5eff1a093ced9826315d5a4ef6c5b5c8bd3c49890ee284231d7e1d0aaa"));
 
-        assertEquals(2, ddo.authentication.size());
+        assertEquals(1, ddo.authentication.size());
         assertTrue(ddo.authentication.get(0).publicKey.startsWith("did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"));
 
         assertEquals(3, ddo.services.size());
@@ -139,7 +139,7 @@ public class DDOTest {
         ddo.publicKeys.add(pk);
         ddo.publicKeys.add(pk);
 
-        DDO.Authentication auth = new DDO.Authentication();
+        DDO.Authentication auth = new DDO.Authentication(did);
         auth.type = "AuthType";
         auth.publicKey = "AuthPK";
 

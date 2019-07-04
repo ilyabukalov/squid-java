@@ -18,14 +18,15 @@ import java.util.List;
 /**
  * Implementation of AccountsAPI
  */
-public class AccountsImpl implements AccountsAPI{
+public class AccountsImpl implements AccountsAPI {
 
     private AccountsManager accountsManager;
 
 
     /**
      * Constructor
-     * @param accountsManager  the accountsManager
+     *
+     * @param accountsManager the accountsManager
      */
     public AccountsImpl(AccountsManager accountsManager) {
 
@@ -35,7 +36,7 @@ public class AccountsImpl implements AccountsAPI{
     @Override
     public List<Account> list() throws EthereumException {
 
-            return accountsManager.getAccounts();
+        return accountsManager.getAccounts();
     }
 
     @Override

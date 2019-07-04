@@ -23,14 +23,15 @@ public class SecretStoreManager {
     private ConsumerWorker consumerWorker;
 
     private SecretStoreManager(SecretStoreDto ssDto, EvmDto evmDto) {
-        this.publisherWorker= new PublisherWorker(ssDto, evmDto);
-        this.consumerWorker= new ConsumerWorker(ssDto, evmDto);
+        this.publisherWorker = new PublisherWorker(ssDto, evmDto);
+        this.consumerWorker = new ConsumerWorker(ssDto, evmDto);
     }
 
 
     /**
      * Gets an instance of the SecretStoreManager
-     * @param ssDto the secret store dto
+     *
+     * @param ssDto  the secret store dto
      * @param evmDto the EVM dto
      * @return an initialized instance of SecretStoreManager
      */
@@ -40,9 +41,10 @@ public class SecretStoreManager {
 
     /**
      * Encrypts a document using Secret Store
+     *
      * @param resourceId the resource id
-     * @param content content to encrypt
-     * @param threshold secret store threshold
+     * @param content    content to encrypt
+     * @param threshold  secret store threshold
      * @return a String with the encrypted content
      * @throws EncryptionException EncryptionException
      */
@@ -52,14 +54,15 @@ public class SecretStoreManager {
 
             return publisherWorker.encryptDocument(resourceId, content, threshold);
 
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new EncryptionException("Error encrypting Document", e);
         }
     }
 
     /**
      * Decrypts a document using Secret Store
-     * @param resourceId the resource id
+     *
+     * @param resourceId       the resource id
      * @param encryptedContent the content to decrypt
      * @return a String with the decrypted content
      * @throws EncryptionException EncryptionException
@@ -70,7 +73,7 @@ public class SecretStoreManager {
 
             return consumerWorker.decryptDocument(resourceId, encryptedContent);
 
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new EncryptionException("Error decrypting Document", e);
         }
     }

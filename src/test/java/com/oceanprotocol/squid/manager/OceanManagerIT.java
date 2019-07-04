@@ -10,8 +10,8 @@ import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
-import com.oceanprotocol.squid.external.parity.JsonRpcSquidAdmin;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.common.web3.parity.JsonRpcSquidAdmin;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
@@ -158,7 +158,7 @@ public class OceanManagerIT {
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
 
         String metadataUrl= config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= config.getString("brizo.url") + "/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String consumeUrl= config.getString("brizo.url") + "/api/v1/brizo/services/consume";
         String purchaseEndpoint= config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint= config.getString("secretstore.url");
         String providerAddress= config.getString("provider.address");
@@ -175,7 +175,7 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
 
         String metadataUrl= config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
-        String consumeUrl= config.getString("brizo.url") + "/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}";
+        String consumeUrl= config.getString("brizo.url") + "/api/v1/brizo/services/consume";
         String purchaseEndpoint= config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint= config.getString("secretstore.url");
         String providerAddress= config.getString("provider.address");
@@ -191,7 +191,7 @@ public class OceanManagerIT {
         DDO resolvedDDO= managerPublisher.resolveDID(did);
 
         assertEquals(ddo.id, resolvedDDO.id);
-        assertEquals(metadataUrl, resolvedDDO.services.get(0).serviceEndpoint);
+        assertEquals(metadataUrl.replace("{did}", did.toString()), resolvedDDO.services.get(0).serviceEndpoint);
         assertTrue( resolvedDDO.services.size() == 3);
 
     }

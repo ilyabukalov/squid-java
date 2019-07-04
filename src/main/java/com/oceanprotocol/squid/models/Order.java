@@ -21,16 +21,16 @@ public class Order {
     public int timeout;
 
     //    @JsonProperty
-    public String pubkey= null;
+    public String pubkey = null;
 
     //    @JsonProperty
-    public String key= null;
+    public String key = null;
 
     //    @JsonProperty
-    public boolean wasPaid= false;
+    public boolean wasPaid = false;
 
     //    @JsonProperty
-    public int status= 0;
+    public int status = 0;
 
     private Order() {
     }

@@ -7,7 +7,7 @@ package com.oceanprotocol.squid.core.sla.functions;
 
 import com.oceanprotocol.keeper.contracts.EscrowReward;
 import com.oceanprotocol.squid.exceptions.EscrowRewardException;
-import com.oceanprotocol.squid.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,16 +18,17 @@ import java.math.BigInteger;
 
 public class FulfillEscrowReward {
 
-    private static final Logger log= LogManager.getLogger(FulfillEscrowReward.class);
+    private static final Logger log = LogManager.getLogger(FulfillEscrowReward.class);
 
     /**
      * Executes a fulfill function of a EscrowReward Condition
-     * @param escrowReward  the EscrowReward contract
+     *
+     * @param escrowReward       the EscrowReward contract
      * @param serviceAgreementId the service agreement id
-     * @param lockRewardAddress the address of the lockReward contract
-     * @param assetInfo basic info of the asset
-     * @param consumerAddress the Address of the consumer
-     * @param lockConditionId the id of the lock condition
+     * @param lockRewardAddress  the address of the lockReward contract
+     * @param assetInfo          basic info of the asset
+     * @param consumerAddress    the Address of the consumer
+     * @param lockConditionId    the id of the lock condition
      * @param releaseConditionId the id of the release condition
      * @return a flag that indicates if the function was executed correctly
      * @throws EscrowRewardException EscrowRewardException
@@ -55,9 +56,9 @@ public class FulfillEscrowReward {
 
             // TODO Calculate lockConditionId and releaseConditionId
 
-            TransactionReceipt receipt= escrowReward.fulfill(
+            TransactionReceipt receipt = escrowReward.fulfill(
                     serviceId,
-                    BigInteger.valueOf(assetInfo.getPrice()),
+                    new BigInteger(assetInfo.getPrice()),
                     lockRewardAddressChecksum,
                     consumerAddress,
                     lockConditionIdBytes,
@@ -76,7 +77,7 @@ public class FulfillEscrowReward {
         } catch (Exception e) {
 
             String msg = "Error executing EscrowReward.Fulfill for serviceAgreement " + serviceAgreementId;
-            log.error(msg+ ": " + e.getMessage());
+            log.error(msg + ": " + e.getMessage());
             throw new EscrowRewardException(msg, e);
         }
 

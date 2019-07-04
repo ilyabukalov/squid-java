@@ -10,9 +10,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.squid.models.CustomDateDeserializer;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Metadata;
-import org.web3j.crypto.Hash;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(alphabetic=true)
+@JsonPropertyOrder(alphabetic = true)
 public class AssetMetadata extends Metadata {
 
     public enum assetTypes {dataset, algorithm, container, workflow, other};
@@ -36,24 +38,24 @@ public class AssetMetadata extends Metadata {
     public Curation curation;
 
     @JsonProperty
-    public Map<String, Object> additionalInformation= new HashMap<>();
+    public Map<String, Object> additionalInformation = new HashMap<>();
 
     public AssetMetadata() {
     }
 
-    public AssetMetadata(DID did)   {
-        this.did= did;
+    public AssetMetadata(DID did) {
+        this.did = did;
     }
 
-    public static AssetMetadata builder()   {
-        AssetMetadata assetMetadata= new AssetMetadata();
-        assetMetadata.base= new Base();
-        assetMetadata.curation= new Curation();
+    public static AssetMetadata builder() {
+        AssetMetadata assetMetadata = new AssetMetadata();
+        assetMetadata.base = new Base();
+        assetMetadata.curation = new Curation();
         return assetMetadata;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class Base {
 
         @JsonProperty
@@ -66,8 +68,12 @@ public class AssetMetadata extends Metadata {
         public String description;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-        @JsonProperty
+        @JsonDeserialize(using = CustomDateDeserializer.class)
         public Date dateCreated;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
+        @JsonDeserialize(using = CustomDateDeserializer.class)
+        public Date datePublished;
 
         @JsonProperty
         public String author;
@@ -82,19 +88,22 @@ public class AssetMetadata extends Metadata {
         public String workExample;
 
         @JsonProperty
-        public ArrayList<File> files= new ArrayList<>();
+        public ArrayList<File> files = new ArrayList<>();
 
         @JsonProperty
-        public String encryptedFiles=null;
+        public String encryptedFiles = null;
 
         @JsonProperty
-        public ArrayList<Link> links= new ArrayList<>();
+        public ArrayList<Link> links = new ArrayList<>();
 
         @JsonProperty
         public String inLanguage;
 
         @JsonProperty
-        public String tags;
+        public ArrayList<String> tags;
+
+        @JsonProperty
+        public ArrayList<String> categories;
 
         @JsonProperty
         public String price;
@@ -108,7 +117,7 @@ public class AssetMetadata extends Metadata {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class Link {
 
         @JsonProperty
@@ -120,11 +129,12 @@ public class AssetMetadata extends Metadata {
         @JsonProperty
         public String url;
 
-        public Link() {}
+        public Link() {
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class Curation {
 
         @JsonProperty
@@ -139,12 +149,13 @@ public class AssetMetadata extends Metadata {
         @JsonProperty
         public boolean isListed;
 
-        public Curation() {}
+        public Curation() {
+        }
     }
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class File {
 
         @JsonProperty
@@ -163,31 +174,32 @@ public class AssetMetadata extends Metadata {
         public String checksum;
 
         @JsonProperty
-        public String contentLength;
+        public Integer contentLength;
 
         @JsonProperty//(access = JsonProperty.Access.READ_ONLY)
         public String url;
 
-        public File() {}
+        public File() {
+        }
     }
 
     public String generateMetadataChecksum(String did) {
 
         String concatFields = this.base.files.stream()
-                .map( file -> file.checksum!=null?file.checksum:"")
+                .map(file -> file.checksum != null ? file.checksum : "")
                 .collect(Collectors.joining(""))
                 .concat(this.base.name)
                 .concat(this.base.author)
                 .concat(this.base.license)
                 .concat(did);
+        return "0x" + CryptoHelper.sha3256(concatFields);
 
-        return Hash.sha3(concatFields);
 
     }
 
     public AssetMetadata eraseFileUrls() {
-        this.base.files.forEach( f -> {
-            f.url= null;
+        this.base.files.forEach(f -> {
+            f.url = null;
         });
 
         return this;

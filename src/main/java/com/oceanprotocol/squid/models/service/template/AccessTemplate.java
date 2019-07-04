@@ -13,17 +13,17 @@ import com.oceanprotocol.squid.models.FromJsonToModel;
 import com.oceanprotocol.squid.models.service.AccessService;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(alphabetic=true)
+@JsonPropertyOrder(alphabetic = true)
 public class AccessTemplate extends AbstractModel implements FromJsonToModel {
 
     @JsonProperty
-    public String type= "Access";
+    public String type = "Access";
 
     @JsonProperty
-    public String id= "";
+    public String id = "";
 
     @JsonProperty
-    public String name= "dataAssetAccessServiceAgreement";
+    public String name = "dataAssetAccessServiceAgreement";
 
     @JsonProperty
     public String description;
@@ -39,7 +39,6 @@ public class AccessTemplate extends AbstractModel implements FromJsonToModel {
     public AccessTemplate() {
 
     }
-
 
 
 }

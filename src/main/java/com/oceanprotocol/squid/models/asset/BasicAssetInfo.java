@@ -8,7 +8,7 @@ package com.oceanprotocol.squid.models.asset;
 public class BasicAssetInfo {
 
     public byte[] assetId;
-    public Integer price;
+    public String price;
 
     public byte[] getAssetId() {
         return assetId;
@@ -18,11 +18,11 @@ public class BasicAssetInfo {
         this.assetId = assetId;
     }
 
-    public Integer getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 

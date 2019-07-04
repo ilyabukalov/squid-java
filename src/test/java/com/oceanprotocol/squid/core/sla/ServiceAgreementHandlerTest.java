@@ -6,7 +6,7 @@
 package com.oceanprotocol.squid.core.sla;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
@@ -106,14 +106,14 @@ public class ServiceAgreementHandlerTest {
     public void generateServiceAgreementSignature() throws Exception {
 
 
-        AccessService accessService= (AccessService) ddo.services.get(0);
+        AccessService accessService= (AccessService) ddo.services.get(1);
 
         String hash= accessService.generateServiceAgreementHash(SERVICEAGREEMENT_ID, "consumerAddress", "publisherAddress", "lockRewardAddress",
                 "accessSecretStoreADdress", "escrowRewardAddredd");
         String signature= accessService.generateServiceAgreementSignatureFromHash(keeper.getWeb3(), keeper.getAddress(), account.password, hash);
 
         final String hashTemplateId= Hash.sha3(TEMPLATE_ID);
-        //final String hashConditionKeys= Hash.sha3(accessService.fetchConditionKeys());
+        //final String hashConditionKeys= Hash.sha3256(accessService.fetchConditionKeys());
         final String hashConditionValues= Hash.sha3(accessService.fetchConditionValues());
         final String hashTimeouts= Hash.sha3(accessService.fetchTimeout());
         final String hashServiceAgreementId= Hash.sha3(SERVICEAGREEMENT_ID);

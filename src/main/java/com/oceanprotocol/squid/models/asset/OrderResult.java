@@ -5,7 +5,10 @@
 
 package com.oceanprotocol.squid.models.asset;
 
-public class OrderResult {
+import com.oceanprotocol.squid.models.AbstractModel;
+import com.oceanprotocol.squid.models.FromJsonToModel;
+
+public class OrderResult extends AbstractModel implements FromJsonToModel {
 
     private String serviceAgreementId;
     private Boolean accessFullfilled = false;

@@ -22,12 +22,12 @@ import java.util.Date;
 
 public abstract class AbstractModel {
 
-    private static ObjectMapper objectMapper= null;
+    private static ObjectMapper objectMapper = null;
 
-    public static final String DATE_PATTERN= "yyyy-MM-dd'T'HH:mm:ss'Z'";
-    public static final DateFormat DATE_FORMAT= new SimpleDateFormat(DATE_PATTERN);
+    public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 
-    public static ObjectMapper getMapperInstance()  {
+    public static ObjectMapper getMapperInstance() {
         if (objectMapper == null) {
 
             objectMapper = new ObjectMapper();
@@ -40,7 +40,7 @@ public abstract class AbstractModel {
     }
 
 
-    private static <T> ObjectReader getReaderInstance(Class<T> clazz)    {
+    private static <T> ObjectReader getReaderInstance(Class<T> clazz) {
         return getMapperInstance().readerFor(clazz);
     }
 
@@ -60,7 +60,7 @@ public abstract class AbstractModel {
         return getMapperInstance().writeValueAsString(object);
     }
 
-    private static String getNowFormatted()    {
+    private static String getNowFormatted() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 

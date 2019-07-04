@@ -8,7 +8,7 @@ package com.oceanprotocol.squid.exceptions;
 /**
  * Business Exception related with Executor interactions issues
  */
-public class ExecutorException extends OceanException{
+public class ExecutorException extends OceanException {
 
 
     public ExecutorException(String message, Throwable e) {

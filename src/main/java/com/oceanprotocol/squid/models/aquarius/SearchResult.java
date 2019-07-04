@@ -19,13 +19,13 @@ import java.util.List;
 public class SearchResult extends AbstractModel implements FromJsonToModel {
 
     @JsonIgnore
-    private static final int DEFAULT_PAGE= 0;
+    private static final int DEFAULT_PAGE = 0;
 
     @JsonIgnore
-    private static final int DEFAULT_TOTAL_PAGES= 1;
+    private static final int DEFAULT_TOTAL_PAGES = 1;
 
     @JsonIgnore
-    private static final int DEFAULT_TOTAL_RESULTS= 0;
+    private static final int DEFAULT_TOTAL_RESULTS = 0;
 
 
     @JsonProperty
@@ -38,24 +38,24 @@ public class SearchResult extends AbstractModel implements FromJsonToModel {
     public int total_results;
 
     @JsonProperty
-    public List<DDO> results= new ArrayList<>();
+    public List<DDO> results = new ArrayList<>();
 
 
     public SearchResult() {
-        this.page= DEFAULT_PAGE;
-        this.total_pages= DEFAULT_TOTAL_PAGES;
-        this.total_results= DEFAULT_TOTAL_RESULTS;
+        this.page = DEFAULT_PAGE;
+        this.total_pages = DEFAULT_TOTAL_PAGES;
+        this.total_results = DEFAULT_TOTAL_RESULTS;
     }
 
-    public SearchResult( List<DDO> results) {
+    public SearchResult(List<DDO> results) {
         this(results, DEFAULT_PAGE, DEFAULT_TOTAL_PAGES, DEFAULT_TOTAL_RESULTS);
     }
 
-    public SearchResult(List<DDO> results, int page, int total_pages, int total_results)  {
-        this.results= results;
-        this.page= page;
-        this.total_pages= total_pages;
-        this.total_results= total_results;
+    public SearchResult(List<DDO> results, int page, int total_pages, int total_results) {
+        this.results = results;
+        this.page = page;
+        this.total_pages = total_pages;
+        this.total_results = total_results;
     }
 
     public List<DDO> getResults() {

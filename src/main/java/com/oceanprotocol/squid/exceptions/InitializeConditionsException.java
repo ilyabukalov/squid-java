@@ -6,7 +6,7 @@
 package com.oceanprotocol.squid.exceptions;
 
 /**
- * Business Exception related with issues during the Initialization of the Conditions of a Service
+ * Business Exception related with issues during the Initialization of the ConditionStatusMap of a Service
  */
 public class InitializeConditionsException extends OceanException {
 

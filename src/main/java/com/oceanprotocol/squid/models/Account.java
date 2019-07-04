@@ -14,7 +14,8 @@ public class Account {
 
     public String password;
 
-    private Account() {}
+    private Account() {
+    }
 
     public Account(String address, String password) {
 
@@ -32,7 +33,7 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getId()   {
+    public String getId() {
         return this.address;
     }
 

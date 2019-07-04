@@ -17,9 +17,9 @@ public class DID {
     @JsonProperty
     public String did;
 
-    public static final String PREFIX= "did:op:";
+    public static final String PREFIX = "did:op:";
 
-    public DID()    {
+    public DID() {
         this.setEmptyDID();
     }
 
@@ -43,10 +43,9 @@ public class DID {
         return did.substring(PREFIX.length());
     }
 
-    public static String generateRandomToken()   {
-        String token= PREFIX + UUID.randomUUID().toString()
-                + UUID.randomUUID().toString()
-                ;
+    public static String generateRandomToken() {
+        String token = PREFIX + UUID.randomUUID().toString()
+                + UUID.randomUUID().toString();
         return token.replaceAll("-", "");
 
     }
@@ -57,7 +56,7 @@ public class DID {
     }
 
     public DID setEmptyDID() {
-        this.did= "";
+        this.did = "";
         return this;
     }
 

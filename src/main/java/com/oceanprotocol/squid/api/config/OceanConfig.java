@@ -18,6 +18,8 @@ public class OceanConfig {
     public static final String KEEPER_URL = "keeper.url";
     public static final String KEEPER_GAS_LIMIT = "keeper.gasLimit";
     public static final String KEEPER_GAS_PRICE = "keeper.gasPrice";
+    public static final String KEEPER_TX_ATTEMPTS = "keeper.tx.attempts";
+    public static final String KEEPER_TX_SLEEPDURATION = "keeper.tx.sleepDuration";
     public static final String AQUARIUS_URL = "aquarius.url";
     public static final String SECRETSTORE_URL = "secretstore.url";
     public static final String PROVIDER_ADDRESS = "provider.address";
@@ -26,6 +28,7 @@ public class OceanConfig {
     public static final String MAIN_ACCOUNT_CREDENTIALS_FILE = "account.main.credentialsFile";
     public static final String DID_REGISTRY_ADDRESS = "contract.DIDRegistry.address";
     public static final String AGREEMENT_STORE_MANAGER_ADDRESS = "contract.AgreementStoreManager.address";
+    public static final String CONDITION_STORE_MANAGER_ADDRESS = "contract.ConditionStoreManager.address";
     public static final String LOCKREWARD_CONDITIONS_ADDRESS = "contract.LockRewardCondition.address";
     public static final String ESCROWREWARD_CONDITIONS_ADDRESS = "contract.EscrowReward.address";
     public static final String ESCROW_ACCESS_SS_CONDITIONS_ADDRESS = "contract.EscrowAccessSecretStoreTemplate.address";
@@ -39,6 +42,8 @@ public class OceanConfig {
     private String keeperUrl;
     private BigInteger keeperGasLimit;
     private BigInteger keeperGasPrice;
+    private int keeperTxAttempts;
+    private long keeperTxSleepDuration;
     private String aquariusUrl;
     private String secretStoreUrl;
     private String providerAddress;
@@ -47,6 +52,7 @@ public class OceanConfig {
     private String mainAccountCredentialsFile;
     private String didRegistryAddress;
     private String agreementStoreManagerAddress;
+    private String conditionStoreManagerAddress;
     private String escrowRewardAddress;
     private String escrowAccessSecretStoreTemplateAddress;
     private String lockRewardAddress;
@@ -80,7 +86,7 @@ public class OceanConfig {
             errors.add(error);
         }
 
-        public String errorsToString(){
+        public String errorsToString() {
             return String.join("; ", this.errors);
         }
 
@@ -89,6 +95,7 @@ public class OceanConfig {
 
     /**
      * Validates that all the needed properties are set in the configuration
+     *
      * @param oceanConfig the configuration
      * @return an OceanConfigValidation object that indicates if the configuration is valid
      */
@@ -108,7 +115,11 @@ public class OceanConfig {
             validation.addErrorMessage("The Address of agreementStoreManager Contract must be set with the property "
                     + OceanConfig.AGREEMENT_STORE_MANAGER_ADDRESS);
         }
-
+        if (oceanConfig.getConditionStoreManagerAddress() == null || oceanConfig.getConditionStoreManagerAddress().isEmpty()) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Address of conditionStoreManager Contract must be set with the property "
+                    + OceanConfig.CONDITION_STORE_MANAGER_ADDRESS);
+        }
 
         if (oceanConfig.getEscrowRewardConditionsAddress() == null || oceanConfig.getEscrowRewardConditionsAddress().isEmpty()) {
             validation.setValid(false);
@@ -194,6 +205,24 @@ public class OceanConfig {
         return this;
     }
 
+    public int getKeeperTxAttempts() {
+        return keeperTxAttempts;
+    }
+
+    public OceanConfig setKeeperTxAttempts(int keeperTxAttempts) {
+        this.keeperTxAttempts = keeperTxAttempts;
+        return this;
+    }
+
+    public long getKeeperTxSleepDuration() {
+        return keeperTxSleepDuration;
+    }
+
+    public OceanConfig setKeeperTxSleepDuration(long keeperTxSleepDuration) {
+        this.keeperTxSleepDuration = keeperTxSleepDuration;
+        return this;
+    }
+
     public String getAquariusUrl() {
         return aquariusUrl;
     }
@@ -226,7 +255,7 @@ public class OceanConfig {
     }
 
     public OceanConfig setEscrowRewardConditionsAddress(String address) {
-        this.escrowRewardAddress= address;
+        this.escrowRewardAddress = address;
         return this;
     }
 
@@ -235,7 +264,16 @@ public class OceanConfig {
     }
 
     public OceanConfig setAgreementStoreManagerAddress(String address) {
-        this.agreementStoreManagerAddress= address;
+        this.agreementStoreManagerAddress = address;
+        return this;
+    }
+
+    public String getConditionStoreManagerAddress() {
+        return conditionStoreManagerAddress;
+    }
+
+    public OceanConfig setConditionStoreManagerAddress(String address) {
+        this.conditionStoreManagerAddress = address;
         return this;
     }
 
@@ -244,7 +282,7 @@ public class OceanConfig {
     }
 
     public OceanConfig setLockrewardConditionsAddress(String address) {
-        this.lockRewardAddress= address;
+        this.lockRewardAddress = address;
         return this;
     }
 
@@ -253,7 +291,7 @@ public class OceanConfig {
     }
 
     public OceanConfig setAccessSsConditionsAddress(String address) {
-        this.accessSsConditionsAddress= address;
+        this.accessSsConditionsAddress = address;
         return this;
     }
 

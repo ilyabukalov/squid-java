@@ -18,14 +18,16 @@ public class TemplateSEA {
 
         private final BigInteger status;
 
-        TemplateState(final BigInteger newStatus)  {
-            status= newStatus;
+        TemplateState(final BigInteger newStatus) {
+            status = newStatus;
         }
 
-        public BigInteger getStatus()   {
+        public BigInteger getStatus() {
             return status;
         }
-    };
+    }
+
+    ;
 
     public BigInteger state;
 

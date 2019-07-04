@@ -30,7 +30,7 @@ public class Balance {
     private BigInteger drops;
 
     public Balance() {
-        this.eth= BigInteger.valueOf(0);
+        this.eth = BigInteger.valueOf(0);
         this.drops = BigInteger.valueOf(0);
     }
 
@@ -46,7 +46,7 @@ public class Balance {
     public BigInteger getDrops() {
         return drops;
     }
-    
+
     public BigDecimal getOceanTokens() {
         return dropsToOcean(this.drops);
     }
@@ -56,7 +56,7 @@ public class Balance {
         return new BigDecimal(drops).divide(new BigDecimal(Unit.OCEAN.factor));
     }
 
-    public static BigInteger oceanToDrops(BigInteger ocean)  {
+    public static BigInteger oceanToDrops(BigInteger ocean) {
         return ocean.multiply(Unit.OCEAN.factor);
     }
 

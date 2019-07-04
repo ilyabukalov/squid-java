@@ -12,7 +12,7 @@ import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.FromJsonToModel;
 
 //@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(alphabetic=true)
+@JsonPropertyOrder(alphabetic = true)
 public class Service extends AbstractModel implements FromJsonToModel {
 
 
@@ -25,7 +25,9 @@ public class Service extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public static final String URL_PARAM = "url";
 
-    public enum serviceTypes {Access, Metadata, Authorization, FitchainCompute, CloudCompute};
+    public enum serviceTypes {Access, Metadata, Authorization, FitchainCompute, CloudCompute}
+
+    ;
 
     @JsonIgnore
     public static final String DEFAULT_METADATA_SERVICE_ID = "0";
@@ -46,12 +48,13 @@ public class Service extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public String serviceEndpoint;
 
-    public Service() {}
+    public Service() {
+    }
 
     public Service(serviceTypes type, String serviceEndpoint, String serviceDefinitionId) {
-        this.type= type.toString();
-        this.serviceDefinitionId= serviceDefinitionId;
-        this.serviceEndpoint= serviceEndpoint;
+        this.type = type.toString();
+        this.serviceDefinitionId = serviceDefinitionId;
+        this.serviceEndpoint = serviceEndpoint;
     }
 
 }

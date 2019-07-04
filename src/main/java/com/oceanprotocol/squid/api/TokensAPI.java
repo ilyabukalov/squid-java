@@ -18,6 +18,7 @@ public interface TokensAPI {
 
     /**
      * Request a number of Ocean Tokens
+     *
      * @param amount Number of tokens requested
      * @return TransactionReceipt tx receipt
      * @throws EthereumException EVM error
@@ -26,8 +27,9 @@ public interface TokensAPI {
 
     /**
      * Transfer tokens from one account to the receiver address
+     *
      * @param receiverAccount Address of the transfer receiver
-     * @param amount Amount of tokens to transfer
+     * @param amount          Amount of tokens to transfer
      * @return boolean indicating success/failure of the transfer
      * @throws EthereumException EVM error
      */

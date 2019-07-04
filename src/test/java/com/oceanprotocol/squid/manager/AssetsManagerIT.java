@@ -7,7 +7,7 @@ package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.KeeperService;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
@@ -119,7 +119,7 @@ public class AssetsManagerIT {
         aquarius.createDDO(ddo4);
         aquarius.createDDO(ddo5);
 
-        List<DDO> result1= manager.searchAssets(randomParam, 10, 0).getResults();
+        List<DDO> result1= manager.searchAssets(randomParam, 10, 1).getResults();
 
         assertEquals(2, result1.size());
         assertEquals(randomParam,result1.get(0).metadata.base.type);

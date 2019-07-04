@@ -18,8 +18,13 @@ import static com.oceanprotocol.squid.models.AbstractModel.DATE_PATTERN;
 
 public class CustomDateDeserializer extends StdDeserializer<Date> {
 
+    public static final String ALT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+
     private SimpleDateFormat formatter =
             new SimpleDateFormat(DATE_PATTERN);
+
+    private SimpleDateFormat altFormatter =
+            new SimpleDateFormat(ALT_DATE_PATTERN);
 
     public CustomDateDeserializer() {
         this(null);
@@ -31,7 +36,13 @@ public class CustomDateDeserializer extends StdDeserializer<Date> {
         try {
             return formatter.parse(date);
         } catch (ParseException e) {
-            throw new IOException(e);
+
+            try {
+                return altFormatter.parse(date);
+            }
+            catch (ParseException e2) {
+                throw new IOException(e);
+            }
         }
     }
 

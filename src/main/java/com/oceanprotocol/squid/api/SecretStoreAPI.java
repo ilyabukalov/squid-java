@@ -15,9 +15,10 @@ public interface SecretStoreAPI {
 
     /**
      * Encrypts a document using Secret Store
+     *
      * @param documentId the id of the document
-     * @param content the content
-     * @param threshold secret store threshold
+     * @param content    the content
+     * @param threshold  secret store threshold
      * @return a String with the encrypted content
      * @throws EncryptionException EncryptionException
      */
@@ -25,7 +26,8 @@ public interface SecretStoreAPI {
 
     /**
      * Decrypts a document using Secret Store
-     * @param documentId the id of the document
+     *
+     * @param documentId       the id of the document
      * @param encryptedContent the encrypted content of the document
      * @return a String with the decrypted content
      * @throws EncryptionException EncryptionException

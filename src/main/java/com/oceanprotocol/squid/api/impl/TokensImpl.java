@@ -18,7 +18,8 @@ public class TokensImpl implements TokensAPI {
 
     /**
      * Constructor
-     * @param accountsManager  the accountsManager
+     *
+     * @param accountsManager the accountsManager
      */
     public TokensImpl(AccountsManager accountsManager) {
 

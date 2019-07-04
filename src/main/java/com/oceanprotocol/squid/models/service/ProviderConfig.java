@@ -28,6 +28,7 @@ public class ProviderConfig {
         this(accessEndpoint, purchaseEndpoint, metadataEndpoint);
         this.secretStoreEndpoint = secretStoreEndpoint;
     }
+
     public ProviderConfig(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint, String secretStoreEndpoint, List<String> providers) {
         this(accessEndpoint, purchaseEndpoint, metadataEndpoint);
         setSecretStoreEndpoint(secretStoreEndpoint);

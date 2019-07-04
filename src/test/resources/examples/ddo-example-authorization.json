@@ -1,11 +1,8 @@
 {
-  "@context": "https://w3id.org/future-method/v1",
+  "@context": "https://w3id.org/did/v1",
   "authentication": [{
     "type": "RsaSignatureAuthentication2018",
-    "publicKey": "did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea#keys-1"
-  }, {
-    "type": "ieee2410Authentication2018",
-    "publicKey": "did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea#keys-2"
+    "publicKey": "did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"
   }],
   "created": "2019-02-08T08:13:49Z",
   "id": "did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf",
@@ -64,11 +61,10 @@
               "url": "https://raw.githubusercontent.com/tbertinmahieux/MSongsDB/master/Tasks_Demos/CoverSongs/shs_dataset_test.txt",
               "index": 0,
               "checksum": "efb2c764274b745f5fc37f97c6b0e761",
-              "contentLength": "4535431",
+              "contentLength": 4535431,
               "contentType": "text/csv",
               "encoding": "UTF-8",
-              "compression": "zip",
-              "resourceId": "access-log2018-02-13-15-17-29-18386C502CAEA932"
+              "compression": "zip"
             }
           ],
           "encryptedFiles": "0x2e48ceefcca7abb024f90c87c676fce8f7913f889605a349c08c0c4a822c69ad651e122cc81db4fbb52938ac627786491514f37a2ebfd04fd98ec726f1d9061ed52f13fde132222af34d9af8ec358429cf45fc669f81a607185cb9a8150df3cbb2b4e3e382fb16429be228ddd920f061b78dd54701025fac8aab976239fb31a5b60a57393e96a338324c5ac8a5600a1247339c4835533cecdb5b53caf6b6f9d6478b579b7426f650a4154a20d18a9d49f509770af62647a57fc174741b47af3c8beeaaa76bee276cce8fba1f3fec0e1c",
@@ -82,12 +78,13 @@
             },
             {
               "name": "Data Format Definition",
-              "type": "format"
+              "type": "format",
+              "url": "https://foo.com/sample2.csv"
             }
           ],
           "name": "UK Weather information 2011",
-          "price": "10",
-          "tags": "weather, uk, 2011, temperature, humidity",
+          "price": "10000000000000000000",
+          "tags": ["weather", "uk", "2011", "temperature", "humidity"],
           "type": "dataset",
           "workExample": "423432fsd,51.509865,-0.118092,2011-01-01T10:55:11+00:00,7.2,68"
         },
@@ -133,7 +130,7 @@
             {
               "name": "price",
               "type": "uint256",
-              "value": 10
+              "value": "10"
             }
           ],
           "timeout": 0
@@ -222,7 +219,7 @@
             {
               "name": "price",
               "type": "uint256",
-              "value": 10
+              "value": "10"
             }
           ],
           "timeout": 0
@@ -264,7 +261,7 @@
             {
               "name": "price",
               "type": "uint256",
-              "value": 10
+              "value": "10"
             }
           ],
           "timeout": 3
@@ -287,7 +284,7 @@
         "fulfillmentOperator": 1
       },
       "serviceDefinitionId": "1",
-      "serviceEndpoint": "http://localhost:8030/api/v1/brizo/services/consume?consumerAddress=${consumerAddress}&serviceAgreementId=${serviceAgreementId}&url=${url}",
+      "serviceEndpoint": "http://localhost:8030/api/v1/brizo/services/consume",
       "templateId": "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d",
       "type": "Access"
     }

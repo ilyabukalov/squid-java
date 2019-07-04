@@ -10,11 +10,11 @@ package com.oceanprotocol.squid.exceptions;
  */
 public abstract class OceanException extends Exception {
 
-    public OceanException(String message, Throwable e){
+    public OceanException(String message, Throwable e) {
         super(message, e);
     }
 
-    public OceanException(String message){
+    public OceanException(String message) {
         super(message);
     }
 }

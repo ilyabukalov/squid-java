@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(alphabetic=true)
+@JsonPropertyOrder(alphabetic = true)
 public class Condition extends AbstractModel implements FromJsonToModel {
 
     @JsonProperty
@@ -34,17 +34,18 @@ public class Condition extends AbstractModel implements FromJsonToModel {
     public String functionName;
 
     @JsonProperty
-    public List<ConditionParameter> parameters= new ArrayList<>();
+    public List<ConditionParameter> parameters = new ArrayList<>();
 
     @JsonProperty
-    public List<Event> events= new ArrayList<>();
+    public List<Event> events = new ArrayList<>();
 
 
-    public Condition() {}
+    public Condition() {
+    }
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class Event {
 
         @JsonProperty
@@ -56,11 +57,12 @@ public class Condition extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public Handler handler;
 
-        public Event() {}
+        public Event() {
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class Handler {
 
         @JsonProperty
@@ -72,12 +74,13 @@ public class Condition extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public String version;
 
-        public Handler() {}
+        public Handler() {
+        }
     }
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic=true)
+    @JsonPropertyOrder(alphabetic = true)
     public static class ConditionParameter {
 
         @JsonProperty
@@ -89,18 +92,18 @@ public class Condition extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public Object value;
 
-        public ConditionParameter() {}
+        public ConditionParameter() {
+        }
     }
 
 
-    public ConditionParameter getParameterByName(String name){
+    public ConditionParameter getParameterByName(String name) {
 
         return this.parameters.stream()
                 .filter(parameter -> parameter.name.equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
     }
-
 
 
 }

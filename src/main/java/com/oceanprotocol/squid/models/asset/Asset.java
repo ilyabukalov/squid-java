@@ -14,8 +14,12 @@ public class Asset extends DDO {
     public Asset() throws DIDFormatException {
     }
 
-    public String getId() { return getDid().toString();}
+    public String getId() {
+        return getDid().toString();
+    }
 
 
-    public DDO getDDO() { return this;}
+    public DDO getDDO() {
+        return this;
+    }
 }

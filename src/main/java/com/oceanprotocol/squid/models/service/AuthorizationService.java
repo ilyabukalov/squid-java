@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(alphabetic=true)
-public class AuthorizationService extends Service{
+@JsonPropertyOrder(alphabetic = true)
+public class AuthorizationService extends Service {
 
     @JsonIgnore
     public static final String DEFAULT_SERVICE = "SecretStore";
@@ -20,7 +20,8 @@ public class AuthorizationService extends Service{
     @JsonProperty
     public String service;
 
-    public AuthorizationService() {}
+    public AuthorizationService() {
+    }
 
     public AuthorizationService(serviceTypes type, String serviceEndpoint, String serviceDefinitionId, String service) {
         super(type, serviceEndpoint, serviceDefinitionId);
