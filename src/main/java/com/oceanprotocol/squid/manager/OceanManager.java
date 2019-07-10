@@ -178,38 +178,12 @@ public class OceanManager extends BaseManager {
         }
     }
 
-    /**
-     * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
-     *
-     * @param metadata       the metadata
-     * @param providerConfig the service Endpoints
-     * @param threshold      secret store threshold
-     * @return an instance of the DDO created
-     * @throws DDOException DDOException
-     */
+
     public DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, int threshold) throws DDOException {
 
         try {
 
-            // Definition of service endpoints
-            String metadataEndpoint;
-            if (providerConfig.getMetadataEndpoint() == null)
-                metadataEndpoint = getAquariusService().getDdoEndpoint() + "/{did}";
-            else
-                metadataEndpoint = providerConfig.getMetadataEndpoint();
-
-            // Initialization of services supported for this asset
-            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_SERVICE_ID);
-
-
-            AuthorizationService authorizationService = null;
-            //Adding the authorization service if the endpoint is defined
-            if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
-                authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
-            }
-
-            // Initializing DDO
-            DDO ddo = this.buildDDO(metadataService, authorizationService, getMainAccount().address, threshold);
+             DID did = DDO.generateDID();
 
             // Definition of a DEFAULT ServiceAgreement Contract
             AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
@@ -241,33 +215,70 @@ public class OceanManager extends BaseManager {
             // Initializing conditions and adding to Access service
             ServiceAgreementHandler sla = new ServiceAgreementHandler();
             accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
-                    //accessService.templateId,
-                    //getContractAddresses(),
-                    getAccessConditionParams(ddo.getDid().toString(), metadata.base.price));
+                    getAccessConditionParams(did.toString(), metadata.base.price));
+
+            return registerAsset (metadata, providerConfig, did, accessService, threshold);
+
+        } catch (InitializeConditionsException | DIDFormatException e) {
+            throw new DDOException("Error registering Asset.", e);
+        }
+
+    }
+
+
+    /**
+     * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     *
+     * @param metadata       the metadata
+     * @param providerConfig the service Endpoints
+     * @param did            the did
+     * @param service        the service
+     * @param threshold      secret store threshold
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, DID did,  Service service, int threshold) throws DDOException {
+
+        try {
+
+            // Definition of service endpoints
+            String metadataEndpoint;
+            if (providerConfig.getMetadataEndpoint() == null)
+                metadataEndpoint = getAquariusService().getDdoEndpoint() + "/{did}";
+            else
+                metadataEndpoint = providerConfig.getMetadataEndpoint();
+
+            // Initialization of services supported for this asset
+            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_SERVICE_ID);
+
+            AuthorizationService authorizationService = null;
+            //Adding the authorization service if the endpoint is defined
+            if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
+                authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
+            }
+
+            // Initializing DDO
+            DDO ddo = this.buildDDO(did, metadataService, authorizationService, getMainAccount().address, threshold);
 
             // Adding services to DDO
-            ddo.addService(accessService);
+            ddo.addService(service);
             if (authorizationService != null)
                 ddo.addService(authorizationService);
 
             // Add authentication
             ddo.addAuthentication(ddo.id);
 
-
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint, metadata.base.checksum, providerConfig.getProviderAddresses());
 
             // Storing DDO
-
             return getAquariusService().createDDO(ddo);
-        } catch (DDOException e) {
-            throw e;
-        } catch (InitializeConditionsException | DIDRegisterException e) {
+
+        } catch (DDOException | DIDRegisterException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
     }
-
 
     /**
      * Purchases an Asset represented by a DID. It implies to initialize a Service Agreement between publisher and consumer
