@@ -1,6 +1,11 @@
 History
 =======
 
+0.7.0 (July, 2019)
+-------------------------
+* Support for compute services (workflow, algorithms, service)
+
+
 0.6.2 (July, 2019)
 -------------------------
 * Common utils are moved to an external library https://github.com/oceanprotocol/common-utils-java
