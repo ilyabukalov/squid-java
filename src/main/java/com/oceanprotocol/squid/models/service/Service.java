@@ -25,7 +25,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public static final String URL_PARAM = "url";
 
-    public enum serviceTypes {Access, Metadata, Authorization, FitchainCompute, CloudCompute}
+    public enum serviceTypes {Access, Metadata, Authorization, Algorithm, Service, Workflow}
 
     ;
 
