@@ -15,6 +15,9 @@ import com.oceanprotocol.common.helpers.CryptoHelper;
 import com.oceanprotocol.squid.models.CustomDateDeserializer;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Metadata;
+import com.oceanprotocol.squid.models.service.metadata.Algorithm;
+import com.oceanprotocol.squid.models.service.metadata.Service;
+import com.oceanprotocol.squid.models.service.metadata.Workflow;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +39,15 @@ public class AssetMetadata extends Metadata {
 
     @JsonProperty
     public Curation curation;
+
+    @JsonProperty
+    public Service service;
+
+    @JsonProperty
+    public Workflow workflow;
+
+    @JsonProperty
+    public Algorithm algorithm;
 
     @JsonProperty
     public Map<String, Object> additionalInformation = new HashMap<>();
@@ -92,6 +104,9 @@ public class AssetMetadata extends Metadata {
 
         @JsonProperty
         public String encryptedFiles = null;
+
+        @JsonProperty
+        public String encryptedService = null;
 
         @JsonProperty
         public ArrayList<Link> links = new ArrayList<>();
@@ -158,11 +173,23 @@ public class AssetMetadata extends Metadata {
     @JsonPropertyOrder(alphabetic = true)
     public static class File {
 
+        @JsonProperty//(access = JsonProperty.Access.READ_ONLY)
+        public String url;
+
+        @JsonProperty
+        public Integer index;
+
         @JsonProperty
         public String contentType;
 
         @JsonProperty
-        public Integer index;
+        public String checksum;
+
+        @JsonProperty
+        public String checksumType;
+
+        @JsonProperty
+        public Integer contentLength;
 
         @JsonProperty
         public String encoding;
@@ -171,17 +198,16 @@ public class AssetMetadata extends Metadata {
         public String compression;
 
         @JsonProperty
-        public String checksum;
+        public String resourceId;
 
         @JsonProperty
-        public Integer contentLength;
+        public Map<String, String> attributes = new HashMap<>();
 
-        @JsonProperty//(access = JsonProperty.Access.READ_ONLY)
-        public String url;
 
         public File() {
         }
     }
+
 
     public String generateMetadataChecksum(String did) {
 
