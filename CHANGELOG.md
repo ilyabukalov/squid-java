@@ -1,9 +1,9 @@
 History
 =======
 
-0.7.0 (July, 2019)
+0.6.3 (July, 2019)
 -------------------------
-* Support for compute services (workflow, algorithms, service)
+* Strategy pattern to build different types of Services
 
 
 0.6.2 (July, 2019)
