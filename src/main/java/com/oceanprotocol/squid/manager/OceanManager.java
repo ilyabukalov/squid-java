@@ -216,7 +216,7 @@ public class OceanManager extends BaseManager {
 
             return registerAsset(metadata, providerConfig, did, accessService, threshold);
 
-        } catch ( DIDFormatException e) {
+        } catch ( DIDFormatException | ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 

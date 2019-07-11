@@ -3,6 +3,7 @@ package com.oceanprotocol.squid.models.service;
 import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
+import com.oceanprotocol.squid.exceptions.ServiceException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,14 +13,14 @@ public interface ServiceBuilder {
 
     Service buildService( Map<String, Object> serviceConfiguration) throws DDOException;
 
-    static ServiceBuilder getServiceBuilder(Service.serviceTypes serviceType) {
+    static ServiceBuilder getServiceBuilder(Service.serviceTypes serviceType) throws ServiceException {
 
         switch (serviceType) {
             case Access: return accessServiceBuilder();
+            default: throw new ServiceException("Invalid Service definition");
 
         }
 
-        return null;
     }
 
     private static ServiceBuilder accessServiceBuilder() {
