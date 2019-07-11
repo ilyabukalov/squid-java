@@ -13,6 +13,13 @@ cache:
   - "$HOME/.cache"
 
 before_install:
+- |
+    errorTrap() {
+      last_rv=$?
+      cat start_ocean.log
+      exit $last_rv
+    }
+    trap errorTrap ERR
 - git clone https://github.com/oceanprotocol/barge
 - cd barge
 - export KEEPER_VERSION=v0.10.3
@@ -35,6 +42,13 @@ before_install:
     /bin/bash src/test/resources/scripts/updateConfAddresses.sh
 
 install:
+- |
+    errorTrap() {
+      last_rv=$?
+      cat start_ocean.log
+      exit $last_rv
+    }
+    trap errorTrap ERR
 #- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # Unit tests only
 - mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
 - mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
@@ -45,6 +59,13 @@ script:
 #- mvn clean verify -P all-test # TODO: uncomment this when barge run properly in travis
 
 after_success:
+- |
+    errorTrap() {
+      last_rv=$?
+      cat start_ocean.log
+      exit $last_rv
+    }
+    trap errorTrap ERR
 - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/jacoco/jacoco.xml
 - mvn javadoc:javadoc
 
