@@ -185,41 +185,22 @@ public class OceanManager extends BaseManager {
 
              DID did = DDO.generateDID();
 
-            // Definition of a DEFAULT ServiceAgreement Contract
-            AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
-            serviceAgreementTemplate.contractName = "EscrowAccessSecretStoreTemplate";
+             Map<String, Object> configuration = new HashMap<>();
+             configuration.put("providerConfig", providerConfig);
+             configuration.put("accessServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
+             configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
+             configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
+             configuration.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
+             configuration.put("did", did.toString());
+             configuration.put("price", metadata.base.price);
 
-            // AgreementCreated Event
-            Condition.Event executeAgreementEvent = new Condition.Event();
-            executeAgreementEvent.name = "AgreementCreated";
-            executeAgreementEvent.actorType = "consumer";
-            // Handler
-            Condition.Handler handler = new Condition.Handler();
-            handler.moduleName = "escrowAccessSecretStoreTemplate";
-            handler.functionName = "fulfillLockRewardCondition";
-            handler.version = "0.1";
-            executeAgreementEvent.handler = handler;
-
-            serviceAgreementTemplate.events = Arrays.asList(executeAgreementEvent);
-
-            // The templateId of the AccessService is the address of the escrowAccessSecretStoreTemplate contract
-            String accessServiceTemplateId = escrowAccessSecretStoreTemplate.getContractAddress();
-            AccessService accessService = new AccessService(providerConfig.getAccessEndpoint(),
-                    Service.DEFAULT_ACCESS_SERVICE_ID,
-                    serviceAgreementTemplate,
-                    accessServiceTemplateId);
-            accessService.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
-            accessService.name = "dataAssetAccessServiceAgreement";
-            accessService.creator = "";
-
-            // Initializing conditions and adding to Access service
-            ServiceAgreementHandler sla = new ServiceAgreementHandler();
-            accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
-                    getAccessConditionParams(did.toString(), metadata.base.price));
+             Service accessService = ServiceBuilder
+                    .getServiceBuilder(Service.serviceTypes.Access)
+                    .buildService(configuration);
 
             return registerAsset (metadata, providerConfig, did, accessService, threshold);
 
-        } catch (InitializeConditionsException | DIDFormatException e) {
+        } catch ( DIDFormatException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
@@ -658,29 +639,6 @@ public class OceanManager extends BaseManager {
     // TODO: to be implemented
     public List<AssetMetadata> searchOrders() {
         return new ArrayList<>();
-    }
-
-
-    /**
-     * Gets the Access ConditionStatusMap Params of a DDO
-     *
-     * @param did   the did
-     * @param price the price
-     * @return a Map with the params of the Access ConditionStatusMap
-     */
-    private Map<String, Object> getAccessConditionParams(String did, String price) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("parameter.did", did);
-        params.put("parameter.price", price);
-
-        //config.getString("")
-        params.put("contract.EscrowReward.address", escrowReward.getContractAddress());
-        params.put("contract.LockRewardCondition.address", lockRewardCondition.getContractAddress());
-        params.put("contract.AccessSecretStoreCondition.address", accessSecretStoreCondition.getContractAddress());
-
-        params.put("parameter.assetId", did.replace("did:op:", ""));
-
-        return params;
     }
 
 
