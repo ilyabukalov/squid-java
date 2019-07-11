@@ -165,7 +165,7 @@ public class OceanManagerIT {
 
         ProviderConfig providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
 
-        return managerPublisher.registerAsset(metadataBase,
+        return managerPublisher.registerAccessServiceAsset(metadataBase,
                 providerConfig,
                 0);
 
@@ -183,7 +183,7 @@ public class OceanManagerIT {
 
         ProviderConfig providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
 
-        DDO ddo= managerPublisher.registerAsset(metadataBase,
+        DDO ddo= managerPublisher.registerAccessServiceAsset(metadataBase,
                 providerConfig,
                 0);
 
