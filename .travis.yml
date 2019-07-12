@@ -25,7 +25,7 @@ before_install:
 - export KEEPER_VERSION=v0.10.3
 - export BRIZO_VERSION=v0.3.12
 - export AQUARIUS_VERSION=v0.3.7
-- bash -x start_ocean.sh --latest --no-pleuston --local-spree-node 2>&1 > start_ocean.log &
+- bash -x start_ocean.sh --latest --no-pleuston --local-spree-node 2>&1 &
 - cd ..
 - sleep 60
 - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
