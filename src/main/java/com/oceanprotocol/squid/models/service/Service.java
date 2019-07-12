@@ -15,6 +15,16 @@ import com.oceanprotocol.squid.models.FromJsonToModel;
 @JsonPropertyOrder(alphabetic = true)
 public class Service extends AbstractModel implements FromJsonToModel {
 
+    /**
+     * Type of service in the DDO
+     */
+    public enum serviceTypes {Access, Metadata, Authorization, Computing}
+
+    /**
+     * Type of Asset. Represented in the base.type attribute
+     */
+    public enum assetTypes {Access, Metadata, Authorization, Algorithm, Service, Workflow}
+
 
     @JsonIgnore
     public static final String CONSUMER_ADDRESS_PARAM = "consumerAddress";
@@ -25,7 +35,6 @@ public class Service extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public static final String URL_PARAM = "url";
 
-    public enum serviceTypes {Access, Metadata, Authorization, Computing}
 
     @JsonIgnore
     public static final String DEFAULT_METADATA_SERVICE_ID = "0";
@@ -33,6 +42,12 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public static final String DEFAULT_ACCESS_SERVICE_ID = "1";
     @JsonIgnore
     public static final String DEFAULT_AUTHORIZATION_SERVICE_ID = "2";
+    @JsonIgnore
+    public static final String DEFAULT_ALGORITHM_SERVICE_ID = "3";
+    @JsonIgnore
+    public static final String DEFAULT_SERVICE_SERVICE_ID = "4";
+    @JsonIgnore
+    public static final String DEFAULT_WORKFLOW_SERVICE_ID = "5";
 
     @JsonProperty
     public String type;

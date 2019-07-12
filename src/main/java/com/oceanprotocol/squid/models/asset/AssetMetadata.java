@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.CustomDateDeserializer;
 import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.Metadata;
 import com.oceanprotocol.squid.models.service.metadata.Algorithm;
 import com.oceanprotocol.squid.models.service.metadata.Service;
 import com.oceanprotocol.squid.models.service.metadata.Workflow;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
-public class AssetMetadata extends Metadata {
+public class AssetMetadata extends AbstractModel {
 
     public enum assetTypes {dataset, algorithm, container, workflow, other};
 
