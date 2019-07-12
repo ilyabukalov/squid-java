@@ -47,7 +47,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public DDO create(AssetMetadata metadata, ProviderConfig providerConfig, int threshold) throws DDOException {
-        return oceanManager.registerAsset(metadata, providerConfig, threshold);
+        return oceanManager.registerAccessServiceAsset(metadata, providerConfig, threshold);
     }
 
     @Override

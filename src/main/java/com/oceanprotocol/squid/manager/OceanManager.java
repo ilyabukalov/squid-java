@@ -178,8 +178,24 @@ public class OceanManager extends BaseManager {
         }
     }
 
+
+    private  Map<String, Object> buildBasicServiceConfiguration(ProviderConfig providerConfig, String did, String price) {
+
+        Map<String, Object> configuration = new HashMap<>();
+        configuration.put("providerConfig", providerConfig);
+        configuration.put("accessServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
+        configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
+        configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
+        configuration.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
+        configuration.put("did", did);
+        configuration.put("price", price);
+
+        return configuration;
+
+    }
+
     /**
-     * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     * Creates a new DDO with an AccessService
      *
      * @param metadata       the metadata
      * @param providerConfig the service Endpoints
@@ -187,7 +203,37 @@ public class OceanManager extends BaseManager {
      * @return an instance of the DDO created
      * @throws DDOException DDOException
      */
-    public DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, int threshold) throws DDOException {
+    public DDO registerAccessServiceAsset(AssetMetadata metadata, ProviderConfig providerConfig, int threshold) throws DDOException {
+
+        try {
+
+             DID did = DDO.generateDID();
+
+             Map<String, Object> configuration = buildBasicServiceConfiguration(providerConfig, did.toString(), metadata.base.price);
+             Service accessService = ServiceBuilder
+                    .getServiceBuilder(Service.serviceTypes.Access)
+                    .buildService(configuration);
+
+            return registerAsset(metadata, providerConfig, did, accessService, threshold);
+
+        } catch ( DIDFormatException | ServiceException e) {
+            throw new DDOException("Error registering Asset.", e);
+        }
+
+    }
+
+    /**
+     * Creates a new DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     *
+     * @param metadata       the metadata
+     * @param providerConfig the service Endpoints
+     * @param did            the did
+     * @param service        the service
+     * @param threshold      secret store threshold
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    private DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, DID did, Service service, int threshold) throws DDOException {
 
         try {
 
@@ -201,7 +247,6 @@ public class OceanManager extends BaseManager {
             // Initialization of services supported for this asset
             MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_SERVICE_ID);
 
-
             AuthorizationService authorizationService = null;
             //Adding the authorization service if the endpoint is defined
             if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
@@ -209,65 +254,27 @@ public class OceanManager extends BaseManager {
             }
 
             // Initializing DDO
-            DDO ddo = this.buildDDO(metadataService, authorizationService, getMainAccount().address, threshold);
-
-            // Definition of a DEFAULT ServiceAgreement Contract
-            AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
-            serviceAgreementTemplate.contractName = "EscrowAccessSecretStoreTemplate";
-
-            // AgreementCreated Event
-            Condition.Event executeAgreementEvent = new Condition.Event();
-            executeAgreementEvent.name = "AgreementCreated";
-            executeAgreementEvent.actorType = "consumer";
-            // Handler
-            Condition.Handler handler = new Condition.Handler();
-            handler.moduleName = "escrowAccessSecretStoreTemplate";
-            handler.functionName = "fulfillLockRewardCondition";
-            handler.version = "0.1";
-            executeAgreementEvent.handler = handler;
-
-            serviceAgreementTemplate.events = Arrays.asList(executeAgreementEvent);
-
-            // The templateId of the AccessService is the address of the escrowAccessSecretStoreTemplate contract
-            String accessServiceTemplateId = escrowAccessSecretStoreTemplate.getContractAddress();
-            AccessService accessService = new AccessService(providerConfig.getAccessEndpoint(),
-                    Service.DEFAULT_ACCESS_SERVICE_ID,
-                    serviceAgreementTemplate,
-                    accessServiceTemplateId);
-            accessService.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
-            accessService.name = "dataAssetAccessServiceAgreement";
-            accessService.creator = "";
-
-            // Initializing conditions and adding to Access service
-            ServiceAgreementHandler sla = new ServiceAgreementHandler();
-            accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
-                    //accessService.templateId,
-                    //getContractAddresses(),
-                    getAccessConditionParams(ddo.getDid().toString(), metadata.base.price));
+            DDO ddo = this.buildDDO(did, metadataService, authorizationService, getMainAccount().address, threshold);
 
             // Adding services to DDO
-            ddo.addService(accessService);
+            ddo.addService(service);
             if (authorizationService != null)
                 ddo.addService(authorizationService);
 
             // Add authentication
             ddo.addAuthentication(ddo.id);
 
-
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint, metadata.base.checksum, providerConfig.getProviderAddresses());
 
             // Storing DDO
-
             return getAquariusService().createDDO(ddo);
-        } catch (DDOException e) {
-            throw e;
-        } catch (InitializeConditionsException | DIDRegisterException e) {
+
+        } catch (DDOException | DIDRegisterException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
     }
-
 
     /**
      * Purchases an Asset represented by a DID. It implies to initialize a Service Agreement between publisher and consumer
@@ -647,29 +654,6 @@ public class OceanManager extends BaseManager {
     // TODO: to be implemented
     public List<AssetMetadata> searchOrders() {
         return new ArrayList<>();
-    }
-
-
-    /**
-     * Gets the Access ConditionStatusMap Params of a DDO
-     *
-     * @param did   the did
-     * @param price the price
-     * @return a Map with the params of the Access ConditionStatusMap
-     */
-    private Map<String, Object> getAccessConditionParams(String did, String price) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("parameter.did", did);
-        params.put("parameter.price", price);
-
-        //config.getString("")
-        params.put("contract.EscrowReward.address", escrowReward.getContractAddress());
-        params.put("contract.LockRewardCondition.address", lockRewardCondition.getContractAddress());
-        params.put("contract.AccessSecretStoreCondition.address", accessSecretStoreCondition.getContractAddress());
-
-        params.put("parameter.assetId", did.replace("did:op:", ""));
-
-        return params;
     }
 
 
