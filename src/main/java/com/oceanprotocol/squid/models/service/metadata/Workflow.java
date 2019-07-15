@@ -36,7 +36,7 @@ public class Workflow {
         public Requirements requirements;
 
         @JsonProperty
-        public List<Input> inputs;
+        public List<Input> input;
 
         @JsonProperty
         public Transformation transformation;

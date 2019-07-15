@@ -35,10 +35,14 @@ public class DDOTest {
     private static final String DDO_JSON_AUTH_SAMPLE = "src/test/resources/examples/ddo-example-authorization.json";
     private static String DDO_JSON_AUTH_CONTENT;
 
+    private static final String DDO_JSON_WORKFLOW_SAMPLE = "src/test/resources/examples/ddo-example-workflow.json";
+    private static String DDO_JSON_WORKFLOW_CONTENT;
+
     @BeforeClass
     public static void setUp() throws Exception {
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
         DDO_JSON_AUTH_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_AUTH_SAMPLE)));
+        DDO_JSON_WORKFLOW_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_WORKFLOW_SAMPLE)));
     }
 
     @Test
@@ -74,6 +78,26 @@ public class DDOTest {
         assertTrue(DATE_FORMAT.format(newDDO.created).startsWith("20"));
     }
 
+
+    @Test
+    public void testWorkflow() throws Exception {
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_WORKFLOW_CONTENT);
+
+        assertEquals("workflow", ddo.metadata.base.type);
+        assertEquals("tensorflow/tensorflow", ddo.metadata.workflow.stages.get(0).requirements.container.image);
+        assertEquals("latest", ddo.metadata.workflow.stages.get(0).requirements.container.tag);
+        assertEquals("sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc",
+                ddo.metadata.workflow.stages.get(0).requirements.container.checksum);
+
+        assertEquals(2, ddo.metadata.workflow.stages.get(0).input.size());
+        assertEquals(0, ddo.metadata.workflow.stages.get(0).input.get(0).index.intValue());
+        assertEquals("did:op:12345", ddo.metadata.workflow.stages.get(0).input.get(0).id.toString());
+        assertEquals("did:op:abcde", ddo.metadata.workflow.stages.get(0).transformation.id.toString());
+        assertEquals("https://localhost:5000/api/v1/aquarius/assets/ddo/",
+                ddo.metadata.workflow.stages.get(0).output.metadataUrl);
+        assertEquals("my filtered asset",
+                ddo.metadata.workflow.stages.get(0).output.metadata.name);
+    }
 
     @Test
     public void generateRandomDID() throws Exception {
