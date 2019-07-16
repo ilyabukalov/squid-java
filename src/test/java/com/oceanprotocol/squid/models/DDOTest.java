@@ -38,11 +38,15 @@ public class DDOTest {
     private static final String DDO_JSON_WORKFLOW_SAMPLE = "src/test/resources/examples/ddo-example-workflow.json";
     private static String DDO_JSON_WORKFLOW_CONTENT;
 
+    private static final String DDO_JSON_ALGORITHM_SAMPLE = "src/test/resources/examples/ddo-example-algorithm.json";
+    private static String DDO_JSON_ALGORITHM_CONTENT;
+
     @BeforeClass
     public static void setUp() throws Exception {
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
         DDO_JSON_AUTH_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_AUTH_SAMPLE)));
         DDO_JSON_WORKFLOW_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_WORKFLOW_SAMPLE)));
+        DDO_JSON_ALGORITHM_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_ALGORITHM_SAMPLE)));
     }
 
     @Test
@@ -97,6 +101,22 @@ public class DDOTest {
                 ddo.metadata.workflow.stages.get(0).output.metadataUrl);
         assertEquals("my filtered asset",
                 ddo.metadata.workflow.stages.get(0).output.metadata.name);
+    }
+
+    @Test
+    public void testAlgorithm() throws Exception {
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_ALGORITHM_CONTENT);
+
+        assertEquals("algorithm", ddo.metadata.base.type);
+        assertEquals("scala", ddo.metadata.algorithm.language);
+        assertEquals("jar", ddo.metadata.algorithm.format);
+        assertEquals("0.1", ddo.metadata.algorithm.version);
+
+        assertEquals(2, ddo.metadata.algorithm.requirements.size());
+        assertEquals("scala", ddo.metadata.algorithm.requirements.get(0).requirement);
+        assertEquals("1.8", ddo.metadata.algorithm.requirements.get(1).version);
+
+
     }
 
     @Test
