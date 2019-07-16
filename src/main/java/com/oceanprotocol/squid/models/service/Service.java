@@ -23,7 +23,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     /**
      * Type of Asset. Represented in the base.type attribute
      */
-    public enum assetTypes {Access, Metadata, Authorization, Algorithm, Service, Workflow}
+    public enum assetTypes {Dataset, Algorithm, Workflow, Service}
 
 
     @JsonIgnore
