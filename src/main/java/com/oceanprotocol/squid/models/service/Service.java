@@ -6,10 +6,15 @@
 package com.oceanprotocol.squid.models.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.FromJsonToModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 //@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
@@ -23,7 +28,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     /**
      * Type of Asset. Represented in the base.type attribute
      */
-    public enum assetTypes {Access, Metadata, Authorization, Algorithm, Service, Workflow}
+    public enum assetTypes {Dataset, Algorithm, Workflow, Service}
 
 
     @JsonIgnore
@@ -60,6 +65,49 @@ public class Service extends AbstractModel implements FromJsonToModel {
 
     @JsonProperty
     public String serviceEndpoint;
+
+    //@JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic = true)
+    public static class ServiceAgreementTemplate {
+
+        @JsonProperty
+        public String contractName;
+
+        @JsonProperty
+        public List<Condition.Event> events = new ArrayList<>();
+
+        @JsonProperty
+        public List<String> fulfillmentOrder = Arrays.asList(
+                "lockReward.fulfill",
+                "accessSecretStore.fulfill",
+                "escrowReward.fulfill");
+
+        @JsonProperty
+        public ConditionDependency conditionDependency = new ConditionDependency();
+
+        @JsonProperty
+        public List<Condition> conditions = new ArrayList<>();
+
+        public ServiceAgreementTemplate() {
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic = true)
+    public static class ConditionDependency {
+
+        @JsonProperty
+        public List<String> lockReward = Arrays.asList();
+
+        @JsonProperty
+        public List<String> accessSecretStore = Arrays.asList();
+
+        @JsonProperty
+        public List<String> escrowReward = Arrays.asList("lockReward", "accessSecretStore");
+
+        public ConditionDependency() {
+        }
+    }
 
     public Service() {
     }
