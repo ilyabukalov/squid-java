@@ -181,7 +181,7 @@
       "metadata": {
         "base": {
           "name": "Ocean protocol white paper",
-          "type": "dataset",
+          "type": "service",
           "description": "Introduce the main concepts and vision behind ocean protocol",
           "dateCreated": "2012-10-10T17:00:000Z",
           "datePublished": "2012-10-10T17:00:000Z",
@@ -194,20 +194,6 @@
             "white-papers"
           ],
           "price": "100000000000000000000000000000000",
-          "services": [
-            {
-              "index": 0,
-              "url": "https://my.service.inet:8080/api/v1/weather",
-            "method": "POST",
-              "auth": {
-                "user": "aitor",
-                "password": "1234",
-                "token": "89c06eb5a88f4bbbf4ac966d737593b36e61e885"
-              },
-              "description": "https://my.service.inet:8080/spec",
-              "checksum": "859486596784567856758aaaa"
-            }
-          ],
           "files": [
             {
               "checksum": "efb2c764274b745f5fc37f97c6b0e761",
@@ -240,6 +226,24 @@
           "tags": ["weather", "uk", "2011", "temperature", "humidity"],
           "checksum": "0x38803b9e6f04fce3fba4b124524672592264d31847182c689095a081c9e85264",
           "encryptedFiles": "<tests.resources.mocks.secret_store_mock.SecretStoreMock object at 0x7f8146a94710>.0c184915b07b44c888d468be85a9b28253e80070e5294b1aaed81c2f0264e430!![{\"url\": \"https://testocnfiles.blob.core.windows.net/testfiles/testzkp.pdf\", \"checksum\": \"efb2c764274b745f5fc37f97c6b0e761\", \"checksumType\": \"MD5\", \"contentLength\": \"4535431\", \"resourceId\": \"access-log2018-02-13-15-17-29-18386C502CAEA932\"}, {\"url\": \"s3://ocean-test-osmosis-data-plugin-dataseeding-1537375953/data.txt\", \"checksum\": \"efb2c764274b745f5fc37f97c6b0e761\", \"contentLength\": \"4535431\", \"resourceId\": \"access-log2018-02-13-15-17-29-18386C502CAEA932\"}, {\"url\": \"http://ipv4.download.thinkbroadband.com/5MB.zip\"}]!!0"
+        },
+        "service": {
+          "spec": "https://my.service.inet:8080/spec",
+          "specChecksum": "859486596784567856758aaaa",
+          "definition": {
+            "auth": {
+              "type": "basic",
+              "user": "aitor",
+              "password": "1234",
+              "token": "89c06eb5a88f4bbbf4ac966d737593b36e61e885"
+            },
+            "endpoints": [{
+              "index": 0,
+              "url": "https://my.service.inet:8080/api/v1/weather",
+              "method": "POST",
+              "contentTypes": ["application/json"]
+            }]
+          }
         },
         "curation": {
           "rating": 0.93,
