@@ -41,12 +41,16 @@ public class DDOTest {
     private static final String DDO_JSON_ALGORITHM_SAMPLE = "src/test/resources/examples/ddo-example-algorithm.json";
     private static String DDO_JSON_ALGORITHM_CONTENT;
 
+    private static final String DDO_JSON_SERVICE_SAMPLE = "src/test/resources/examples/ddo-example-service.json";
+    private static String DDO_JSON_SERVICE_CONTENT;
+
     @BeforeClass
     public static void setUp() throws Exception {
         DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
         DDO_JSON_AUTH_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_AUTH_SAMPLE)));
         DDO_JSON_WORKFLOW_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_WORKFLOW_SAMPLE)));
         DDO_JSON_ALGORITHM_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_ALGORITHM_SAMPLE)));
+        DDO_JSON_SERVICE_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SERVICE_SAMPLE)));
     }
 
     @Test
@@ -116,8 +120,24 @@ public class DDOTest {
         assertEquals("scala", ddo.metadata.algorithm.requirements.get(0).requirement);
         assertEquals("1.8", ddo.metadata.algorithm.requirements.get(1).version);
 
+    }
+
+    @Test
+    public void testService() throws Exception {
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_SERVICE_CONTENT);
+
+        assertEquals("service", ddo.metadata.base.type);
+        assertEquals("https://my.service.inet:8080/spec", ddo.metadata.service.spec);
+        assertEquals("859486596784567856758aaaa", ddo.metadata.service.specChecksum);
+        assertEquals("basic", ddo.metadata.service.definition.auth.type);
+
+        assertEquals(1, ddo.metadata.service.definition.endpoints.size());
+        assertEquals(0, ddo.metadata.service.definition.endpoints.get(0).index.intValue());
+        assertEquals("POST", ddo.metadata.service.definition.endpoints.get(0).method);
+        assertEquals(1, ddo.metadata.service.definition.endpoints.get(0).contentTypes.size());
 
     }
+
 
     @Test
     public void generateRandomDID() throws Exception {
