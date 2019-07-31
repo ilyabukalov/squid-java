@@ -1,6 +1,7 @@
 package com.oceanprotocol.squid.models.service;
 
-import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
@@ -68,7 +69,7 @@ public interface ServiceBuilder {
         accessService.creator = "";
 
         // Initializing conditions and adding to Access service
-        ServiceAgreementHandler sla = new ServiceAgreementHandler();
+        ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
         try {
             accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
                     getAccessConditionParams(did, price, escrowRewardAddress, lockRewardConditionAddress, accessSecretStoreConditionAddress));

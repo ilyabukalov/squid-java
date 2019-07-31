@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.oceanprotocol.squid.core.sla;
+package com.oceanprotocol.squid.core.sla.handlers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
@@ -38,17 +38,15 @@ import java.util.UUID;
 /**
  * Handles functionality related with the execution of a Service Agreement
  */
-public class ServiceAgreementHandler {
+public abstract class ServiceAgreementHandler {
 
     private static final Logger log = LogManager.getLogger(ServiceAgreementHandler.class);
 
-    private static final String ACCESS_CONDITIONS_FILE_TEMPLATE = "sla-access-conditions-template.json";
     private String conditionsTemplate = null;
 
-    public static final String FUNCTION_LOCKREWARD_DEF = "fulfill(bytes32,address,uint256)";
-    public static final String FUNCTION_ACCESSSECRETSTORE_DEF = "grantAccess(bytes32,bytes32,address)";
-    public static final String FUNCTION_ESCROWREWARD_DEF = "escrowReward(bytes32,uint256,address,address,bytes32,bytes32)";
 
+    public static final String FUNCTION_LOCKREWARD_DEF = "fulfill(bytes32,address,uint256)";
+    public static final String FUNCTION_ESCROWREWARD_DEF = "escrowReward(bytes32,uint256,address,address,bytes32,bytes32)";
 
     /**
      * Generates a new and random Service Agreement Id
@@ -145,6 +143,12 @@ public class ServiceAgreementHandler {
 
 
     /**
+     * gets the name of the file that contains a template for the conditions
+     * @return the name of the template file
+     */
+    public abstract String getConditionFileTemplate();
+
+    /**
      * Gets and Initializes all the conditions associated with a template
      *
      * @param params params to fill the conditions
@@ -155,7 +159,7 @@ public class ServiceAgreementHandler {
 
         try {
             conditionsTemplate = IOUtils.toString(
-                    this.getClass().getClassLoader().getResourceAsStream("sla/sla-access-conditions-template.json"),
+                    this.getClass().getClassLoader().getResourceAsStream("sla/" + getConditionFileTemplate()),
                     StandardCharsets.UTF_8);
 
         } catch (IOException ex) {
@@ -164,7 +168,7 @@ public class ServiceAgreementHandler {
         try {
 
             if (conditionsTemplate == null)
-                conditionsTemplate = new String(Files.readAllBytes(Paths.get("src/main/resources/sla/" + ACCESS_CONDITIONS_FILE_TEMPLATE)));
+                conditionsTemplate = new String(Files.readAllBytes(Paths.get("src/main/resources/sla/" + getConditionFileTemplate())));
 
             params.putAll(getFunctionsFingerprints());
 
@@ -186,32 +190,14 @@ public class ServiceAgreementHandler {
         }
     }
 
+
     /**
      * Compose the different function fingerprint hashes
      *
      * @return Map of (varible name, function fingerprint)
      * @throws UnsupportedEncodingException UnsupportedEncodingException
      */
-    public static Map<String, Object> getFunctionsFingerprints() throws UnsupportedEncodingException {
-
-
-        //String checksumLockConditionsAddress = Keys.toChecksumAddress(addresses.getLockRewardConditionAddress());
-        //String checksumAccessSecretStoreConditionsAddress = Keys.toChecksumAddress(addresses.getAccessSecretStoreConditionAddress());
-
-        Map<String, Object> fingerprints = new HashMap<>();
-
-        fingerprints.put("function.lockReward.fingerprint", EthereumHelper.getFunctionSelector(FUNCTION_LOCKREWARD_DEF));
-        log.debug("lockReward fingerprint: " + fingerprints.get("function.lockReward.fingerprint"));
-
-        fingerprints.put("function.accessSecretStore.fingerprint", EthereumHelper.getFunctionSelector(FUNCTION_ACCESSSECRETSTORE_DEF));
-        log.debug("accessSecretStore fingerprint: " + fingerprints.get("function.accessSecretStore.fingerprint"));
-
-        fingerprints.put("function.escrowReward.fingerprint", EthereumHelper.getFunctionSelector(FUNCTION_ESCROWREWARD_DEF));
-        log.debug("escrowReward fingerprint: " + fingerprints.get("function.escrowReward.fingerprint"));
-
-
-        return fingerprints;
-    }
+    public abstract  Map<String, Object> getFunctionsFingerprints() throws UnsupportedEncodingException;
 
 
 

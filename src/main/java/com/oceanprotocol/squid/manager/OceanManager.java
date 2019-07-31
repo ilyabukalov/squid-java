@@ -6,7 +6,7 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
-import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.exceptions.*;

@@ -13,7 +13,7 @@ import com.oceanprotocol.squid.models.service.AgreementStatus;
 import org.web3j.crypto.Keys;
 import org.web3j.tuples.generated.Tuple2;
 
-import static com.oceanprotocol.squid.core.sla.ServiceAgreementHandler.generateSlaId;
+import static com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler.generateSlaId;
 
 public class AgreementsImpl implements AgreementsAPI {
 

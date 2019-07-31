@@ -2,7 +2,7 @@ package com.oceanprotocol.squid.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.api.config.OceanConfig;
-import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
