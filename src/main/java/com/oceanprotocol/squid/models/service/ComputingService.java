@@ -112,4 +112,9 @@ public class ComputingService extends Service {
     @JsonProperty
     public Provider provider;
 
+    @JsonProperty
+    public ServiceAgreementTemplate serviceAgreementTemplate;
+
+    public ComputingService() {}
+
 }
