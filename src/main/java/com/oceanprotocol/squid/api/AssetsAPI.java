@@ -11,6 +11,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.service.ComputingService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import io.reactivex.Flowable;
 
@@ -43,6 +44,32 @@ public interface AssetsAPI {
      * @throws DDOException DDOException
      */
     public DDO create(AssetMetadata metadata, ProviderConfig providerConfig) throws DDOException;
+
+
+
+    /**
+     * Creates a new ComputingService DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     *
+     * @param metadata       the metadata of the DDO
+     * @param providerConfig the endpoints of the DDO's services
+     * @param computingProvider the computing provider configuration
+     * @param threshold      the secret store threshold
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO createComputingService(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider, int threshold) throws DDOException;
+
+    /**
+     * Creates a new ComputingService DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     *
+     * @param metadata       the metadata of the DDO
+     * @param providerConfig the endpoints of the DDO's services
+     * @param computingProvider the computing provider configuration
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO createComputingService(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider) throws DDOException;
+
 
     /**
      * Gets a DDO from a DID
