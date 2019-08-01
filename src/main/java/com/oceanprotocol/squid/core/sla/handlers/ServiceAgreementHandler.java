@@ -45,9 +45,6 @@ public abstract class ServiceAgreementHandler {
     private String conditionsTemplate = null;
 
 
-    public static final String FUNCTION_LOCKREWARD_DEF = "fulfill(bytes32,address,uint256)";
-    public static final String FUNCTION_ESCROWREWARD_DEF = "escrowReward(bytes32,uint256,address,address,bytes32,bytes32)";
-
     /**
      * Generates a new and random Service Agreement Id
      *
@@ -170,8 +167,6 @@ public abstract class ServiceAgreementHandler {
             if (conditionsTemplate == null)
                 conditionsTemplate = new String(Files.readAllBytes(Paths.get("src/main/resources/sla/" + getConditionFileTemplate())));
 
-            params.putAll(getFunctionsFingerprints());
-
             params.forEach((_name, _func) -> {
                 if (_func instanceof byte[])
                     conditionsTemplate = conditionsTemplate.replaceAll("\\{" + _name + "\\}", CryptoHelper.getHex((byte[]) _func));
@@ -189,16 +184,6 @@ public abstract class ServiceAgreementHandler {
             throw new InitializeConditionsException(msg, e);
         }
     }
-
-
-    /**
-     * Compose the different function fingerprint hashes
-     *
-     * @return Map of (varible name, function fingerprint)
-     * @throws UnsupportedEncodingException UnsupportedEncodingException
-     */
-    public abstract  Map<String, Object> getFunctionsFingerprints() throws UnsupportedEncodingException;
-
 
 
 }
