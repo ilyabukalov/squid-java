@@ -139,6 +139,7 @@ public class AssetsApiIT {
     public void createComputingService() throws Exception {
 
         // TODO add the proper metadata. like the ddo-example-algorithm.json??
+        // TODO check the temmplate
         DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBase, providerConfig, computingProvider);
 
         DID did = new DID(ddo.id);

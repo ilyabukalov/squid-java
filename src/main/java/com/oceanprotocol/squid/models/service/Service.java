@@ -48,11 +48,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public static final String DEFAULT_AUTHORIZATION_SERVICE_ID = "2";
     @JsonIgnore
-    public static final String DEFAULT_ALGORITHM_SERVICE_ID = "3";
-    @JsonIgnore
-    public static final String DEFAULT_SERVICE_SERVICE_ID = "4";
-    @JsonIgnore
-    public static final String DEFAULT_WORKFLOW_SERVICE_ID = "5";
+    public static final String DEFAULT_COMPUTING_SERVICE_ID = "3";
 
     @JsonProperty
     public String type;

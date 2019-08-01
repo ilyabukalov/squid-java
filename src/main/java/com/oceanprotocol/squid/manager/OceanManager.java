@@ -199,7 +199,7 @@ public class OceanManager extends BaseManager {
 
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("providerConfig", providerConfig);
-        configuration.put("ComputingProvider", computingProvider);
+        configuration.put("computingProvider", computingProvider);
 
         // TODO Define template to use
         configuration.put("computingServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
@@ -249,18 +249,18 @@ public class OceanManager extends BaseManager {
      *
      * @param metadata       the metadata
      * @param providerConfig the service Endpoints
-     * @param computeProvider
+     * @param computingProvider
      * @param threshold      secret store threshold
      * @return an instance of the DDO created
      * @throws DDOException DDOException
      */
-    public DDO registerComputingServiceAsset(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computeProvider, int threshold) throws DDOException {
+    public DDO registerComputingServiceAsset(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider, int threshold) throws DDOException {
 
         try {
 
             DID did = DDO.generateDID();
 
-            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computeProvider, did.toString(), metadata.base.price);
+            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, did.toString(), metadata.base.price);
             Service accessService = ServiceBuilder
                     .getServiceBuilder(Service.serviceTypes.Computing)
                     .buildService(configuration);

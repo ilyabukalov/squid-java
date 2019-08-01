@@ -19,6 +19,7 @@ public interface ServiceBuilder {
 
         switch (serviceType) {
             case Access: return accessServiceBuilder();
+            case Computing: return computingServiceBuilder();
             default: throw new ServiceException("Invalid Service definition");
 
         }
@@ -63,7 +64,7 @@ public interface ServiceBuilder {
 
         // The templateId of the AccessService is the address of the escrowAccessSecretStoreTemplate contract
         ComputingService computingService = new ComputingService(providerConfig.getAccessEndpoint(),
-                Service.DEFAULT_ACCESS_SERVICE_ID,
+                Service.DEFAULT_COMPUTING_SERVICE_ID,
                 serviceAgreementTemplate,
                 computingServiceTemplateId);
 

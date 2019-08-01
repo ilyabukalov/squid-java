@@ -120,13 +120,13 @@ public class ComputingService extends Service {
     }
 
     public ComputingService(String serviceEndpoint, String serviceDefinitionId, String templateId) {
-        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+        super(serviceTypes.Computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
 
     }
 
     public ComputingService(String serviceEndpoint, String serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
-        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+        super(serviceTypes.Computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
         this.serviceAgreementTemplate = serviceAgreementTemplate;
     }
