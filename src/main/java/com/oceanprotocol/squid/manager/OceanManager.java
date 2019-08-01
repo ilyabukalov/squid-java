@@ -179,7 +179,7 @@ public class OceanManager extends BaseManager {
     }
 
 
-    private  Map<String, Object> buildBasicServiceConfiguration(ProviderConfig providerConfig, String did, String price) {
+    private  Map<String, Object> buildBasicAccessServiceConfiguration(ProviderConfig providerConfig, String did, String price) {
 
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("providerConfig", providerConfig);
@@ -187,6 +187,27 @@ public class OceanManager extends BaseManager {
         configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
         configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
         configuration.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
+        configuration.put("did", did);
+        configuration.put("price", price);
+
+        return configuration;
+
+    }
+
+
+    private  Map<String, Object> buildBasicComputingServiceConfiguration(ProviderConfig providerConfig, ComputingService.Provider computingProvider, String did, String price) {
+
+        Map<String, Object> configuration = new HashMap<>();
+        configuration.put("providerConfig", providerConfig);
+        configuration.put("ComputingProvider", computingProvider);
+
+        // TODO Define template to use
+        configuration.put("computingServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
+        configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
+        configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
+
+        // TODO Define contract to use
+        configuration.put("execComputeConditionAddress", accessSecretStoreCondition.getContractAddress());
         configuration.put("did", did);
         configuration.put("price", price);
 
@@ -209,9 +230,39 @@ public class OceanManager extends BaseManager {
 
              DID did = DDO.generateDID();
 
-             Map<String, Object> configuration = buildBasicServiceConfiguration(providerConfig, did.toString(), metadata.base.price);
+             Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, did.toString(), metadata.base.price);
              Service accessService = ServiceBuilder
                     .getServiceBuilder(Service.serviceTypes.Access)
+                    .buildService(configuration);
+
+            return registerAsset(metadata, providerConfig, did, accessService, threshold);
+
+        } catch ( DIDFormatException | ServiceException e) {
+            throw new DDOException("Error registering Asset.", e);
+        }
+
+    }
+
+
+    /**
+     * Creates a new DDO with a ComputeService
+     *
+     * @param metadata       the metadata
+     * @param providerConfig the service Endpoints
+     * @param computeProvider
+     * @param threshold      secret store threshold
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO registerComputingServiceAsset(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computeProvider, int threshold) throws DDOException {
+
+        try {
+
+            DID did = DDO.generateDID();
+
+            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computeProvider, did.toString(), metadata.base.price);
+            Service accessService = ServiceBuilder
+                    .getServiceBuilder(Service.serviceTypes.Computing)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, did, accessService, threshold);

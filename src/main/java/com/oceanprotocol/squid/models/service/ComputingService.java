@@ -115,6 +115,20 @@ public class ComputingService extends Service {
     @JsonProperty
     public ServiceAgreementTemplate serviceAgreementTemplate;
 
-    public ComputingService() {}
+    public ComputingService() {
+        this.type = serviceTypes.Computing.toString();
+    }
+
+    public ComputingService(String serviceEndpoint, String serviceDefinitionId, String templateId) {
+        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+        this.templateId = templateId;
+
+    }
+
+    public ComputingService(String serviceEndpoint, String serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
+        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+        this.templateId = templateId;
+        this.serviceAgreementTemplate = serviceAgreementTemplate;
+    }
 
 }
