@@ -17,6 +17,7 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.service.ComputingService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
@@ -46,6 +47,9 @@ public class AssetsApiIT {
     private static String METADATA_JSON_SAMPLE = "src/test/resources/examples/metadata.json";
     private static String METADATA_JSON_CONTENT;
     private static AssetMetadata metadataBase;
+    private static String COMPUTING_PROVIDER_JSON_SAMPLE = "src/test/resources/examples/computing-provider-example.json";
+    private static String COMPUTING_PROVIDER_JSON_CONTENT;
+    private static ComputingService.Provider computingProvider;
     private static ProviderConfig providerConfig;
     private static OceanAPI oceanAPI;
     private static OceanAPI oceanAPIConsumer;
@@ -58,9 +62,14 @@ public class AssetsApiIT {
     public static void setUp() throws Exception {
 
         config = ConfigFactory.load();
+
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
+
+        COMPUTING_PROVIDER_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(COMPUTING_PROVIDER_JSON_SAMPLE)));
+        computingProvider = DDO.fromJSON(new TypeReference<ComputingService.Provider>() {
+        },  COMPUTING_PROVIDER_JSON_CONTENT);
 
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
         String consumeUrl = config.getString("brizo.url") + "/api/v1/brizo/services/consume";
@@ -118,6 +127,19 @@ public class AssetsApiIT {
     public void create() throws Exception {
 
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
+
+        DID did = new DID(ddo.id);
+        DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
+        assertEquals(ddo.id, resolvedDDO.id);
+        assertTrue(resolvedDDO.services.size() == 3);
+
+    }
+
+    @Test
+    public void createComputingService() throws Exception {
+
+        // TODO add the proper metadata. like the ddo-example-algorithm.json??
+        DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBase, providerConfig, computingProvider);
 
         DID did = new DID(ddo.id);
         DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);

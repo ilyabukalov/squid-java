@@ -102,7 +102,7 @@ public class ComputingService extends Service {
         public String description;
 
         @JsonProperty
-        public Enviroment enviroment;
+        public Enviroment environment;
 
 
         public Provider(){}
