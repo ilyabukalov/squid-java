@@ -11,10 +11,7 @@ import com.google.api.client.util.Base64;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.AccessService;
-import com.oceanprotocol.squid.models.service.AuthorizationService;
-import com.oceanprotocol.squid.models.service.MetadataService;
-import com.oceanprotocol.squid.models.service.Service;
+import com.oceanprotocol.squid.models.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -183,7 +180,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     public DDO addService(Service service) {
-        service.serviceDefinitionId = String.valueOf(services.size());
+        service.serviceDefinitionId = (service.serviceDefinitionId!=null&&!service.serviceDefinitionId.isEmpty())?service.serviceDefinitionId:String.valueOf(services.size());
         services.add(service);
         return this;
     }
@@ -206,6 +203,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
                     } else if (service.get("type").equals(Service.serviceTypes.Access.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AccessService.class));
+                    } else if (service.get("type").equals(Service.serviceTypes.Computing.toString())) {
+                        this.services.add(getMapperInstance().convertValue(service, ComputingService.class));
                     } else if (service.get("type").equals(Service.serviceTypes.Authorization.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AuthorizationService.class));
                     } else {

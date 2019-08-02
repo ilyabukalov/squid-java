@@ -1,0 +1,30 @@
+{
+
+  "base": {
+    "author": "John Doe",
+    "copyrightHolder": "John Doe",
+    "dateCreated": "2019-02-08T08:13:49Z",
+    "description": "Workflow to aggregate weather information",
+    "inLanguage": "en",
+    "license": "CC-BY",
+    "name": "My workflow",
+    "price": "0",
+    "tags": ["weather", "uk", "2011", "workflow", "aggregation"],
+    "type": "algorithm"
+  },
+  "algorithm": {
+    "language": "scala",
+    "format": "jar",
+    "version": "0.1",
+    "entrypoint": "ocean-entrypoint.sh",
+    "requirements": [{
+      "requirement": "scala",
+      "version": "2.12.8"
+    },{
+      "requirement": "java",
+      "version": "1.8"
+    }
+    ]
+  },
+  "curation": {}
+}

@@ -47,6 +47,11 @@ public class AssetsApiIT {
     private static String METADATA_JSON_SAMPLE = "src/test/resources/examples/metadata.json";
     private static String METADATA_JSON_CONTENT;
     private static AssetMetadata metadataBase;
+
+    private static String METADATA_ALG_JSON_SAMPLE = "src/test/resources/examples/metadata-algorithm.json";
+    private static String METADATA_ALG_JSON_CONTENT;
+    private static AssetMetadata metadataBaseAlgorithm;
+
     private static String COMPUTING_PROVIDER_JSON_SAMPLE = "src/test/resources/examples/computing-provider-example.json";
     private static String COMPUTING_PROVIDER_JSON_CONTENT;
     private static ComputingService.Provider computingProvider;
@@ -66,6 +71,10 @@ public class AssetsApiIT {
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
+
+        METADATA_ALG_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_ALG_JSON_SAMPLE)));
+        metadataBaseAlgorithm = DDO.fromJSON(new TypeReference<AssetMetadata>() {
+        }, METADATA_ALG_JSON_CONTENT);
 
         COMPUTING_PROVIDER_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(COMPUTING_PROVIDER_JSON_SAMPLE)));
         computingProvider = DDO.fromJSON(new TypeReference<ComputingService.Provider>() {
@@ -138,9 +147,8 @@ public class AssetsApiIT {
     @Test
     public void createComputingService() throws Exception {
 
-        // TODO add the proper metadata. like the ddo-example-algorithm.json??
         // TODO check the temmplate
-        DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBase, providerConfig, computingProvider);
+        DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBaseAlgorithm, providerConfig, computingProvider);
 
         DID did = new DID(ddo.id);
         DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
