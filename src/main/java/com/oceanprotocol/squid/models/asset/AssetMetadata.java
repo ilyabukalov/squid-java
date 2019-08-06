@@ -200,9 +200,6 @@ public class AssetMetadata extends AbstractModel {
         @JsonProperty
         public String resourceId;
 
-        @JsonProperty
-        public Map<String, String> attributes = new HashMap<>();
-
 
         public File() {
         }
