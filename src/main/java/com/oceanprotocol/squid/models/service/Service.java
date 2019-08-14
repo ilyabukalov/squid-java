@@ -45,17 +45,19 @@ public class Service extends AbstractModel implements FromJsonToModel {
 
 
     @JsonIgnore
-    public static final String DEFAULT_METADATA_INDEX = "0";
+    public static final int DEFAULT_METADATA_INDEX = 0;
     @JsonIgnore
-    public static final String DEFAULT_ACCESS_INDEX = "1";
+    public static final int DEFAULT_PROVENANCE_INDEX = 1;
     @JsonIgnore
-    public static final String DEFAULT_AUTHORIZATION_INDEX = "2";
+    public static final int DEFAULT_AUTHORIZATION_INDEX = 2;
     @JsonIgnore
-    public static final String DEFAULT_COMPUTING_INDEX = "3";
+    public static final int DEFAULT_ACCESS_INDEX = 3;
+    @JsonIgnore
+    public static final int DEFAULT_COMPUTING_INDEX = 4;
 
 
     @JsonProperty
-    public String index;
+    public int index;
 
     @JsonProperty
     public String type;
@@ -131,7 +133,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public Service() {
     }
 
-    public Service(serviceTypes type, String serviceEndpoint, String index) {
+    public Service(serviceTypes type, String serviceEndpoint, int index) {
         this.type = type.toString();
         this.index = index;
         this.serviceEndpoint = serviceEndpoint;

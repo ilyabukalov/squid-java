@@ -121,13 +121,13 @@ public class ComputingService extends Service {
         this.type = serviceTypes.computing.toString();
     }
 
-    public ComputingService(String serviceEndpoint, String serviceDefinitionId, String templateId) {
+    public ComputingService(String serviceEndpoint, int serviceDefinitionId, String templateId) {
         super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
 
     }
 
-    public ComputingService(String serviceEndpoint, String serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
+    public ComputingService(String serviceEndpoint, int serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
         super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
         this.attributes.main.serviceAgreementTemplate = serviceAgreementTemplate;

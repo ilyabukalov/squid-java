@@ -19,7 +19,7 @@ public interface AgreementsAPI {
      * @return Tuple with agreement id and signature.
      * @throws Exception Exception
      */
-    public Tuple2<String, String> prepare(DID did, String serviceDefinitionId, Account consumerAccount) throws Exception;
+    public Tuple2<String, String> prepare(DID did, int serviceDefinitionId, Account consumerAccount) throws Exception;
 
     /**
      * Send a signed service agreement to the publisher Brizo instance to consume/access the service.
@@ -32,7 +32,7 @@ public interface AgreementsAPI {
      * @throws Exception Exception
      */
     @Deprecated
-    public void send(DID did, String agreementId, String serviceDefinitionId, String signature, Account consumerAccount) throws Exception;
+    public void send(DID did, String agreementId, int serviceDefinitionId, String signature, Account consumerAccount) throws Exception;
 
     /**
      * Create a service agreement.
@@ -44,7 +44,7 @@ public interface AgreementsAPI {
      * @return a flag a true if the creation of the agreement was successful.
      * @throws Exception Exception
      */
-    public boolean create(DID did, String agreementId, String serviceDefinitionId, String consumerAddress) throws Exception;
+    public boolean create(DID did, String agreementId, int serviceDefinitionId, String consumerAddress) throws Exception;
 
     /**
      * Get the status of a service agreement.

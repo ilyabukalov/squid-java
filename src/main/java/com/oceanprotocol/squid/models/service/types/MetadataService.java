@@ -15,7 +15,7 @@ import com.oceanprotocol.squid.models.service.Service;
 @JsonPropertyOrder(alphabetic = true)
 public class MetadataService extends Service {
 
-    public static final String DEFAULT_SERVICE_DEFINITION_ID = "0";
+    public static final int DEFAULT_SERVICE_DEFINITION_ID = 0;
 
     public MetadataService() {
         this.type = serviceTypes.metadata.toString();
@@ -26,7 +26,7 @@ public class MetadataService extends Service {
         this(assetMetadata, serviceEndpoint, DEFAULT_SERVICE_DEFINITION_ID);
     }
 
-    public MetadataService(AssetMetadata assetMetadata,String serviceEndpoint, String serviceDefinitionId) {
+    public MetadataService(AssetMetadata assetMetadata, String serviceEndpoint, int serviceDefinitionId) {
         super(serviceTypes.metadata, serviceEndpoint, serviceDefinitionId);
         this.attributes = assetMetadata.attributes;
     }

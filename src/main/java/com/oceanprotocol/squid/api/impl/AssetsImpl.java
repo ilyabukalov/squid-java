@@ -107,48 +107,48 @@ public class AssetsImpl implements AssetsAPI {
 
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException {
         return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, false, -1, basePath, threshold);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath) throws ConsumeServiceException {
         return this.consume(serviceAgreementId, did, serviceDefinitionId, basePath, 0);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId,  Integer index, String basePath) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath) throws ConsumeServiceException {
         return this.consume(serviceAgreementId, did, serviceDefinitionId, index, basePath, 0);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId,  Integer index, String basePath, int threshold) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath, int threshold) throws ConsumeServiceException {
         return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, true, index, basePath, threshold);
     }
 
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index) throws ConsumeServiceException{
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index) throws ConsumeServiceException{
         return this.consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, 0);
     }
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException{
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException{
         return oceanManager.consumeBinary(serviceAgreementId, did, serviceDefinitionId,  index, threshold);
     }
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException {
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException {
         return this.consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, rangeStart, rangeEnd, 0);
     }
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException{
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException{
         return oceanManager.consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, true, rangeStart, rangeEnd, threshold);
     }
 
     @Override
-    public Flowable<OrderResult> order(DID did, String serviceDefinitionId) throws OrderException{
+    public Flowable<OrderResult> order(DID did, int serviceDefinitionId) throws OrderException{
         return oceanManager.purchaseAsset(did, serviceDefinitionId);
     }
 

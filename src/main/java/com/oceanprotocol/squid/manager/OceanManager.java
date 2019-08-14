@@ -339,7 +339,7 @@ public class OceanManager extends BaseManager {
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
      * @throws OrderException OrderException
      */
-    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId)
+    public Flowable<OrderResult> purchaseAsset(DID did, int serviceDefinitionId)
             throws OrderException {
 
         String serviceAgreementId = ServiceAgreementHandler.generateSlaId();
@@ -413,7 +413,7 @@ public class OceanManager extends BaseManager {
      * @throws ServiceException          ServiceException
      * @throws ServiceAgreementException ServiceAgreementException
      */
-    private Flowable<EscrowAccessSecretStoreTemplate.AgreementCreatedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String serviceAgreementId)
+    private Flowable<EscrowAccessSecretStoreTemplate.AgreementCreatedEventResponse> initializeServiceAgreement(DID did, DDO ddo, int serviceDefinitionId, String serviceAgreementId)
             throws  ServiceException, ServiceAgreementException {
 
         Boolean isTemplateApproved;
@@ -478,7 +478,7 @@ public class OceanManager extends BaseManager {
      * @throws ServiceException           ServiceException
      * @throws LockRewardFulfillException LockRewardFulfillException
      */
-    private boolean fulfillLockReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockRewardFulfillException {
+    private boolean fulfillLockReward(DDO ddo, int serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockRewardFulfillException {
 
         AccessService accessService = ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
@@ -496,7 +496,7 @@ public class OceanManager extends BaseManager {
      * @throws ServiceException      ServiceException
      * @throws EscrowRewardException EscrowRewardException
      */
-    private boolean fulfillEscrowReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, EscrowRewardException {
+    private boolean fulfillEscrowReward(DDO ddo, int serviceDefinitionId, String serviceAgreementId) throws ServiceException, EscrowRewardException {
 
         AccessService accessService = ddo.getAccessService(serviceDefinitionId);
         BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
@@ -533,7 +533,7 @@ public class OceanManager extends BaseManager {
      * @return a Map with the data needed to consume the asset
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    private Map<String, Object> getConsumeData(DID did, String serviceDefinitionId, Boolean isIndexDownload, Integer index) throws ConsumeServiceException {
+    private Map<String, Object> getConsumeData(DID did, int serviceDefinitionId, Boolean isIndexDownload, Integer index) throws ConsumeServiceException {
 
         DDO ddo;
         String serviceEndpoint;
@@ -581,7 +581,7 @@ public class OceanManager extends BaseManager {
      * @return a flag that indicates if the consume operation was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException {
+    public boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath) throws ConsumeServiceException {
 
         return consume(serviceAgreementId, did, serviceDefinitionId, false, -1, basePath, 0);
     }
@@ -600,7 +600,7 @@ public class OceanManager extends BaseManager {
      * @return a flag that indicates if the consume operation was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Boolean isIndexDownload, Integer index, String basePath, int threshold) throws ConsumeServiceException {
+    public boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Boolean isIndexDownload, Integer index, String basePath, int threshold) throws ConsumeServiceException {
 
 
         Map<String, Object> consumeData = getConsumeData(did, serviceDefinitionId, isIndexDownload, index);
@@ -650,7 +650,7 @@ public class OceanManager extends BaseManager {
      * @return an InputStream that represents the binary content
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException {
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException {
         return consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, false, 0, 0, threshold);
     }
 
@@ -668,7 +668,7 @@ public class OceanManager extends BaseManager {
      * @return an InputStream that represents the binary content
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Boolean isRangeRequest, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException {
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Boolean isRangeRequest, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException {
 
 
         Map<String, Object> consumeData = getConsumeData(did, serviceDefinitionId, true, index);

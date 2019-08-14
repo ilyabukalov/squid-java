@@ -223,7 +223,6 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     public DDO addService(Service service) {
-        service.index = (service.index!=null&&!service.index.isEmpty())?service.index:String.valueOf(services.size());
         services.add(service);
         return this;
     }
@@ -286,9 +285,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
 
-    public AccessService getAccessService(String serviceDefinitionId) throws ServiceException {
+    public AccessService getAccessService(int serviceDefinitionId) throws ServiceException {
         for (Service service : services) {
-            if (service.index.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.access.toString())) {
+            if (service.index == serviceDefinitionId && service.type.equals(Service.serviceTypes.access.toString())) {
                 return (AccessService) service;
             }
         }
@@ -296,9 +295,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     @JsonIgnore
-    public AuthorizationService getAuthorizationService(String serviceDefinitionId) {
+    public AuthorizationService getAuthorizationService(int serviceDefinitionId) {
         for (Service service : services) {
-            if (service.index.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.authorization.toString())) {
+            if (service.index == serviceDefinitionId && service.type.equals(Service.serviceTypes.authorization.toString())) {
                 return (AuthorizationService) service;
             }
         }

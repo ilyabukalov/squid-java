@@ -21,12 +21,12 @@ public class AuthorizationService extends Service {
     public AuthorizationService() {
     }
 
-    public AuthorizationService(serviceTypes type, String serviceEndpoint, String index, String service) {
+    public AuthorizationService(serviceTypes type, String serviceEndpoint, int index, String service) {
         super(type, serviceEndpoint, index);
         this.attributes.main.service = service;
     }
 
-    public AuthorizationService(serviceTypes type, String serviceEndpoint, String index) {
+    public AuthorizationService(serviceTypes type, String serviceEndpoint, int index) {
         super(type, serviceEndpoint, index);
         this.attributes.main.service = DEFAULT_SERVICE;
     }
