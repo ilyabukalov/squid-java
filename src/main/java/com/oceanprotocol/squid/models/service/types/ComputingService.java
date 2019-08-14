@@ -1,8 +1,9 @@
-package com.oceanprotocol.squid.models.service;
+package com.oceanprotocol.squid.models.service.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -109,26 +110,27 @@ public class ComputingService extends Service {
 
     }
 
-    @JsonProperty
-    public Provider provider;
 
-    @JsonProperty
-    public ServiceAgreementTemplate serviceAgreementTemplate;
+    //@JsonProperty
+    //public Provider provider;
+
+    //@JsonProperty
+    //public ServiceAgreementTemplate serviceAgreementTemplate;
 
     public ComputingService() {
-        this.type = serviceTypes.Computing.toString();
+        this.type = serviceTypes.computing.toString();
     }
 
     public ComputingService(String serviceEndpoint, String serviceDefinitionId, String templateId) {
-        super(serviceTypes.Computing, serviceEndpoint, serviceDefinitionId);
+        super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
 
     }
 
     public ComputingService(String serviceEndpoint, String serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
-        super(serviceTypes.Computing, serviceEndpoint, serviceDefinitionId);
+        super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
-        this.serviceAgreementTemplate = serviceAgreementTemplate;
+        this.attributes.main.serviceAgreementTemplate = serviceAgreementTemplate;
     }
 
 }

@@ -10,7 +10,7 @@ import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;

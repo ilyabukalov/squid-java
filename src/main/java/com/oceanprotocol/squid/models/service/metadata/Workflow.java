@@ -17,11 +17,6 @@ import java.util.List;
 @JsonPropertyOrder(alphabetic = true)
 public class Workflow {
 
-    @JsonProperty
-    public List<Stage> stages;
-
-    public Workflow() {}
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class Stage {
@@ -110,9 +105,14 @@ public class Workflow {
         public String accessProxyUrl;
 
         @JsonProperty
-        public AssetMetadata.Base metadata;
+        public AssetMetadata metadata;
 
         public Output() {}
     }
+
+    @JsonProperty
+    public List<Workflow.Stage> stages;
+
+    public Workflow(){}
 
 }

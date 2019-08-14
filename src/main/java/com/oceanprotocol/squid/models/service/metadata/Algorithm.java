@@ -15,21 +15,6 @@ import java.util.List;
 @JsonPropertyOrder(alphabetic = true)
 public class Algorithm {
 
-    @JsonProperty
-    public String language;
-
-    @JsonProperty
-    public String format;
-
-    @JsonProperty
-    public String version;
-
-    @JsonProperty
-    public String entrypoint;
-
-    @JsonProperty
-    public List<Requirement> requirements;
-
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class Requirement {
@@ -43,6 +28,21 @@ public class Algorithm {
         public Requirement() {}
     }
 
+    @JsonProperty
+    public String language;
 
-    public Algorithm() {}
+    @JsonProperty
+    public String format;
+
+    @JsonProperty
+    public String version;
+
+    @JsonProperty
+    public String entrypoint;
+
+    @JsonProperty
+    public List<Algorithm.Requirement> requirements;
+
+    public Algorithm(){}
+
 }

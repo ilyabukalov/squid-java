@@ -15,14 +15,12 @@ import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.exceptions.TokenApproveException;
 import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.common.web3.KeeperService;
-import com.oceanprotocol.common.helpers.EncodingHelper;
-import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.AuthorizationService;
-import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
+import com.oceanprotocol.squid.models.service.types.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Keys;
-import org.web3j.crypto.Sign;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.IOException;
@@ -117,19 +114,25 @@ public abstract class BaseManager {
         try {
 
             Credentials credentials = getKeeperService().getCredentials();
-
-            String filesJson = metadataService.metadata.toJson(metadataService.metadata.base.files);
-
             SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
-            metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
-            metadataService.metadata.base.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
-            metadataService.metadata.base.checksum = metadataService.metadata.generateMetadataChecksum(did.getDid());
 
+            metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
+
+
+            String filesJson = metadataService.toJson(metadataService.attributes.main.files);
+            metadataService.attributes.main.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
+
+             /*
+            TODO CALCULATE checksum and signature
+            metadataService.metadata.base.checksum = metadataService.metadata.generateMetadataChecksum(did.getDid());
             Sign.SignatureData signatureSource = EthereumHelper.signMessage(metadataService.metadata.base.checksum, credentials);
             String signature = EncodingHelper.signatureToString(signatureSource);
+             */
+
+            String signature = "";
 
             return new DDO(did, metadataService, address, signature);
-        } catch (DIDFormatException | EncryptionException | CipherException | IOException e) {
+        } catch (DIDFormatException  | EncryptionException |CipherException | IOException e) {
             throw new DDOException("Error building DDO", e);
         }
 
@@ -157,7 +160,7 @@ public abstract class BaseManager {
         AuthorizationService authorizationService = ddo.getAuthorizationService();
         SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
 
-        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.metadata.base.encryptedFiles);
+        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.getMetadataService().attributes.main.encryptedFiles);
         return DDO.fromJSON(new TypeReference<ArrayList<AssetMetadata.File>>() {
         }, jsonFiles);
     }

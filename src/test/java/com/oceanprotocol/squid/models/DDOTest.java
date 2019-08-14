@@ -7,10 +7,8 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
-import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.AccessService;
-import com.oceanprotocol.squid.models.service.AuthorizationService;
-import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
 import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,38 +85,41 @@ public class DDOTest {
     }
 
 
+
     @Test
     public void testWorkflow() throws Exception {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_WORKFLOW_CONTENT);
 
-        assertEquals("workflow", ddo.metadata.base.type);
-        assertEquals("tensorflow/tensorflow", ddo.metadata.workflow.stages.get(0).requirements.container.image);
-        assertEquals("latest", ddo.metadata.workflow.stages.get(0).requirements.container.tag);
-        assertEquals("sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc",
-                ddo.metadata.workflow.stages.get(0).requirements.container.checksum);
+        Service metadataService = ddo.getMetadataService();
 
-        assertEquals(2, ddo.metadata.workflow.stages.get(0).input.size());
-        assertEquals(0, ddo.metadata.workflow.stages.get(0).input.get(0).index.intValue());
-        assertEquals("did:op:12345", ddo.metadata.workflow.stages.get(0).input.get(0).id.toString());
-        assertEquals("did:op:abcde", ddo.metadata.workflow.stages.get(0).transformation.id.toString());
+        assertEquals("workflow", metadataService.attributes.main.type);
+        assertEquals("tensorflow/tensorflow", metadataService.attributes.main.workflow.stages.get(0).requirements.container.image);
+        assertEquals("latest",  metadataService.attributes.main.workflow.stages.get(0).requirements.container.tag);
+        assertEquals("sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc",
+                metadataService.attributes.main.workflow.stages.get(0).requirements.container.checksum);
+
+        assertEquals(2,  metadataService.attributes.main.workflow.stages.get(0).input.size());
+        assertEquals(0,  metadataService.attributes.main.workflow.stages.get(0).input.get(0).index.intValue());
+        assertEquals("did:op:12345",  metadataService.attributes.main.workflow.stages.get(0).input.get(0).id.toString());
+        assertEquals("did:op:abcde",  metadataService.attributes.main.workflow.stages.get(0).transformation.id.toString());
         assertEquals("https://localhost:5000/api/v1/aquarius/assets/ddo/",
-                ddo.metadata.workflow.stages.get(0).output.metadataUrl);
-        assertEquals("my filtered asset",
-                ddo.metadata.workflow.stages.get(0).output.metadata.name);
+                metadataService.attributes.main.workflow.stages.get(0).output.metadataUrl);
     }
 
     @Test
     public void testAlgorithm() throws Exception {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_ALGORITHM_CONTENT);
 
-        assertEquals("algorithm", ddo.metadata.base.type);
-        assertEquals("scala", ddo.metadata.algorithm.language);
-        assertEquals("jar", ddo.metadata.algorithm.format);
-        assertEquals("0.1", ddo.metadata.algorithm.version);
+        Service metadataService = ddo.getMetadataService();
 
-        assertEquals(2, ddo.metadata.algorithm.requirements.size());
-        assertEquals("scala", ddo.metadata.algorithm.requirements.get(0).requirement);
-        assertEquals("1.8", ddo.metadata.algorithm.requirements.get(1).version);
+        assertEquals("algorithm",  metadataService.attributes.main.type);
+        assertEquals("scala", metadataService.attributes.main.algorithm.language);
+        assertEquals("jar", metadataService.attributes.main.algorithm.format);
+        assertEquals("0.1", metadataService.attributes.main.algorithm.version);
+
+        assertEquals(2, metadataService.attributes.main.algorithm.requirements.size());
+        assertEquals("scala", metadataService.attributes.main.algorithm.requirements.get(0).requirement);
+        assertEquals("1.8", metadataService.attributes.main.algorithm.requirements.get(1).version);
 
     }
 
@@ -126,15 +127,17 @@ public class DDOTest {
     public void testService() throws Exception {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_SERVICE_CONTENT);
 
-        assertEquals("service", ddo.metadata.base.type);
-        assertEquals("https://my.service.inet:8080/spec", ddo.metadata.service.spec);
-        assertEquals("859486596784567856758aaaa", ddo.metadata.service.specChecksum);
-        assertEquals("basic", ddo.metadata.service.definition.auth.type);
+        Service metadataService = ddo.getMetadataService();
 
-        assertEquals(1, ddo.metadata.service.definition.endpoints.size());
-        assertEquals(0, ddo.metadata.service.definition.endpoints.get(0).index.intValue());
-        assertEquals("POST", ddo.metadata.service.definition.endpoints.get(0).method);
-        assertEquals(1, ddo.metadata.service.definition.endpoints.get(0).contentTypes.size());
+        assertEquals("service",  metadataService.attributes.main.type);
+        assertEquals("https://my.service.inet:8080/spec",  metadataService.attributes.main.spec);
+        assertEquals("859486596784567856758aaaa",  metadataService.attributes.main.specChecksum);
+        assertEquals("basic",  metadataService.attributes.main.definition.auth.type);
+
+        assertEquals(1,  metadataService.attributes.main.definition.endpoints.size());
+        assertEquals(0,  metadataService.attributes.main.definition.endpoints.get(0).index.intValue());
+        assertEquals("POST",  metadataService.attributes.main.definition.endpoints.get(0).method);
+        assertEquals(1,  metadataService.attributes.main.definition.endpoints.get(0).contentTypes.size());
 
     }
 
@@ -162,11 +165,6 @@ public class DDOTest {
         assertEquals(2, ddo.services.size());
         assertTrue(ddo.services.get(1).serviceEndpoint.startsWith("http"));
 
-        AssetMetadata metadata = (AssetMetadata) ddo.metadata;
-
-        assertEquals("UK Weather information 2011", metadata.base.name);
-        assertEquals(2, metadata.base.links.size());
-        assertEquals(123, metadata.curation.numVotes);
     }
 
     @Test
@@ -187,7 +185,7 @@ public class DDOTest {
 
         AuthorizationService authorizationService = ddo.getAuthorizationService();
         assertEquals("http://localhost:12001", authorizationService.serviceEndpoint);
-        assertEquals(Service.serviceTypes.Authorization.name(), authorizationService.type);
+        assertEquals(Service.serviceTypes.authorization.name(), authorizationService.type);
     }
 
     @Test
@@ -211,13 +209,8 @@ public class DDOTest {
         ddo.authentication.add(auth);
         ddo.authentication.add(auth);
 
-        AssetMetadata metadata = new AssetMetadata();
-        AssetMetadata.Base base = new AssetMetadata.Base();
-        base.name = "test name";
-
-        metadata.base = base;
-
-        MetadataService metadataService = new MetadataService(metadata, "http://disney.com", "0");
+        Service metadataService = new Service(Service.serviceTypes.metadata, "http://disney.com", "0");
+        metadataService.attributes.main.name = "test name";
 
         AccessService accessService = new AccessService("http://ocean.com", "1", "0x00000000");
 
@@ -236,7 +229,7 @@ public class DDOTest {
         assertEquals("AuthType", ((JSONObject) (json.getJSONArray("authentication").get(1))).getString("type"));
 
         assertEquals(2, (json.getJSONArray("service").length()));
-        assertEquals("test name", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("metadata").getJSONObject("base").getString("name"));
+        assertEquals("test name", ((JSONObject) (json.getJSONArray("service").get(0))).getJSONObject("attributes").getJSONObject("main").getString("name"));
 
     }
 
@@ -245,7 +238,7 @@ public class DDOTest {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
 
         DDO newDdo= DDO.cleanFileUrls(ddo);
-        assertNull(newDdo.getMetadataService().metadata.base.files.get(0).url);
+        assertNull(newDdo.getMetadataService().attributes.main.files.get(0).url);
     }
 
 }

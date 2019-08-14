@@ -10,15 +10,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
-import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.*;
+import com.oceanprotocol.squid.models.service.types.AccessService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
+import com.oceanprotocol.squid.models.service.types.MetadataService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;
 
@@ -53,13 +53,12 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public Proof proof;
 
+    @JsonProperty
+    public List<VerifiableCredential> verifiableCredential;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
     @JsonDeserialize(using = CustomDateDeserializer.class)
     public Date created;
-
-    @JsonIgnore
-    public AssetMetadata metadata = null;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
     @JsonProperty
@@ -135,6 +134,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public String signatureValue;
 
+        @JsonProperty
+        public Map<String, String> checksum;
+
         public Proof() {
         }
 
@@ -148,6 +150,48 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         public Proof(String type, String creator, byte[] signature) {
             this(type, creator, Base64.encodeBase64URLSafeString(signature));
         }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic = true)
+    public static class VerifiableCredential {
+
+        public enum Types {read, update, deactivate}
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        @JsonPropertyOrder(alphabetic = true)
+        public static class CredentialSubject {
+
+            @JsonProperty
+            public String id;
+
+            public CredentialSubject(){}
+        }
+
+        @JsonProperty("@context")
+        public List<String> context = List.of("https://www.w3.org/2018/credentials/v1", "https://www.w3.org/2018/credentials/examples/v1");
+
+        @JsonProperty
+        public String id;
+
+        @JsonProperty
+        public List<Types> type;
+
+        @JsonProperty
+        public String issuer;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
+        @JsonDeserialize(using = CustomDateDeserializer.class)
+        public Date issuanceDate;
+
+        @JsonProperty
+        public CredentialSubject credentialSubject;
+
+        @JsonProperty
+        Proof proof;
+
+        public VerifiableCredential(){}
+
     }
 
     public DDO() throws DIDFormatException {
@@ -166,7 +210,6 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
         if (null == this.created)
             this.created = getDateNowFormatted();
-        this.metadata = metadataService.metadata;
         this.services.add(metadataService);
 
         this.proof = new Proof(UUID_PROOF_TYPE, publicKey, signature);
@@ -180,7 +223,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     public DDO addService(Service service) {
-        service.serviceDefinitionId = (service.serviceDefinitionId!=null&&!service.serviceDefinitionId.isEmpty())?service.serviceDefinitionId:String.valueOf(services.size());
+        service.index = (service.index!=null&&!service.index.isEmpty())?service.index:String.valueOf(services.size());
         services.add(service);
         return this;
     }
@@ -190,22 +233,19 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this;
     }
 
-
     @JsonSetter("service")
     public void servicesSetter(ArrayList<LinkedHashMap> services) {
 
         try {
             for (LinkedHashMap service : services) {
                 if (service.containsKey("type")) {
-                    if (service.get("type").equals(Service.serviceTypes.Metadata.toString()) && service.containsKey("metadata")) {
-                        this.metadata = getMapperInstance().convertValue(service.get("metadata"), AssetMetadata.class);
+                    if (service.get("type").equals(Service.serviceTypes.metadata.toString()) && service.containsKey("metadata")) {
                         this.services.add(getMapperInstance().convertValue(service, MetadataService.class));
-
-                    } else if (service.get("type").equals(Service.serviceTypes.Access.toString())) {
+                    } else if (service.get("type").equals(Service.serviceTypes.access.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AccessService.class));
-                    } else if (service.get("type").equals(Service.serviceTypes.Computing.toString())) {
+                    } else if (service.get("type").equals(Service.serviceTypes.computing.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, ComputingService.class));
-                    } else if (service.get("type").equals(Service.serviceTypes.Authorization.toString())) {
+                    } else if (service.get("type").equals(Service.serviceTypes.authorization.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AuthorizationService.class));
                     } else {
                         this.services.add(getMapperInstance().convertValue(service, Service.class));
@@ -219,29 +259,20 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
     }
 
-
     @JsonGetter("service")
     public List<Service> servicesGetter() {
 
         int counter = 0;
         for (Service service : services) {
             if (service.type != null) {
-                if (service.type.equals(Service.serviceTypes.Metadata.toString()) && this.metadata != null) {
-                    try {
-                        ((MetadataService) service).metadata = this.metadata;
-                        services.set(counter, service);
-                    } catch (Exception e) {
-                        log.error("Error getting metadata object");
-                    }
-                } else {
-                    services.set(counter, service);
-                }
+                services.set(counter, service);
                 counter++;
             }
         }
 
         return this.services;
     }
+
 
     public static DID generateDID() throws DIDFormatException {
         DID did = DID.builder();
@@ -257,7 +288,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
     public AccessService getAccessService(String serviceDefinitionId) throws ServiceException {
         for (Service service : services) {
-            if (service.serviceDefinitionId.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.Access.toString())) {
+            if (service.index.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.access.toString())) {
                 return (AccessService) service;
             }
         }
@@ -267,7 +298,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public AuthorizationService getAuthorizationService(String serviceDefinitionId) {
         for (Service service : services) {
-            if (service.serviceDefinitionId.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.Authorization.toString())) {
+            if (service.index.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.authorization.toString())) {
                 return (AuthorizationService) service;
             }
         }
@@ -277,7 +308,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public AuthorizationService getAuthorizationService() {
         for (Service service : services) {
-            if (service.type.equals(Service.serviceTypes.Authorization.toString())) {
+            if (service.type.equals(Service.serviceTypes.authorization.toString())) {
                 return (AuthorizationService) service;
             }
         }
@@ -286,10 +317,10 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     @JsonIgnore
-    public MetadataService getMetadataService() {
+    public Service getMetadataService() {
         for (Service service : services) {
-            if (service.type.equals(Service.serviceTypes.Metadata.toString())) {
-                return (MetadataService) service;
+            if (service.type.equals(Service.serviceTypes.metadata.toString())) {
+                return service;
             }
         }
 
@@ -299,7 +330,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public AccessService getAccessService() {
         for (Service service : services) {
-            if (service.type.equals(Service.serviceTypes.Access.toString())) {
+            if (service.type.equals(Service.serviceTypes.access.toString())) {
                 return (AccessService) service;
             }
         }
@@ -309,12 +340,10 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
     @JsonIgnore
     public static DDO cleanFileUrls(DDO ddo) {
-        ddo.metadata.base.files.forEach(f -> {
-            f.url = null;
-        });
+
         ddo.services.forEach(service -> {
-            if (service.type.equals(Service.serviceTypes.Metadata.toString())) {
-                ((MetadataService) service).metadata.base.files.forEach(f -> {
+            if (service.type.equals(Service.serviceTypes.metadata.toString())) {
+               service.attributes.main.files.forEach(f -> {
                     f.url = null;
                 });
             }

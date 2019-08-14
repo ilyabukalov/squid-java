@@ -17,7 +17,7 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
-import com.oceanprotocol.squid.models.service.ComputingService;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
@@ -168,7 +168,7 @@ public class AssetsApiIT {
 
         log.debug("Account " + oceanAPIConsumer.getMainAccount().address + " balance is: " + balance.toString());
 
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         //Balance balanceAfter= oceanAPIConsumer.getAccountsAPI().balance(oceanAPIConsumer.getMainAccount());
 
@@ -223,7 +223,7 @@ public class AssetsApiIT {
 
         log.debug("DDO registered!");
 
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did,  Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did,  Service.DEFAULT_ACCESS_INDEX);
 
         OrderResult orderResult = response.blockingFirst();
         assertNotNull(orderResult.getServiceAgreementId());
@@ -233,7 +233,7 @@ public class AssetsApiIT {
         InputStream result = oceanAPIConsumer.getAssetsAPI().consumeBinary(
                 orderResult.getServiceAgreementId(),
                 did,
-                Service.DEFAULT_ACCESS_SERVICE_ID,
+                Service.DEFAULT_ACCESS_INDEX,
                 0);
 
         assertNotNull(result);
@@ -282,7 +282,7 @@ public class AssetsApiIT {
 
         log.debug("DDO registered!");
         oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.TEN);
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         TimeUnit.SECONDS.sleep(2l);
 
@@ -294,7 +294,7 @@ public class AssetsApiIT {
         boolean result = oceanAPIConsumer.getAssetsAPI().consume(
                 orderResult.getServiceAgreementId(),
                 did,
-                Service.DEFAULT_ACCESS_SERVICE_ID, basePath);
+                Service.DEFAULT_ACCESS_INDEX, basePath);
         assertTrue(result);
 
 

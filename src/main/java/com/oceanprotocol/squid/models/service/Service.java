@@ -11,6 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.FromJsonToModel;
+import com.oceanprotocol.squid.models.service.attributes.ServiceAdditionalInformation;
+import com.oceanprotocol.squid.models.service.attributes.ServiceCuration;
+import com.oceanprotocol.squid.models.service.attributes.ServiceMain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +26,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     /**
      * Type of service in the DDO
      */
-    public enum serviceTypes {Access, Metadata, Authorization, Computing}
+    public enum serviceTypes {access, metadata, authorization, computing}
 
     /**
      * Type of Asset. Represented in the base.type attribute
@@ -42,13 +45,17 @@ public class Service extends AbstractModel implements FromJsonToModel {
 
 
     @JsonIgnore
-    public static final String DEFAULT_METADATA_SERVICE_ID = "0";
+    public static final String DEFAULT_METADATA_INDEX = "0";
     @JsonIgnore
-    public static final String DEFAULT_ACCESS_SERVICE_ID = "1";
+    public static final String DEFAULT_ACCESS_INDEX = "1";
     @JsonIgnore
-    public static final String DEFAULT_AUTHORIZATION_SERVICE_ID = "2";
+    public static final String DEFAULT_AUTHORIZATION_INDEX = "2";
     @JsonIgnore
-    public static final String DEFAULT_COMPUTING_SERVICE_ID = "3";
+    public static final String DEFAULT_COMPUTING_INDEX = "3";
+
+
+    @JsonProperty
+    public String index;
 
     @JsonProperty
     public String type;
@@ -57,10 +64,26 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public String templateId;
 
     @JsonProperty
-    public String serviceDefinitionId;
+    public String serviceEndpoint;
 
     @JsonProperty
-    public String serviceEndpoint;
+    public Attributes attributes;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPropertyOrder(alphabetic = true)
+    public static class Attributes {
+
+        @JsonProperty
+        public ServiceMain main;
+
+        @JsonProperty
+        public ServiceAdditionalInformation additionalInformation;
+
+        @JsonProperty
+        public ServiceCuration curation;
+
+        public Attributes(){}
+    }
 
     //@JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)
@@ -108,10 +131,14 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public Service() {
     }
 
-    public Service(serviceTypes type, String serviceEndpoint, String serviceDefinitionId) {
+    public Service(serviceTypes type, String serviceEndpoint, String index) {
         this.type = type.toString();
-        this.serviceDefinitionId = serviceDefinitionId;
+        this.index = index;
         this.serviceEndpoint = serviceEndpoint;
+
+        this.attributes = new Attributes();
+        this.attributes.main = new ServiceMain();
+        this.attributes.additionalInformation = new ServiceAdditionalInformation();
     }
 
 }

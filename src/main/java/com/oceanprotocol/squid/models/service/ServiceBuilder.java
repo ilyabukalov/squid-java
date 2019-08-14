@@ -6,6 +6,8 @@ import com.oceanprotocol.squid.core.sla.handlers.ServiceComputingAgreementHandle
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
+import com.oceanprotocol.squid.models.service.types.AccessService;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,8 +20,8 @@ public interface ServiceBuilder {
     static ServiceBuilder getServiceBuilder(Service.serviceTypes serviceType) throws ServiceException {
 
         switch (serviceType) {
-            case Access: return accessServiceBuilder();
-            case Computing: return computingServiceBuilder();
+            case access: return accessServiceBuilder();
+            case computing: return computingServiceBuilder();
             default: throw new ServiceException("Invalid Service definition");
 
         }
@@ -64,11 +66,11 @@ public interface ServiceBuilder {
 
         // The templateId of the AccessService is the address of the escrowAccessSecretStoreTemplate contract
         ComputingService computingService = new ComputingService(providerConfig.getAccessEndpoint(),
-                Service.DEFAULT_COMPUTING_SERVICE_ID,
+                Service.DEFAULT_COMPUTING_INDEX,
                 serviceAgreementTemplate,
                 computingServiceTemplateId);
 
-        computingService.provider = computingProvider;
+        computingService.attributes.main.provider = computingProvider;
 
         /*
         TODO makes sense this properties would be in computing service as well?
@@ -80,7 +82,7 @@ public interface ServiceBuilder {
         // Initializing conditions and adding to Computing service
         ServiceAgreementHandler sla = new ServiceComputingAgreementHandler();
         try {
-            computingService.serviceAgreementTemplate.conditions = sla.initializeConditions(
+            computingService.attributes.main.serviceAgreementTemplate.conditions = sla.initializeConditions(
                     getComputingConditionParams(did, price, escrowRewardAddress, lockRewardConditionAddress, execComputeConditionAddress));
         }catch (InitializeConditionsException  e) {
             throw new DDOException("Error registering Asset.", e);
@@ -126,17 +128,17 @@ public interface ServiceBuilder {
 
         // The templateId of the AccessService is the address of the escrowAccessSecretStoreTemplate contract
         AccessService accessService = new AccessService(providerConfig.getAccessEndpoint(),
-                Service.DEFAULT_ACCESS_SERVICE_ID,
+                Service.DEFAULT_ACCESS_INDEX,
                 serviceAgreementTemplate,
                 accessServiceTemplateId);
-        accessService.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
-        accessService.name = "dataAssetAccessServiceAgreement";
-        accessService.creator = "";
+        accessService.attributes.main.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
+        accessService.attributes.main.name = "dataAssetAccessServiceAgreement";
+        accessService.attributes.main.creator = "";
 
         // Initializing conditions and adding to Access service
         ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
         try {
-            accessService.serviceAgreementTemplate.conditions = sla.initializeConditions(
+            accessService.attributes.main.serviceAgreementTemplate.conditions = sla.initializeConditions(
                     getAccessConditionParams(did, price, escrowRewardAddress, lockRewardConditionAddress, accessSecretStoreConditionAddress));
         }catch (InitializeConditionsException  e) {
             throw new DDOException("Error registering Asset.", e);

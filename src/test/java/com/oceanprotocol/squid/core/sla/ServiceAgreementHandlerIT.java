@@ -96,7 +96,7 @@ public class ServiceAgreementHandlerIT {
         DID did= new DID(ddo.id);
 
         oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.valueOf(9000000));
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         OrderResult orderResult = response.blockingFirst();
         assertNotNull(orderResult.getServiceAgreementId());

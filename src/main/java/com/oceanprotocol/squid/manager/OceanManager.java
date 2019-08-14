@@ -23,6 +23,10 @@ import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.*;
+import com.oceanprotocol.squid.models.service.types.AccessService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
+import com.oceanprotocol.squid.models.service.types.MetadataService;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -230,9 +234,9 @@ public class OceanManager extends BaseManager {
 
              DID did = DDO.generateDID();
 
-             Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, did.toString(), metadata.base.price);
+             Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, did.toString(), metadata.attributes.main.price);
              Service accessService = ServiceBuilder
-                    .getServiceBuilder(Service.serviceTypes.Access)
+                    .getServiceBuilder(Service.serviceTypes.access)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, did, accessService, threshold);
@@ -260,9 +264,9 @@ public class OceanManager extends BaseManager {
 
             DID did = DDO.generateDID();
 
-            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, did.toString(), metadata.base.price);
+            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, did.toString(), metadata.attributes.main.price);
             Service computingService = ServiceBuilder
-                    .getServiceBuilder(Service.serviceTypes.Computing)
+                    .getServiceBuilder(Service.serviceTypes.computing)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, did, computingService, threshold);
@@ -296,12 +300,12 @@ public class OceanManager extends BaseManager {
                 metadataEndpoint = providerConfig.getMetadataEndpoint();
 
             // Initialization of services supported for this asset
-            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_SERVICE_ID);
+            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_INDEX);
 
             AuthorizationService authorizationService = null;
             //Adding the authorization service if the endpoint is defined
             if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
-                authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
+                authorizationService = new AuthorizationService(Service.serviceTypes.authorization, providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_INDEX);
             }
 
             // Initializing DDO
@@ -316,7 +320,7 @@ public class OceanManager extends BaseManager {
             ddo.addAuthentication(ddo.id);
 
             // Registering DID
-            registerDID(ddo.getDid(), metadataEndpoint, metadata.base.checksum, providerConfig.getProviderAddresses());
+            registerDID(ddo.getDid(), metadataEndpoint, metadata.attributes.main.checksum, providerConfig.getProviderAddresses());
 
             // Storing DDO
             return getAquariusService().createDDO(ddo);
@@ -361,12 +365,13 @@ public class OceanManager extends BaseManager {
                             return Flowable.empty();
                         else {
                             log.debug("Received AgreementCreated Event with Id: " + eventServiceAgreementId);
-                            tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), ddo.metadata.base.price);
+                            String price = ddo.getMetadataService().attributes.main.price;
+                            tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), price);
                             BigInteger balance = this.tokenContract.balanceOf(getMainAccount().address).send();
-                            if (balance.compareTo(new BigInteger(ddo.metadata.base.price)) < 0) {
+                            if (balance.compareTo(new BigInteger(price)) < 0) {
                                 log.warn("Consumer account does not have sufficient token balance to fulfill the " +
                                         "LockRewardCondition. Do `requestTokens` using the `dispenser` contract then try this again.");
-                                log.info("token balance is: " + balance + " price is: " + ddo.metadata.base.price);
+                                log.info("token balance is: " + balance + " price is: " + price);
                                 throw new Exception("LockRewardCondition.fulfill will fail due to insufficient token balance in the consumer account.");
                             }
                             this.fulfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);

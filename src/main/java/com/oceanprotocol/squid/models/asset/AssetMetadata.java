@@ -6,24 +6,18 @@
 package com.oceanprotocol.squid.models.asset;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.oceanprotocol.common.helpers.CryptoHelper;
 import com.oceanprotocol.squid.models.AbstractModel;
-import com.oceanprotocol.squid.models.CustomDateDeserializer;
-import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.service.metadata.Algorithm;
-import com.oceanprotocol.squid.models.service.metadata.Service;
-import com.oceanprotocol.squid.models.service.metadata.Workflow;
+import com.oceanprotocol.squid.models.service.Service;
+import com.oceanprotocol.squid.models.service.attributes.ServiceAdditionalInformation;
+import com.oceanprotocol.squid.models.service.attributes.ServiceCuration;
+import com.oceanprotocol.squid.models.service.attributes.ServiceMain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
+
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
@@ -32,103 +26,19 @@ public class AssetMetadata extends AbstractModel {
     public enum assetTypes {dataset, algorithm, container, workflow, other};
 
     @JsonProperty
-    public DID did;
+    public Service.Attributes attributes;
 
-    @JsonProperty
-    public Base base;
-
-    @JsonProperty
-    public Curation curation;
-
-    @JsonProperty
-    public Service service;
-
-    @JsonProperty
-    public Workflow workflow;
-
-    @JsonProperty
-    public Algorithm algorithm;
-
-    @JsonProperty
-    public Map<String, Object> additionalInformation = new HashMap<>();
 
     public AssetMetadata() {
     }
 
-    public AssetMetadata(DID did) {
-        this.did = did;
-    }
-
     public static AssetMetadata builder() {
         AssetMetadata assetMetadata = new AssetMetadata();
-        assetMetadata.base = new Base();
-        assetMetadata.curation = new Curation();
+        assetMetadata.attributes = new Service.Attributes();
+        assetMetadata.attributes.main = new ServiceMain();
+        assetMetadata.attributes.additionalInformation = new ServiceAdditionalInformation();
+        assetMetadata.attributes.curation = new ServiceCuration();
         return assetMetadata;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic = true)
-    public static class Base {
-
-        @JsonProperty
-        public String name;
-
-        @JsonProperty
-        public String type;
-
-        @JsonProperty
-        public String description;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-        @JsonDeserialize(using = CustomDateDeserializer.class)
-        public Date dateCreated;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
-        @JsonDeserialize(using = CustomDateDeserializer.class)
-        public Date datePublished;
-
-        @JsonProperty
-        public String author;
-
-        @JsonProperty
-        public String license;
-
-        @JsonProperty
-        public String copyrightHolder;
-
-        @JsonProperty
-        public String workExample;
-
-        @JsonProperty
-        public ArrayList<File> files = new ArrayList<>();
-
-        @JsonProperty
-        public String encryptedFiles = null;
-
-        @JsonProperty
-        public String encryptedService = null;
-
-        @JsonProperty
-        public ArrayList<Link> links = new ArrayList<>();
-
-        @JsonProperty
-        public String inLanguage;
-
-        @JsonProperty
-        public ArrayList<String> tags;
-
-        @JsonProperty
-        public ArrayList<String> categories;
-
-        @JsonProperty
-        public String price;
-
-        @JsonProperty
-        public String checksum;
-
-        public Base() {
-        }
-
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -145,26 +55,6 @@ public class AssetMetadata extends AbstractModel {
         public String url;
 
         public Link() {
-        }
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonPropertyOrder(alphabetic = true)
-    public static class Curation {
-
-        @JsonProperty
-        public float rating;
-
-        @JsonProperty
-        public int numVotes;
-
-        @JsonProperty
-        public String schema;
-
-        @JsonProperty
-        public boolean isListed;
-
-        public Curation() {
         }
     }
 
@@ -206,22 +96,24 @@ public class AssetMetadata extends AbstractModel {
     }
 
 
+    // TODO Remove
     public String generateMetadataChecksum(String did) {
 
-        String concatFields = this.base.files.stream()
+        String concatFields = this.attributes.main.files.stream()
                 .map(file -> file.checksum != null ? file.checksum : "")
                 .collect(Collectors.joining(""))
-                .concat(this.base.name)
-                .concat(this.base.author)
-                .concat(this.base.license)
+                .concat(this.attributes.main.name)
+                .concat(this.attributes.main.author)
+                .concat(this.attributes.main.license)
                 .concat(did);
         return "0x" + CryptoHelper.sha3256(concatFields);
 
 
     }
 
+    // TODO Remove
     public AssetMetadata eraseFileUrls() {
-        this.base.files.forEach(f -> {
+        this.attributes.main.files.forEach(f -> {
             f.url = null;
         });
 

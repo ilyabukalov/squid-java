@@ -8,7 +8,7 @@ import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
-import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
 import org.web3j.crypto.Keys;
 import org.web3j.tuples.generated.Tuple2;
@@ -50,7 +50,7 @@ public class AgreementsImpl implements AgreementsAPI {
                 signature,
                 Keys.toChecksumAddress(consumerAccount.address)
         );
-        BrizoService.initializeAccessServiceAgreement(accessService.purchaseEndpoint, initializePayload);
+        BrizoService.initializeAccessServiceAgreement(accessService.attributes.main.purchaseEndpoint, initializePayload);
     }
 
     @Override

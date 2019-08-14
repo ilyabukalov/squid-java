@@ -13,7 +13,6 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;
 import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.MetadataService;
 
 import java.util.Map;
 
@@ -48,22 +47,6 @@ public class AssetsManager extends BaseManager {
         return getAquariusService().createDDO(ddo);
     }
 
-    /**
-     * Publishes in Aquarius the metadata of a DDO
-     *
-     * @param metadata        the metadata of the DDO
-     * @param serviceEndpoint the endpoint of the service
-     * @return the published DDO
-     * @throws Exception if Aquarius service fails publishing the metadata
-     */
-    public DDO publishMetadata(AssetMetadata metadata, String serviceEndpoint) throws Exception {
-
-        MetadataService service = new MetadataService(metadata, serviceEndpoint);
-
-        return publishMetadata(
-                this.buildDDO(service, null, getKeeperService().getAddress()));
-
-    }
 
     /**
      * Gets a DDO from the DID

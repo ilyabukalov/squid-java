@@ -5,7 +5,7 @@ import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.Agreement;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
 import org.apache.logging.log4j.LogManager;

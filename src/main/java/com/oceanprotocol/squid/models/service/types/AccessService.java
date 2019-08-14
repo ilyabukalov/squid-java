@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.oceanprotocol.squid.models.service;
+package com.oceanprotocol.squid.models.service.types;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.models.DDO;
+import com.oceanprotocol.squid.models.service.Condition;
+import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Hash;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,39 +30,23 @@ public class AccessService extends Service {
 
     private static final Logger log = LogManager.getLogger(AccessService.class);
 
-    @JsonProperty
-    public String purchaseEndpoint;
-
-    @JsonProperty
-    public String name;
-
-    @JsonProperty
-    public String description;
-
-    @JsonProperty
-    public String creator;
-
-
-    @JsonProperty
-    public ServiceAgreementTemplate serviceAgreementTemplate;
-
     public AccessService() {
-        this.type = serviceTypes.Access.toString();
+        this.type = serviceTypes.access.toString();
     }
 
-    public AccessService(String serviceEndpoint, String serviceDefinitionId, String templateId) {
-        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+    public AccessService(String serviceEndpoint, String index, String templateId) {
+        super(serviceTypes.access, serviceEndpoint, index);
         this.templateId = templateId;
     }
 
 
-    public AccessService(String serviceEndpoint, String serviceDefinitionId,
+    public AccessService(String serviceEndpoint, String index,
                          ServiceAgreementTemplate serviceAgreementTemplate,
                          String templateId
     ) {
-        super(serviceTypes.Access, serviceEndpoint, serviceDefinitionId);
+        super(serviceTypes.access, serviceEndpoint, index);
         this.templateId = templateId;
-        this.serviceAgreementTemplate = serviceAgreementTemplate;
+        this.attributes.main.serviceAgreementTemplate = serviceAgreementTemplate;
 
     }
 
@@ -198,7 +182,7 @@ public class AccessService extends Service {
 
         String data = "";
 
-        for (Condition condition : serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
             String token = "";
 
             for (Condition.ConditionParameter param : condition.parameters) {
@@ -214,7 +198,7 @@ public class AccessService extends Service {
     public String fetchTimeout() throws IOException {
         String data = "";
 
-        for (Condition condition : serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
             data = data + EthereumHelper.remove0x(
                     EncodingHelper.hexEncodeAbiType("uint256", condition.timeout));
         }
@@ -226,7 +210,7 @@ public class AccessService extends Service {
     public String fetchTimelock() throws IOException {
         String data = "";
 
-        for (Condition condition : serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
             data = data + EthereumHelper.remove0x(
                     EncodingHelper.hexEncodeAbiType("uint256", condition.timelock));
         }
@@ -237,7 +221,7 @@ public class AccessService extends Service {
 
     public Condition getConditionbyName(String name) {
 
-        return this.serviceAgreementTemplate.conditions.stream()
+        return this.attributes.main.serviceAgreementTemplate.conditions.stream()
                 .filter(condition -> condition.name.equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
@@ -245,7 +229,7 @@ public class AccessService extends Service {
 
     public List<BigInteger> retrieveTimeOuts() {
         List<BigInteger> timeOutsList = new ArrayList<BigInteger>();
-        for (Condition condition : serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
             timeOutsList.add(BigInteger.valueOf(condition.timeout));
         }
         return timeOutsList;
@@ -253,7 +237,7 @@ public class AccessService extends Service {
 
     public List<BigInteger> retrieveTimeLocks() {
         List<BigInteger> timeLocksList = new ArrayList<BigInteger>();
-        for (Condition condition : serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
             timeLocksList.add(BigInteger.valueOf(condition.timelock));
         }
         return timeLocksList;

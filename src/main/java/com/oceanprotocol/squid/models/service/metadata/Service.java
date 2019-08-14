@@ -11,21 +11,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(alphabetic = true)
+
 public class Service {
-
-    @JsonProperty
-    public String spec;
-
-    @JsonProperty
-    public String specChecksum;
-
-    @JsonProperty
-    public Definition definition;
-
-    public Service() {}
-
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)

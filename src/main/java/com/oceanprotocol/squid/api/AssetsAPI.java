@@ -11,7 +11,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
-import com.oceanprotocol.squid.models.service.ComputingService;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import io.reactivex.Flowable;
 
