@@ -78,10 +78,12 @@ public class DDOTest {
         log.debug("Date found: " + DATE_FORMAT.format(ddo.created));
         log.debug("Date String: " + ddo.created.toString());
         assertTrue(DATE_FORMAT.format(ddo.created).startsWith("20"));
+        assertTrue(DATE_FORMAT.format(ddo.updated).startsWith("20"));
 
         DDO newDDO= new DDO();
         log.debug("Date found: " + DATE_FORMAT.format(newDDO.created));
         assertTrue(DATE_FORMAT.format(newDDO.created).startsWith("20"));
+        assertTrue(DATE_FORMAT.format(newDDO.updated).startsWith("20"));
     }
 
 
@@ -141,8 +143,17 @@ public class DDOTest {
 
     }
 
-
     @Test
+    public void testChecksum() throws Exception {
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {
+        }, DDO_JSON_CONTENT);
+
+        String checksum= ddo.services.get(0).attributes.main.calculateChecksum();
+        log.debug("Checksum: " + checksum);
+        assertEquals(64 + 2, checksum.length());
+    }
+
+        @Test
     public void generateRandomDID() throws Exception {
         DID did= DID.builder();
         assertEquals(64, did.getHash().length());

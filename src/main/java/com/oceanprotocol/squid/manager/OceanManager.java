@@ -312,7 +312,7 @@ public class OceanManager extends BaseManager {
             // Adding services to DDO
             ddo.addService(service);
             ddo.addService(provenanceService);
-            
+
             if (authorizationService != null)
                 ddo.addService(authorizationService);
 
