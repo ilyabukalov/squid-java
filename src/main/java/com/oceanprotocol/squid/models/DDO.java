@@ -198,6 +198,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         this.did = generateDID();
         if (null == this.created)
             this.created = getDateNowFormatted();
+        if (null == this.updated)
+            this.updated = getDateNowFormatted();
 
         this.id = this.did.toString();
     }

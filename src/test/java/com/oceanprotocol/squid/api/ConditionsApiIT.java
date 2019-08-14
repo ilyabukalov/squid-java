@@ -90,7 +90,7 @@ public class ConditionsApiIT {
     public void executeConditions() throws Exception {
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         String agreementId = ServiceAgreementHandler.generateSlaId();
-        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, "1",  oceanAPIConsumer.getMainAccount().address));
+        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, 1, oceanAPIConsumer.getMainAccount().address));
         AgreementStatus initialStatus = oceanAPI.getAgreementsAPI().status(agreementId);
         assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("lockReward"));
         assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("accessSecretStore"));

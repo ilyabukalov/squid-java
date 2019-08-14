@@ -52,7 +52,7 @@ public class AgreementsApiIT {
     public void create() throws Exception {
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         String agreementId = ServiceAgreementHandler.generateSlaId();
-        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, "1", oceanAPI.getMainAccount().address));
+        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, 1, oceanAPI.getMainAccount().address));
         oceanAPI.getAgreementsAPI().status(agreementId);
     }
 }

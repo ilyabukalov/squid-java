@@ -209,10 +209,10 @@ public class DDOTest {
         ddo.authentication.add(auth);
         ddo.authentication.add(auth);
 
-        Service metadataService = new Service(Service.serviceTypes.metadata, "http://disney.com", "0");
+        Service metadataService = new Service(Service.serviceTypes.metadata, "http://disney.com", 0);
         metadataService.attributes.main.name = "test name";
 
-        AccessService accessService = new AccessService("http://ocean.com", "1", "0x00000000");
+        AccessService accessService = new AccessService("http://ocean.com", 1, "0x00000000");
 
         ddo.services.add(metadataService);
         ddo.services.add(accessService);
