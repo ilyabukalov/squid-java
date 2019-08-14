@@ -23,10 +23,7 @@ import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.*;
-import com.oceanprotocol.squid.models.service.types.AccessService;
-import com.oceanprotocol.squid.models.service.types.AuthorizationService;
-import com.oceanprotocol.squid.models.service.types.ComputingService;
-import com.oceanprotocol.squid.models.service.types.MetadataService;
+import com.oceanprotocol.squid.models.service.types.*;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -302,6 +299,7 @@ public class OceanManager extends BaseManager {
             // Initialization of services supported for this asset
             MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_INDEX);
 
+            ProvenanceService provenanceService= new ProvenanceService(Service.serviceTypes.provenance, providerConfig.getMetadataEndpoint(), Service.DEFAULT_PROVENANCE_INDEX);
             AuthorizationService authorizationService = null;
             //Adding the authorization service if the endpoint is defined
             if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
@@ -313,6 +311,8 @@ public class OceanManager extends BaseManager {
 
             // Adding services to DDO
             ddo.addService(service);
+            ddo.addService(provenanceService);
+            
             if (authorizationService != null)
                 ddo.addService(authorizationService);
 

@@ -26,7 +26,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     /**
      * Type of service in the DDO
      */
-    public enum serviceTypes {access, metadata, authorization, computing}
+    public enum serviceTypes {access, metadata, authorization, computing, provenance}
 
     /**
      * Type of Asset. Represented in the base.type attribute

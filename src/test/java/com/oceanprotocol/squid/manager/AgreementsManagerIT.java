@@ -56,11 +56,12 @@ public class AgreementsManagerIT {
         keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
         aquarius = ManagerHelper.getAquarius(config);
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
+        String provenanceUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl = config.getString("brizo.url") + "/api/v1/brizo/services/consume";
         String purchaseEndpoint = config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
         oceanAPI = OceanAPI.getInstance(config);
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
