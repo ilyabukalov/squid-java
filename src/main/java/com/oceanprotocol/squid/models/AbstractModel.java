@@ -53,7 +53,7 @@ public abstract class AbstractModel {
         return getMapperInstance().readValue(json, type);
     }
 
-    public String calculateChecksum() throws JsonProcessingException {
+    public String checksum() throws JsonProcessingException {
         return CryptoHelper.sha3256(toJson());
     }
 

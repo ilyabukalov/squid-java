@@ -8,6 +8,10 @@ package com.oceanprotocol.squid.models;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
+import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
+import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.service.*;
@@ -17,6 +21,8 @@ import com.oceanprotocol.squid.models.service.types.ComputingService;
 import com.oceanprotocol.squid.models.service.types.MetadataService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Sign;
 
 import java.util.*;
 
@@ -274,6 +280,26 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this.services;
     }
 
+    public DDO integrityBuilder(Credentials credentials) throws DDOException {
+        SortedMap<String, String> checksums= new TreeMap<>();
+        try {
+            for (Service service : services) {
+                checksums.put(
+                        String.valueOf(service.index),
+                        service.attributes.main.checksum());
+            }
+            proof.checksum= checksums;
+            this.did = DID.builder(toJson(checksums));
+            this.id = this.did.getDid();
+
+            Sign.SignatureData signatureData= EthereumHelper.signMessage(this.id, credentials);
+            proof.signatureValue= EncodingHelper.signatureToString(signatureData);
+
+        } catch (Exception ex)  {
+            throw new DDOException("Unable to generate service checksum: " + ex.getMessage());
+        }
+        return this;
+    }
 
     public static DID generateDID() throws DIDFormatException {
         DID did = DID.builder();
