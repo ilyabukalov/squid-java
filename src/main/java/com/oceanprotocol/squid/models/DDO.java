@@ -280,6 +280,15 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this.services;
     }
 
+    /**
+     * Given a user credentials this method do the following:
+     * - Calculate the individual DDO.services checksums
+     * - Calculate the DID using the hash of the DDO.services checksums
+     * - Generate the DDO.proof entry signing the DID generated and adding the credentials information
+     * @param credentials account credentials
+     * @return DDO
+     * @throws DDOException if there is an error calculating anything
+     */
     public DDO integrityBuilder(Credentials credentials) throws DDOException {
         SortedMap<String, String> checksums= new TreeMap<>();
         try {
