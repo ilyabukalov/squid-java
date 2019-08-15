@@ -7,7 +7,11 @@
   "dependencies": [
     {
       "name": "squid-spec",
-      "version": "0.3"
+      "version": "0.4"
+    },
+    {
+      "name": "OEP-7",
+      "version": "0.2"
     },
     {
       "name": "OEP-8",
@@ -19,7 +23,7 @@
     },
     {
       "name": "aquarius",
-      "version": "0.3.7"
+      "version": "0.4.0"
     },
     {
       "name": "brizo",

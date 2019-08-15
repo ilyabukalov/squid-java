@@ -1,6 +1,12 @@
 History
 =======
 
+0.7.0 (August, 2019)
+-------------------------
+DDO Breaking changes included:
+* New checksum & DID calculation implementing OEP7 v0.2
+* New Metadata format implementing OEP8 v0.4
+
 0.6.3 (July, 2019)
 -------------------------
 * Strategy pattern to build different types of Services
