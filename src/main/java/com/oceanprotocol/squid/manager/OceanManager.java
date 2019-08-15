@@ -31,6 +31,7 @@ import org.web3j.abi.EventEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.abi.datatypes.Type;
+import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
@@ -319,13 +320,16 @@ public class OceanManager extends BaseManager {
             // Add authentication
             ddo.addAuthentication(ddo.id);
 
+            // Generating the DDO.proof, checksums and calculating DID
+            ddo.integrityBuilder(getKeeperService().getCredentials());
+
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint, metadata.attributes.main.checksum, providerConfig.getProviderAddresses());
 
             // Storing DDO
             return getAquariusService().createDDO(ddo);
 
-        } catch (DDOException | DIDRegisterException e) {
+        } catch (DDOException | DIDRegisterException | IOException | CipherException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
