@@ -324,7 +324,7 @@ public class OceanManager extends BaseManager {
             ddo.integrityBuilder(getKeeperService().getCredentials());
 
             // Registering DID
-            registerDID(ddo.getDid(), metadataEndpoint, metadata.attributes.main.checksum, providerConfig.getProviderAddresses());
+            registerDID(ddo.getDid(), metadataEndpoint, ddo.getDid().getHash(), providerConfig.getProviderAddresses());
 
             // Storing DDO
             return getAquariusService().createDDO(ddo);

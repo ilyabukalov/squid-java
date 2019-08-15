@@ -59,8 +59,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public Proof proof;
 
-    @JsonProperty
-    public List<VerifiableCredential> verifiableCredential;
+    //@JsonProperty
+    //public List<VerifiableCredential> verifiableCredential;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
     @JsonDeserialize(using = CustomDateDeserializer.class)
@@ -158,6 +158,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
     }
 
+    /*
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class VerifiableCredential {
@@ -198,7 +199,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
         public VerifiableCredential(){}
 
-    }
+    }*/
 
     public DDO() throws DIDFormatException {
         this.did = generateDID();
