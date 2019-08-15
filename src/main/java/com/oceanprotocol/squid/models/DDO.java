@@ -283,17 +283,24 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     public DDO integrityBuilder(Credentials credentials) throws DDOException {
         SortedMap<String, String> checksums= new TreeMap<>();
         try {
+            // 1. Calculating the individual DDO.services checksums
             for (Service service : services) {
                 checksums.put(
                         String.valueOf(service.index),
                         service.attributes.main.checksum());
             }
+            // 2. Setting up the checksums in the DDO.proof.checksum entry
             proof.checksum= checksums;
+
+            // 3. Calculating the DID as a Hash of the DDO.services checksums
             this.did = DID.builder(toJson(checksums));
             this.id = this.did.getDid();
 
+            // 4. Completing the DDO.proof signing the DID and adding the rest of the values
             Sign.SignatureData signatureData= EthereumHelper.signMessage(this.id, credentials);
             proof.signatureValue= EncodingHelper.signatureToString(signatureData);
+            proof.creator= credentials.getAddress();
+            proof.created= getDateNowFormatted();
 
         } catch (Exception ex)  {
             throw new DDOException("Unable to generate service checksum: " + ex.getMessage());
