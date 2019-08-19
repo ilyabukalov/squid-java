@@ -141,7 +141,7 @@ public class AssetsApiIT {
         DID did = new DID(ddo.id);
         DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
         assertEquals(ddo.id, resolvedDDO.id);
-        assertTrue(resolvedDDO.services.size() == 3);
+        assertTrue(resolvedDDO.services.size() == 4);
 
     }
 
@@ -154,7 +154,7 @@ public class AssetsApiIT {
         DID did = new DID(ddo.id);
         DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
         assertEquals(ddo.id, resolvedDDO.id);
-        assertTrue(resolvedDDO.services.size() == 3);
+        assertTrue(resolvedDDO.services.size() == 4);
 
     }
 
