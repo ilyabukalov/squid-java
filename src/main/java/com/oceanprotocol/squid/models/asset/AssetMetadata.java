@@ -79,7 +79,7 @@ public class AssetMetadata extends AbstractModel {
         public String checksumType;
 
         @JsonProperty
-        public Integer contentLength;
+        public String contentLength;
 
         @JsonProperty
         public String encoding;
