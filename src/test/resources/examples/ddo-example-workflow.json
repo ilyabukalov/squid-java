@@ -5,6 +5,7 @@
     "publicKey": "did:op:0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea"
   }],
   "created": "2019-02-08T08:13:49Z",
+  "updated": "2019-06-30T14:53:09Z",
   "id": "did:op:0bc278fee025464f8012b811d1bce8e22094d0984e4e49139df5d5ff7a028bdf",
   "proof": {
     "created": "2019-02-08T08:13:41Z",
@@ -53,7 +54,7 @@
   }],
   "service": [
     {
-      "index": "0",
+      "index": 0,
       "serviceEndpoint": "http://localhost:5000/api/v1/aquarius/assets/ddo/{did}",
       "type": "metadata",
       "attributes": {
@@ -61,6 +62,7 @@
           "author": "John Doe",
           "checksum": "0x52b5c93b82dd9e7ecc3d9fdf4755f7f69a54484941897dc517b4adfe3bbc3377",
           "dateCreated": "2019-02-08T08:13:49Z",
+          "datePublished": "2019-05-08T08:13:49Z",
           "license": "CC-BY",
           "name": "My workflow",
           "price": "1",

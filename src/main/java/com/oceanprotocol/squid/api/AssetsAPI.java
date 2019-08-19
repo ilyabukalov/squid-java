@@ -141,7 +141,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, String basePath, int threshold) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath, int threshold) throws ConsumeServiceException;
 
     /**
      *  Downloads a single file of an Asset previously ordered through a Service Agreement
@@ -153,7 +153,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, String basePath) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath) throws ConsumeServiceException;
 
     /**
      * Downloads an Asset previously ordered through a Service Agreement
@@ -166,7 +166,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException;
 
     /**
      * Downloads an Asset previously ordered through a Service Agreement
@@ -178,7 +178,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath) throws ConsumeServiceException;
 
 
     /**
@@ -190,7 +190,7 @@ public interface AssetsAPI {
      * @return the input stream wit the binary content of the file
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index) throws ConsumeServiceException;
 
     /**
      * Gets the input stream of one file of the asset
@@ -202,7 +202,7 @@ public interface AssetsAPI {
      * @return the input stream wit the binary content of the file
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException;
 
 
     /**
@@ -216,7 +216,7 @@ public interface AssetsAPI {
      * @return                    the input stream wit the binary content of the specified range
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException;
 
 
     /**
@@ -231,7 +231,7 @@ public interface AssetsAPI {
      * @return                    the input stream wit the binary content of the specified range
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException;
 
 
     /**
@@ -242,7 +242,7 @@ public interface AssetsAPI {
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
      * @throws OrderException OrderException
      */
-    Flowable<OrderResult> order(DID did, String serviceDefinitionId) throws OrderException;
+    Flowable<OrderResult> order(DID did, int serviceDefinitionId) throws OrderException;
 
     /**
      * Return the owner of the asset.

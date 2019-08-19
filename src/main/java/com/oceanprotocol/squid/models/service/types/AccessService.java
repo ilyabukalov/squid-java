@@ -34,13 +34,13 @@ public class AccessService extends Service {
         this.type = serviceTypes.access.toString();
     }
 
-    public AccessService(String serviceEndpoint, String index, String templateId) {
+    public AccessService(String serviceEndpoint, int index, String templateId) {
         super(serviceTypes.access, serviceEndpoint, index);
         this.templateId = templateId;
     }
 
 
-    public AccessService(String serviceEndpoint, String index,
+    public AccessService(String serviceEndpoint, int index,
                          ServiceAgreementTemplate serviceAgreementTemplate,
                          String templateId
     ) {

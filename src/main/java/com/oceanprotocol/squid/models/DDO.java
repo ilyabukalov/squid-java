@@ -8,6 +8,10 @@ package com.oceanprotocol.squid.models;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
+import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
+import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.service.*;
@@ -17,6 +21,8 @@ import com.oceanprotocol.squid.models.service.types.ComputingService;
 import com.oceanprotocol.squid.models.service.types.MetadataService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Sign;
 
 import java.util.*;
 
@@ -53,8 +59,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public Proof proof;
 
-    @JsonProperty
-    public List<VerifiableCredential> verifiableCredential;
+    //@JsonProperty
+    //public List<VerifiableCredential> verifiableCredential;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_PATTERN)
     @JsonDeserialize(using = CustomDateDeserializer.class)
@@ -152,6 +158,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
     }
 
+    /*
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class VerifiableCredential {
@@ -192,12 +199,14 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
         public VerifiableCredential(){}
 
-    }
+    }*/
 
     public DDO() throws DIDFormatException {
         this.did = generateDID();
         if (null == this.created)
             this.created = getDateNowFormatted();
+        if (null == this.updated)
+            this.updated = getDateNowFormatted();
 
         this.id = this.did.toString();
     }
@@ -223,7 +232,6 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     public DDO addService(Service service) {
-        service.index = (service.index!=null&&!service.index.isEmpty())?service.index:String.valueOf(services.size());
         services.add(service);
         return this;
     }
@@ -273,6 +281,42 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         return this.services;
     }
 
+    /**
+     * Given a user credentials this method do the following:
+     * - Calculate the individual DDO.services checksums
+     * - Calculate the DID using the hash of the DDO.services checksums
+     * - Generate the DDO.proof entry signing the DID generated and adding the credentials information
+     * @param credentials account credentials
+     * @return DDO
+     * @throws DDOException if there is an error calculating anything
+     */
+    public DDO integrityBuilder(Credentials credentials) throws DDOException {
+        SortedMap<String, String> checksums= new TreeMap<>();
+        try {
+            // 1. Calculating the individual DDO.services checksums
+            for (Service service : services) {
+                checksums.put(
+                        String.valueOf(service.index),
+                        service.attributes.main.checksum());
+            }
+            // 2. Setting up the checksums in the DDO.proof.checksum entry
+            proof.checksum= checksums;
+
+            // 3. Calculating the DID as a Hash of the DDO.services checksums
+            this.did = DID.builder(toJson(checksums));
+            this.id = this.did.getDid();
+
+            // 4. Completing the DDO.proof signing the DID and adding the rest of the values
+            Sign.SignatureData signatureData= EthereumHelper.signMessage(this.id, credentials);
+            proof.signatureValue= EncodingHelper.signatureToString(signatureData);
+            proof.creator= credentials.getAddress();
+            proof.created= getDateNowFormatted();
+
+        } catch (Exception ex)  {
+            throw new DDOException("Unable to generate service checksum: " + ex.getMessage());
+        }
+        return this;
+    }
 
     public static DID generateDID() throws DIDFormatException {
         DID did = DID.builder();
@@ -286,9 +330,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
 
-    public AccessService getAccessService(String serviceDefinitionId) throws ServiceException {
+    public AccessService getAccessService(int serviceDefinitionId) throws ServiceException {
         for (Service service : services) {
-            if (service.index.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.access.toString())) {
+            if (service.index == serviceDefinitionId && service.type.equals(Service.serviceTypes.access.toString())) {
                 return (AccessService) service;
             }
         }
@@ -296,9 +340,9 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     @JsonIgnore
-    public AuthorizationService getAuthorizationService(String serviceDefinitionId) {
+    public AuthorizationService getAuthorizationService(int serviceDefinitionId) {
         for (Service service : services) {
-            if (service.index.equals(serviceDefinitionId) && service.type.equals(Service.serviceTypes.authorization.toString())) {
+            if (service.index == serviceDefinitionId && service.type.equals(Service.serviceTypes.authorization.toString())) {
                 return (AuthorizationService) service;
             }
         }

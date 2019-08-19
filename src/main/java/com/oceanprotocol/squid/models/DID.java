@@ -7,6 +7,9 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 
 import java.util.UUID;
@@ -25,6 +28,16 @@ public class DID {
 
     public DID(String did) throws DIDFormatException {
         setDid(did);
+    }
+
+    public static DID builder(String seed) throws DIDFormatException {
+        DID _did= new DID(
+                PREFIX +
+                EthereumHelper.remove0x(
+                    CryptoHelper.sha3256(seed))
+        );
+        _did.setDid(_did.getDid());
+        return _did;
     }
 
     public static DID builder() throws DIDFormatException {
