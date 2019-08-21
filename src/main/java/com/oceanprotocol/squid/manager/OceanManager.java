@@ -340,9 +340,7 @@ public class OceanManager extends BaseManager {
             }
 
             service.attributes.serviceAgreementTemplate.conditions = conditions;
-            List<BigInteger> timeouts = service.retrieveTimeOuts();
-            // TODO set service.attributes.main.timeout
-
+            service.attributes.main.timeout = service.getServiceTimeout();
 
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint, ddo.getDid().getHash(), providerConfig.getProviderAddresses());

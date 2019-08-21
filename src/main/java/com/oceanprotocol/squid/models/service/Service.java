@@ -155,6 +155,12 @@ public class Service extends AbstractModel implements FromJsonToModel {
         return timeOutsList;
     }
 
+    public Integer getServiceTimeout() {
+
+        List<BigInteger> timeOutsList = retrieveTimeOuts();
+        return timeOutsList.stream().mapToInt(BigInteger::intValue).max().orElse(0);
+    }
+
     public List<BigInteger> retrieveTimeLocks() {
         List<BigInteger> timeLocksList = new ArrayList<BigInteger>();
         for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
