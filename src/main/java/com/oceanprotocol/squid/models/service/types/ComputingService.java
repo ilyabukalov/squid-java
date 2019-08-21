@@ -110,13 +110,6 @@ public class ComputingService extends Service {
 
     }
 
-
-    //@JsonProperty
-    //public Provider provider;
-
-    //@JsonProperty
-    //public ServiceAgreementTemplate serviceAgreementTemplate;
-
     public ComputingService() {
         this.type = serviceTypes.computing.toString();
     }
@@ -130,7 +123,7 @@ public class ComputingService extends Service {
     public ComputingService(String serviceEndpoint, int serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
         super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
-        this.attributes.main.serviceAgreementTemplate = serviceAgreementTemplate;
+        this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
     }
 
 }

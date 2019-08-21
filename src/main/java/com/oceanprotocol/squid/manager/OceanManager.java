@@ -6,6 +6,7 @@
 package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
 import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
 import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
@@ -181,37 +182,31 @@ public class OceanManager extends BaseManager {
     }
 
 
-    private  Map<String, Object> buildBasicAccessServiceConfiguration(ProviderConfig providerConfig, String did, String price) {
+    private  Map<String, Object> buildBasicAccessServiceConfiguration(ProviderConfig providerConfig, String price, String creatorAddress) {
 
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("providerConfig", providerConfig);
         configuration.put("accessServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
-        configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
-        configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
         configuration.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
-        configuration.put("did", did);
         configuration.put("price", price);
+        configuration.put("creator", creatorAddress);
 
         return configuration;
 
     }
 
 
-    private  Map<String, Object> buildBasicComputingServiceConfiguration(ProviderConfig providerConfig, ComputingService.Provider computingProvider, String did, String price) {
+    private  Map<String, Object> buildBasicComputingServiceConfiguration(ProviderConfig providerConfig, ComputingService.Provider computingProvider, String price, String creatorAddress) {
 
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("providerConfig", providerConfig);
         configuration.put("computingProvider", computingProvider);
-
         // TODO Define template to use
         configuration.put("computingServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
-        configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
-        configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
-
         // TODO Define contract to use
         configuration.put("execComputeConditionAddress", accessSecretStoreCondition.getContractAddress());
-        configuration.put("did", did);
         configuration.put("price", price);
+        configuration.put("creator", creatorAddress);
 
         return configuration;
 
@@ -232,12 +227,12 @@ public class OceanManager extends BaseManager {
 
              DID did = DDO.generateDID();
 
-             Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, did.toString(), metadata.attributes.main.price);
+             Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, metadata.attributes.main.price, getMainAccount().address);
              Service accessService = ServiceBuilder
                     .getServiceBuilder(Service.serviceTypes.access)
                     .buildService(configuration);
 
-            return registerAsset(metadata, providerConfig, did, accessService, threshold);
+            return registerAsset(metadata, providerConfig, accessService, threshold);
 
         } catch ( DIDFormatException | ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
@@ -260,16 +255,14 @@ public class OceanManager extends BaseManager {
 
         try {
 
-            DID did = DDO.generateDID();
-
-            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, did.toString(), metadata.attributes.main.price);
+            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, metadata.attributes.main.price, getMainAccount().address);
             Service computingService = ServiceBuilder
                     .getServiceBuilder(Service.serviceTypes.computing)
                     .buildService(configuration);
 
-            return registerAsset(metadata, providerConfig, did, computingService, threshold);
+            return registerAsset(metadata, providerConfig, computingService, threshold);
 
-        } catch ( DIDFormatException | ServiceException e) {
+        } catch ( ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
@@ -280,13 +273,12 @@ public class OceanManager extends BaseManager {
      *
      * @param metadata       the metadata
      * @param providerConfig the service Endpoints
-     * @param did            the did
      * @param service        the service
      * @param threshold      secret store threshold
      * @return an instance of the DDO created
      * @throws DDOException DDOException
      */
-    private DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, DID did, Service service, int threshold) throws DDOException {
+    private DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, Service service, int threshold) throws DDOException {
 
         try {
 
@@ -308,7 +300,7 @@ public class OceanManager extends BaseManager {
             }
 
             // Initializing DDO
-            DDO ddo = this.buildDDO(did, metadataService, authorizationService, getMainAccount().address, threshold);
+            DDO ddo = this.buildDDO(metadataService, authorizationService, getMainAccount().address, threshold);
 
             // Adding services to DDO
             ddo.addService(service);
@@ -322,6 +314,35 @@ public class OceanManager extends BaseManager {
 
             // Generating the DDO.proof, checksums and calculating DID
             ddo.integrityBuilder(getKeeperService().getCredentials());
+
+            // Initialize conditions
+            ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
+            List<Condition> conditions;
+            Map<String, Object> conditionParams = null;
+
+            if (service instanceof AccessService)
+                conditionParams = ServiceBuilder.getAccessConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
+                        escrowReward.getContractAddress(),
+                        lockRewardCondition.getContractAddress(),
+                        accessSecretStoreCondition.getContractAddress());
+            else if (service instanceof ComputingService)
+                // TODO Change accessSecretStoreCondition address for future execCOmpute Condition
+                conditionParams = ServiceBuilder.getComputingConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
+                        escrowReward.getContractAddress(),
+                        lockRewardCondition.getContractAddress(),
+                        accessSecretStoreCondition.getContractAddress());
+
+
+            try {
+                conditions = sla.initializeConditions(conditionParams);
+            }catch (InitializeConditionsException  e) {
+                throw new DDOException("Error registering Asset.", e);
+            }
+
+            service.attributes.serviceAgreementTemplate.conditions = conditions;
+            List<BigInteger> timeouts = service.retrieveTimeOuts();
+            // TODO set service.attributes.main.timeout
+
 
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint, ddo.getDid().getHash(), providerConfig.getProviderAddresses());

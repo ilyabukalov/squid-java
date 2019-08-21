@@ -212,10 +212,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
 
-    public DDO(DID did, MetadataService metadataService, String publicKey, String signature) throws DIDFormatException {
-
-        this.did = did;
-        this.id = did.toString();
+    public DDO(MetadataService metadataService, String publicKey, String signature) throws DIDFormatException {
 
         if (null == this.created)
             this.created = getDateNowFormatted();
@@ -224,6 +221,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         this.proof = new Proof(UUID_PROOF_TYPE, publicKey, signature);
         this.publicKeys.add(new DDO.PublicKey(this.id, ETHEREUM_KEY_TYPE, publicKey));
     }
+
 
     @JsonSetter("id")
     public void didSetter(String id) throws DIDFormatException {

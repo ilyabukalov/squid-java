@@ -15,6 +15,7 @@ import com.oceanprotocol.squid.models.service.attributes.ServiceAdditionalInform
 import com.oceanprotocol.squid.models.service.attributes.ServiceCuration;
 import com.oceanprotocol.squid.models.service.attributes.ServiceMain;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -82,6 +83,9 @@ public class Service extends AbstractModel implements FromJsonToModel {
         public ServiceAdditionalInformation additionalInformation;
 
         @JsonProperty
+        public Service.ServiceAgreementTemplate serviceAgreementTemplate;
+
+        @JsonProperty
         public ServiceCuration curation;
 
         public Attributes(){}
@@ -141,6 +145,30 @@ public class Service extends AbstractModel implements FromJsonToModel {
         this.attributes = new Attributes();
         this.attributes.main = new ServiceMain();
         this.attributes.additionalInformation = new ServiceAdditionalInformation();
+    }
+
+    public List<BigInteger> retrieveTimeOuts() {
+        List<BigInteger> timeOutsList = new ArrayList<BigInteger>();
+        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
+            timeOutsList.add(BigInteger.valueOf(condition.timeout));
+        }
+        return timeOutsList;
+    }
+
+    public List<BigInteger> retrieveTimeLocks() {
+        List<BigInteger> timeLocksList = new ArrayList<BigInteger>();
+        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
+            timeLocksList.add(BigInteger.valueOf(condition.timelock));
+        }
+        return timeLocksList;
+    }
+
+    public Condition getConditionbyName(String name) {
+
+        return this.attributes.serviceAgreementTemplate.conditions.stream()
+                .filter(condition -> condition.name.equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
 }

@@ -24,8 +24,6 @@ public class ServiceMain extends AbstractModel {
     @JsonProperty
     public String type;
 
-    @JsonProperty
-    public Service.ServiceAgreementTemplate serviceAgreementTemplate;
 
     // Properties of Authorization Service
     @JsonProperty
@@ -44,6 +42,10 @@ public class ServiceMain extends AbstractModel {
 
     @JsonProperty
     public String creator;
+
+
+    @JsonProperty
+    public int timeout;
 
     // Properties of Metadata
 

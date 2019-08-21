@@ -6,10 +6,12 @@ import com.oceanprotocol.squid.core.sla.handlers.ServiceComputingAgreementHandle
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
+import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.types.ComputingService;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,17 +37,14 @@ public interface ServiceBuilder {
             ProviderConfig providerConfig = (ProviderConfig) config.get("providerConfig");
             ComputingService.Provider computingProvider = (ComputingService.Provider) config.get("computingProvider");
             String computingServiceTemplateId = (String) config.get("computingServiceTemplateId");
-            String escrowRewardAddress = (String) config.get("escrowRewardAddress");
-            String lockRewardConditionAddress = (String) config.get("lockRewardConditionAddress");
-            String execComputeConditionAddress = (String) config.get("execComputeConditionAddress");
-            String did = (String)config.get("did");
             String price = (String)config.get("price");
-            return buildComputingService(providerConfig, computingProvider, computingServiceTemplateId, escrowRewardAddress, lockRewardConditionAddress, execComputeConditionAddress, did, price);
+            String creator = (String)config.get("creator");
+            return buildComputingService(providerConfig, computingProvider, computingServiceTemplateId, price, creator);
         };
 
     }
 
-    private static ComputingService buildComputingService(ProviderConfig providerConfig, ComputingService.Provider computingProvider, String computingServiceTemplateId, String escrowRewardAddress, String lockRewardConditionAddress, String execComputeConditionAddress, String did, String price) throws DDOException {
+    private static ComputingService buildComputingService(ProviderConfig providerConfig, ComputingService.Provider computingProvider, String computingServiceTemplateId, String price, String creator) throws DDOException {
 
         // Definition of a DEFAULT ServiceAgreement Contract
         ComputingService.ServiceAgreementTemplate serviceAgreementTemplate = new ComputingService.ServiceAgreementTemplate();
@@ -72,14 +71,14 @@ public interface ServiceBuilder {
 
         computingService.attributes.main.provider = computingProvider;
 
-        /*
-        TODO makes sense this properties would be in computing service as well?
-        computingService.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
-        computingService.name = "dataAssetAccessServiceAgreement";
-        computingService.creator = "";
-        */
+        computingService.attributes.main.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
+        computingService.attributes.main.name = "dataAssetAccessServiceAgreement";
+        computingService.attributes.main.price = price;
+        computingService.attributes.main.creator = creator;
+        computingService.attributes.main.datePublished = new Date();
 
         // Initializing conditions and adding to Computing service
+        /*
         ServiceAgreementHandler sla = new ServiceComputingAgreementHandler();
         try {
             computingService.attributes.main.serviceAgreementTemplate.conditions = sla.initializeConditions(
@@ -87,6 +86,7 @@ public interface ServiceBuilder {
         }catch (InitializeConditionsException  e) {
             throw new DDOException("Error registering Asset.", e);
         }
+         */
         return computingService;
     }
 
@@ -97,17 +97,14 @@ public interface ServiceBuilder {
 
             ProviderConfig providerConfig = (ProviderConfig) config.get("providerConfig");
             String accessServiceTemplateId = (String) config.get("accessServiceTemplateId");
-            String escrowRewardAddress = (String) config.get("escrowRewardAddress");
-            String lockRewardConditionAddress = (String) config.get("lockRewardConditionAddress");
-            String accessSecretStoreConditionAddress = (String) config.get("accessSecretStoreConditionAddress");
-            String did = (String)config.get("did");
             String price = (String)config.get("price");
-            return buildAccessService(providerConfig, accessServiceTemplateId, escrowRewardAddress, lockRewardConditionAddress, accessSecretStoreConditionAddress, did, price);
+            String creator = (String)config.get("creator");
+            return buildAccessService(providerConfig, accessServiceTemplateId, price, creator);
         };
 
     }
 
-    private static AccessService buildAccessService(ProviderConfig providerConfig, String accessServiceTemplateId, String escrowRewardAddress, String lockRewardConditionAddress, String accessSecretStoreConditionAddress, String did, String price) throws DDOException {
+    private static AccessService buildAccessService(ProviderConfig providerConfig, String accessServiceTemplateId, String price, String creator) {
 
         // Definition of a DEFAULT ServiceAgreement Contract
         AccessService.ServiceAgreementTemplate serviceAgreementTemplate = new AccessService.ServiceAgreementTemplate();
@@ -133,8 +130,11 @@ public interface ServiceBuilder {
                 accessServiceTemplateId);
         accessService.attributes.main.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
         accessService.attributes.main.name = "dataAssetAccessServiceAgreement";
-        accessService.attributes.main.creator = "";
+        accessService.attributes.main.price = price;
+        accessService.attributes.main.creator = creator;
+        accessService.attributes.main.datePublished = new Date();
 
+        /*
         // Initializing conditions and adding to Access service
         ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
         try {
@@ -143,6 +143,7 @@ public interface ServiceBuilder {
         }catch (InitializeConditionsException  e) {
             throw new DDOException("Error registering Asset.", e);
         }
+         */
         return accessService;
     }
 
@@ -154,7 +155,7 @@ public interface ServiceBuilder {
      * @param price the price
      * @return a Map with the params of the Access ConditionStatusMap
      */
-    private static  Map<String, Object> getAccessConditionParams(String did, String price,  String escrowRewardAddress, String lockRewardConditionAddress, String accessSecretStoreConditionAddress) {
+    public static  Map<String, Object> getAccessConditionParams(String did, String price,  String escrowRewardAddress, String lockRewardConditionAddress, String accessSecretStoreConditionAddress) {
         Map<String, Object> params = new HashMap<>();
         params.put("parameter.did", did);
         params.put("parameter.price", price);
@@ -176,7 +177,7 @@ public interface ServiceBuilder {
      * @param price the price
      * @return a Map with the params of the Access ConditionStatusMap
      */
-    private static  Map<String, Object> getComputingConditionParams(String did, String price,  String escrowRewardAddress, String lockRewardConditionAddress, String execComputeConditionAddress) {
+    public static  Map<String, Object> getComputingConditionParams(String did, String price,  String escrowRewardAddress, String lockRewardConditionAddress, String execComputeConditionAddress) {
         Map<String, Object> params = new HashMap<>();
         params.put("parameter.did", did);
         params.put("parameter.price", price);

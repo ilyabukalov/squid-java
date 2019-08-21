@@ -118,20 +118,11 @@ public abstract class BaseManager {
 
             metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
 
-
             String filesJson = metadataService.toJson(metadataService.attributes.main.files);
             metadataService.attributes.main.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
-
-             /*
-            TODO CALCULATE checksum and signature
-            metadataService.metadata.base.checksum = metadataService.metadata.generateMetadataChecksum(did.getDid());
-            Sign.SignatureData signatureSource = EthereumHelper.signMessage(metadataService.metadata.base.checksum, credentials);
-            String signature = EncodingHelper.signatureToString(signatureSource);
-             */
-
             String signature = "";
 
-            return new DDO(did, metadataService, address, signature);
+            return new DDO(metadataService, address, signature);
         } catch (DIDFormatException  | EncryptionException |CipherException | IOException e) {
             throw new DDOException("Error building DDO", e);
         }

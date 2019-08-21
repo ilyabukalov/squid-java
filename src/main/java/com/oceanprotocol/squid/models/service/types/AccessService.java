@@ -46,7 +46,7 @@ public class AccessService extends Service {
     ) {
         super(serviceTypes.access, serviceEndpoint, index);
         this.templateId = templateId;
-        this.attributes.main.serviceAgreementTemplate = serviceAgreementTemplate;
+        this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
 
     }
 
@@ -182,7 +182,7 @@ public class AccessService extends Service {
 
         String data = "";
 
-        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
             String token = "";
 
             for (Condition.ConditionParameter param : condition.parameters) {
@@ -198,7 +198,7 @@ public class AccessService extends Service {
     public String fetchTimeout() throws IOException {
         String data = "";
 
-        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
             data = data + EthereumHelper.remove0x(
                     EncodingHelper.hexEncodeAbiType("uint256", condition.timeout));
         }
@@ -210,7 +210,7 @@ public class AccessService extends Service {
     public String fetchTimelock() throws IOException {
         String data = "";
 
-        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
+        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
             data = data + EthereumHelper.remove0x(
                     EncodingHelper.hexEncodeAbiType("uint256", condition.timelock));
         }
@@ -218,30 +218,6 @@ public class AccessService extends Service {
         return data;
     }
 
-
-    public Condition getConditionbyName(String name) {
-
-        return this.attributes.main.serviceAgreementTemplate.conditions.stream()
-                .filter(condition -> condition.name.equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public List<BigInteger> retrieveTimeOuts() {
-        List<BigInteger> timeOutsList = new ArrayList<BigInteger>();
-        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
-            timeOutsList.add(BigInteger.valueOf(condition.timeout));
-        }
-        return timeOutsList;
-    }
-
-    public List<BigInteger> retrieveTimeLocks() {
-        List<BigInteger> timeLocksList = new ArrayList<BigInteger>();
-        for (Condition condition : attributes.main.serviceAgreementTemplate.conditions) {
-            timeLocksList.add(BigInteger.valueOf(condition.timelock));
-        }
-        return timeLocksList;
-    }
 
     public List<byte[]> generateConditionIds(String agreementId, OceanManager oceanManager, DDO ddo, String consumerAddress) throws Exception {
         List<byte[]> conditionIds = new ArrayList<byte[]>();
