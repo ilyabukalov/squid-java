@@ -54,7 +54,7 @@ public abstract class AbstractModel {
     }
 
     public String checksum() throws JsonProcessingException {
-        return CryptoHelper.sha3256(toJson());
+        return CryptoHelper.sha3_256(toJson());
     }
 
     public String toJson() throws JsonProcessingException {

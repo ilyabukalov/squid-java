@@ -25,7 +25,7 @@
         <final-name>squid</final-name>
 
         <web3j.version>4.1.1</web3j.version>
-        <common-utils.version>0.1.4</common-utils.version>
+        <common-utils.version>0.1.5</common-utils.version>
 
         <ocean.keeper.version>0.10.3</ocean.keeper.version>
         <ocean.secretstore.version>0.1.4</ocean.secretstore.version>

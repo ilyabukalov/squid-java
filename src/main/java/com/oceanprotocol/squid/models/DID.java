@@ -34,7 +34,7 @@ public class DID {
         DID _did= new DID(
                 PREFIX +
                 EthereumHelper.remove0x(
-                    CryptoHelper.sha3256(seed))
+                    CryptoHelper.sha3_256(seed))
         );
         _did.setDid(_did.getDid());
         return _did;
