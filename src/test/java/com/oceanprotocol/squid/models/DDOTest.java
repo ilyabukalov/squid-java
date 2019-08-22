@@ -22,6 +22,8 @@ import org.web3j.crypto.WalletUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static com.oceanprotocol.squid.models.AbstractModel.DATE_FORMAT;
 import static org.junit.Assert.*;
@@ -81,6 +83,32 @@ public class DDOTest {
 
         assertTrue(ddo.id.startsWith(DID.PREFIX));
         assertEquals(64, ddo.getDid().getHash().length());
+    }
+
+
+    @Test
+    public void generateDIDFromChecksums() throws Exception {
+
+        SortedMap<String, String> checksums= new TreeMap<>();
+        checksums.put("0", "0x52b5c93b82dd9e7ecc3d9fdf4755f7f69a54484941897dc517b4adfe3bbc3377");
+        checksums.put("1",  "0x999999952b5c93b82dd9e7ecc3d9fdf4755f7f69a54484941897dc517b4adfe3");
+
+        DDO ddo = new DDO();
+        String json = ddo.toJson(checksums);
+
+        DID did = DID.builder(json);
+        log.debug("Did generated from checksums: " + did.did);
+        assertEquals(64, did.getHash().length());
+    }
+
+    @Test
+    public void generateChecksums() throws Exception {
+
+        DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
+        SortedMap<String, String> checksums = ddo.generateChecksums();
+
+        assertEquals(2, checksums.size());
+
     }
 
     @Test
