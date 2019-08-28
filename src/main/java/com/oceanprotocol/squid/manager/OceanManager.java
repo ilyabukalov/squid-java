@@ -225,7 +225,7 @@ public class OceanManager extends BaseManager {
 
         try {
 
-             DID did = DDO.generateDID();
+             //DID did = DDO.generateDID();
 
              Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, metadata.attributes.main.price, getMainAccount().address);
              Service accessService = ServiceBuilder
@@ -234,7 +234,7 @@ public class OceanManager extends BaseManager {
 
             return registerAsset(metadata, providerConfig, accessService, threshold);
 
-        } catch ( DIDFormatException | ServiceException e) {
+        } catch (ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
