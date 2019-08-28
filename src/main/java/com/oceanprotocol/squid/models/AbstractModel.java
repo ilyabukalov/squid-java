@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -54,6 +55,7 @@ public abstract class AbstractModel {
     }
 
     public String checksum() throws JsonProcessingException {
+        //return EthereumHelper.add0x(CryptoHelper.sha3_256(toJson()));
         return CryptoHelper.sha3_256(toJson());
     }
 

@@ -81,13 +81,13 @@ public class DdoIT {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(2, checksums.size());
-        assertEquals("cdf7af4efa44ba3c6d05745ee2ae55d8caac1c672db97414c2c9a5b759088cde", checksums.get("0"));
-        assertEquals("c3dfa5f742c5a6aa75dd005f5f24486ba790d370e3d8a108fce2217814ae177c", checksums.get("1"));
+        assertEquals("e03ea51adbbb8a214efb0ecb883ca61b42593ab29cf9644f29bf55b26c8839f8", checksums.get("0"));
+        assertEquals("d0110601aacf848d5d68ec5f48cbc7349f6ec09b643cc40f0ef3a1f82f348045", checksums.get("1"));
 
         DID did = DID.builder(OEP7_DATASET_EXAMPLE_CONTENT);
         log.debug("Did generated from checksums: " + did.did);
         assertEquals(64, did.getHash().length());
-        assertEquals("did:op:96005eb0794903a4138f568a8d0e117ededda2f87999c083af2443d0fdc459a2", did.did);
+        assertEquals("did:op:b438d5fbb7636efe4ee2d2d2e99f55f08be5616eb42e36f8131810adf693040d", did.did);
 
     }
 
