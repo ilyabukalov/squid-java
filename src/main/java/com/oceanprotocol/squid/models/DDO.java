@@ -349,13 +349,13 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
 
-    public AccessService getAccessService(int serviceDefinitionId) throws ServiceException {
+    public AccessService getAccessService(int index) throws ServiceException {
         for (Service service : services) {
-            if (service.index == serviceDefinitionId && service.type.equals(Service.serviceTypes.access.toString())) {
+            if (service.index == index && service.type.equals(Service.serviceTypes.access.toString())) {
                 return (AccessService) service;
             }
         }
-        throw new ServiceException("Access Service with serviceDefinitionId=" + serviceDefinitionId + " not found");
+        throw new ServiceException("Access Service with index=" + index + " not found");
     }
 
     @JsonIgnore
