@@ -6,15 +6,15 @@
 package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
+import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.types.AuthorizationService;
 import com.oceanprotocol.squid.models.service.types.MetadataService;
-import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -97,7 +97,7 @@ public class BaseManagerTest {
     public void buildDDOWithAuthorizationService() throws Exception {
 
         String serviceEndpoint =  config.getString("secretstore.url");
-        AuthorizationService authorizationService = new AuthorizationService(Service.serviceTypes.authorization, serviceEndpoint, Service.DEFAULT_AUTHORIZATION_INDEX);
+        AuthorizationService authorizationService = new AuthorizationService(serviceEndpoint, Service.DEFAULT_AUTHORIZATION_INDEX);
 
         DDO ddo = baseManager.buildDDO(metadataService, authorizationService, SERVICE_AGREEMENT_ADDRESS);
         assertNotNull(ddo.proof);

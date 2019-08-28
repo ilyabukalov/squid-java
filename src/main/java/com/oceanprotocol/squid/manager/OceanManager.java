@@ -5,18 +5,18 @@
 
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
-import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
-import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
-import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
-import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
-import com.oceanprotocol.squid.exceptions.*;
-import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.BrizoService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.common.helpers.UrlHelper;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
+import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
+import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
+import com.oceanprotocol.squid.exceptions.*;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
@@ -292,11 +292,11 @@ public class OceanManager extends BaseManager {
             // Initialization of services supported for this asset
             MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_INDEX);
 
-            ProvenanceService provenanceService= new ProvenanceService(Service.serviceTypes.provenance, providerConfig.getMetadataEndpoint(), Service.DEFAULT_PROVENANCE_INDEX);
+            ProvenanceService provenanceService= new ProvenanceService(providerConfig.getMetadataEndpoint(), Service.DEFAULT_PROVENANCE_INDEX);
             AuthorizationService authorizationService = null;
             //Adding the authorization service if the endpoint is defined
             if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
-                authorizationService = new AuthorizationService(Service.serviceTypes.authorization, providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_INDEX);
+                authorizationService = new AuthorizationService(providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_INDEX);
             }
 
             // Initializing DDO

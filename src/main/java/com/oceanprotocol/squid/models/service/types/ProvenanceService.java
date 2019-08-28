@@ -14,19 +14,25 @@ import com.oceanprotocol.squid.models.service.Service;
 @JsonPropertyOrder(alphabetic = true)
 public class ProvenanceService extends Service {
 
+
+    @JsonIgnore
+    public static final int DEFAULT_INDEX = 1;
+
     @JsonIgnore
     public static final String DEFAULT_SERVICE = "provenance";
 
     public ProvenanceService() {
+        this.index = DEFAULT_INDEX;
+        this.type= serviceTypes.provenance.toString();
     }
 
-    public ProvenanceService(serviceTypes type, String serviceEndpoint, int index, String service) {
-        super(type, serviceEndpoint, index);
+    public ProvenanceService(String serviceEndpoint, int index, String service) {
+        super(Service.serviceTypes.provenance, serviceEndpoint, index);
         this.attributes.main.service = service;
     }
 
-    public ProvenanceService(serviceTypes type, String serviceEndpoint, int index) {
-        super(type, serviceEndpoint, index);
+    public ProvenanceService(String serviceEndpoint, int index) {
+        super(Service.serviceTypes.provenance, serviceEndpoint, index);
         this.attributes.main.service = DEFAULT_SERVICE;
     }
 

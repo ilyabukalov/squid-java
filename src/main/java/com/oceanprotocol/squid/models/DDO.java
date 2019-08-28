@@ -15,10 +15,7 @@ import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.models.service.*;
-import com.oceanprotocol.squid.models.service.types.AccessService;
-import com.oceanprotocol.squid.models.service.types.AuthorizationService;
-import com.oceanprotocol.squid.models.service.types.ComputingService;
-import com.oceanprotocol.squid.models.service.types.MetadataService;
+import com.oceanprotocol.squid.models.service.types.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Credentials;
@@ -27,6 +24,7 @@ import org.web3j.crypto.Sign;
 import java.util.*;
 
 import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;
+import static com.oceanprotocol.squid.models.service.Service.*;
 
 @JsonPropertyOrder(alphabetic = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -229,13 +227,20 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         this.did = new DID(id);
     }
 
-    public DDO addService(Service service) {
-        services.add(service);
-        return this;
-    }
 
     public DDO addAuthentication(String id) {
         this.authentication.add(new Authentication(id));
+        return this;
+    }
+
+
+    private void sortServices()    {
+        Collections.sort(services, new DDOServiceIndexSorter());
+    }
+
+
+    public DDO addService(Service service) {
+        services.add(service);
         return this;
     }
 
@@ -247,6 +252,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
                 if (service.containsKey("type")) {
                     if (service.get("type").equals(Service.serviceTypes.metadata.toString()) && service.containsKey("metadata")) {
                         this.services.add(getMapperInstance().convertValue(service, MetadataService.class));
+                    } else if (service.get("type").equals(Service.serviceTypes.provenance.toString())) {
+                        this.services.add(getMapperInstance().convertValue(service, ProvenanceService.class));
                     } else if (service.get("type").equals(Service.serviceTypes.access.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AccessService.class));
                     } else if (service.get("type").equals(Service.serviceTypes.computing.toString())) {
@@ -290,6 +297,8 @@ public class DDO extends AbstractModel implements FromJsonToModel {
      */
     public DDO integrityBuilder(Credentials credentials) throws DDOException {
         try {
+            // 1. Sorting services
+            sortServices();
 
             // 2. Setting up the checksums in the DDO.proof.checksum entry
             proof.checksum= generateChecksums();
@@ -309,6 +318,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         }
         return this;
     }
+
 
     public SortedMap<String, String> generateChecksums() throws DDOException {
 

@@ -1,11 +1,15 @@
 package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.WalletUtils;
 
 import java.net.URI;
 import java.util.SortedMap;
@@ -31,6 +35,11 @@ public class DdoIT {
     private static  String OEP7_WORKFLOW_EXAMPLE_CONTENT;
     private static  String OEP7_SERVICE_EXAMPLE_CONTENT;
 
+    private static final Config config = ConfigFactory.load();
+
+    private static Credentials credentials;
+
+
     @BeforeClass
     public static void setUp() throws Exception {
 
@@ -42,6 +51,9 @@ public class DdoIT {
         OEP7_WORKFLOW_EXAMPLE_CONTENT = IOUtils.toString(new URI(OEP7_WORKFLOW_EXAMPLE_URL), "utf-8");
         OEP7_SERVICE_EXAMPLE_CONTENT = IOUtils.toString(new URI(OEP7_SERVICE_EXAMPLE_URL), "utf-8");
 
+        credentials = WalletUtils.loadCredentials(
+                config.getString("account.main.password"),
+                config.getString("account.main.credentialsFile"));
     }
 
     @Test
@@ -75,8 +87,22 @@ public class DdoIT {
 
     }
 
+
     @Test
-    public void TestOEP7DatasetMetadata() throws Exception {
+    public void testDDOServicesOrder() throws Exception {
+
+        DDO ddoFromJson = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
+        DDO ddo= ddoFromJson.integrityBuilder(credentials);
+
+        assertEquals("metadata", ddo.services.get(0).type);
+        assertEquals("access", ddo.services.get(1).type);
+
+        assertEquals(0, ddo.services.get(0).index);
+        assertEquals(1, ddo.services.get(1).index);
+    }
+
+        @Test
+    public void testOEP7DatasetMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
@@ -92,7 +118,7 @@ public class DdoIT {
     }
 
     @Test
-    public void TestOEP7AlgorithmMetadata() throws Exception {
+    public void testOEP7AlgorithmMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_ALGORITHM_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
@@ -107,7 +133,7 @@ public class DdoIT {
     }
 
     @Test
-    public void TestOEP7WorkflowMetadata() throws Exception {
+    public void testOEP7WorkflowMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_WORKFLOW_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
@@ -122,7 +148,7 @@ public class DdoIT {
     }
 
     @Test
-    public void TestOEP7ServiceMetadata() throws Exception {
+    public void testOEP7ServiceMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_SERVICE_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();

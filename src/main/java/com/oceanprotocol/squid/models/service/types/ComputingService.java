@@ -1,11 +1,10 @@
 package com.oceanprotocol.squid.models.service.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.squid.models.service.Service;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,8 @@ import java.util.List;
 @JsonPropertyOrder(alphabetic = true)
 public class ComputingService extends Service {
 
-    private static final Logger log = LogManager.getLogger(ComputingService.class);
+    @JsonIgnore
+    public static final int DEFAULT_INDEX = 4;
 
     @JsonPropertyOrder(alphabetic = true)
     public static class Provider {
@@ -111,7 +111,8 @@ public class ComputingService extends Service {
     }
 
     public ComputingService() {
-        this.type = serviceTypes.computing.toString();
+        this.index = DEFAULT_INDEX;
+        type= serviceTypes.computing.toString();
     }
 
     public ComputingService(String serviceEndpoint, int serviceDefinitionId, String templateId) {

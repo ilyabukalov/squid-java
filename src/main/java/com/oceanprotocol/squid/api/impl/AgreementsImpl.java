@@ -54,9 +54,9 @@ public class AgreementsImpl implements AgreementsAPI {
     }
 
     @Override
-    public boolean create(DID did, String agreementId, int serviceDefinitionId, String consumerAddress) throws Exception {
+    public boolean create(DID did, String agreementId, int index, String consumerAddress) throws Exception {
         DDO ddo = oceanManager.resolveDID(did);
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
+        AccessService accessService = ddo.getAccessService(index);
         return agreementsManager.createAgreement(agreementId,
                 ddo,
                 accessService.generateConditionIds(agreementId, oceanManager, ddo, Keys.toChecksumAddress(consumerAddress)),

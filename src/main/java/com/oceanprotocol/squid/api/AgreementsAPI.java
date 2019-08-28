@@ -39,12 +39,12 @@ public interface AgreementsAPI {
      *
      * @param did                 the did
      * @param agreementId         the agreement id
-     * @param serviceDefinitionId the service definition id of the agreement
+     * @param index the service definition id of the agreement
      * @param consumerAddress     the address of the consumer
      * @return a flag a true if the creation of the agreement was successful.
      * @throws Exception Exception
      */
-    public boolean create(DID did, String agreementId, int serviceDefinitionId, String consumerAddress) throws Exception;
+    public boolean create(DID did, String agreementId, int index, String consumerAddress) throws Exception;
 
     /**
      * Get the status of a service agreement.
