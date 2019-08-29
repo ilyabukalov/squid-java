@@ -164,7 +164,7 @@ public class OceanManagerIT {
         String secretStoreEndpoint= config.getString("secretstore.url");
         String providerAddress= config.getString("provider.address");
 
-        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
+        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
 
         return managerPublisher.registerAccessServiceAsset(metadataBase,
                 providerConfig,
@@ -183,7 +183,7 @@ public class OceanManagerIT {
         String providerAddress= config.getString("provider.address");
 
 
-        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
+        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
 
         DDO ddo= managerPublisher.registerAccessServiceAsset(metadataBase,
                 providerConfig,

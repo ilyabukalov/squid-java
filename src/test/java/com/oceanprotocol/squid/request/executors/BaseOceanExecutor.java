@@ -54,7 +54,7 @@ public abstract class BaseOceanExecutor implements Executor {
         String secretStoreEndpoint= config.getString("secretstore.url");
         String providerAddress= config.getString("provider.address");
 
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
 
         try {
 

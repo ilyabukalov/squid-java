@@ -89,7 +89,6 @@ public class BaseManagerTest {
 
         DDO ddo = baseManager.buildDDO(metadataService, null, SERVICE_AGREEMENT_ADDRESS);
         assertNotNull(ddo.proof);
-        assertNotNull(ddo.getMetadataService().attributes.main.checksum);
 
     }
 
@@ -101,7 +100,6 @@ public class BaseManagerTest {
 
         DDO ddo = baseManager.buildDDO(metadataService, authorizationService, SERVICE_AGREEMENT_ADDRESS);
         assertNotNull(ddo.proof);
-         assertNotNull(ddo.getMetadataService().attributes.main.checksum);
 
     }
 

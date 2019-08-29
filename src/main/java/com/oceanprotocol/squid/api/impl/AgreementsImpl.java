@@ -40,20 +40,6 @@ public class AgreementsImpl implements AgreementsAPI {
     }
 
     @Override
-    public void send(DID did, String agreementId, int serviceDefinitionId, String signature, Account consumerAccount) throws Exception {
-        DDO ddo = oceanManager.resolveDID(did);
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
-        InitializeAccessSLA initializePayload = new InitializeAccessSLA(
-                did.toString(),
-                "0x".concat(agreementId),
-                String.valueOf(serviceDefinitionId),
-                signature,
-                Keys.toChecksumAddress(consumerAccount.address)
-        );
-        BrizoService.initializeAccessServiceAgreement(accessService.attributes.main.purchaseEndpoint, initializePayload);
-    }
-
-    @Override
     public boolean create(DID did, String agreementId, int serviceDefinitionId, String consumerAddress) throws Exception {
         DDO ddo = oceanManager.resolveDID(did);
         AccessService accessService = ddo.getAccessService(serviceDefinitionId);

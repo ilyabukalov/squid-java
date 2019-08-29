@@ -41,7 +41,7 @@ public class AgreementsApiIT {
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
 
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
         oceanAPI = OceanAPI.getInstance(config);
 
         assertNotNull(oceanAPI.getAssetsAPI());

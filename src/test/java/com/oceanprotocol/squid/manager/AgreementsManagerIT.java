@@ -61,7 +61,7 @@ public class AgreementsManagerIT {
         String purchaseEndpoint = config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
         oceanAPI = OceanAPI.getInstance(config);
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
