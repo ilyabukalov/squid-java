@@ -107,13 +107,13 @@ public class DdoIT {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(2, checksums.size());
-        assertEquals("e03ea51adbbb8a214efb0ecb883ca61b42593ab29cf9644f29bf55b26c8839f8", checksums.get("0"));
+        assertEquals("78ff901794b5789308148819f8fe64ad2093a29bf1db393cfaa853c0b492e120", checksums.get("0"));
         assertEquals("d0110601aacf848d5d68ec5f48cbc7349f6ec09b643cc40f0ef3a1f82f348045", checksums.get("1"));
 
         DID did = DID.builder(OEP7_DATASET_EXAMPLE_CONTENT);
         log.debug("Did generated from checksums: " + did.did);
         assertEquals(64, did.getHash().length());
-        assertEquals("did:op:b438d5fbb7636efe4ee2d2d2e99f55f08be5616eb42e36f8131810adf693040d", did.did);
+        assertEquals("did:op:1aa8bbdc1e7f954d61fb10a57513bb245b04722a2c392ef443e83696bac91938", did.did);
 
     }
 
@@ -123,7 +123,7 @@ public class DdoIT {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_ALGORITHM_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(1, checksums.size());
-        assertEquals("7b878b380f8f12cbe3fca1b3771b08da8b297caaa5482c3030e3df58ad08af33", checksums.get("0"));
+        assertEquals("64acbafb101de6bc2bcdda165556110a36110856ff286cf2b1ad9ffe41aef3b9", checksums.get("0"));
 
         DID did = DID.builder(OEP7_ALGORITHM_EXAMPLE_CONTENT);
         log.debug("Did generated from checksums: " + did.did);
@@ -138,7 +138,7 @@ public class DdoIT {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_WORKFLOW_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(1, checksums.size());
-        assertEquals("55fa9a80abfaf3921b05f3f62a895ba6d167f8a8d557293e0caedc15887fb806", checksums.get("0"));
+        assertEquals("58f3871585861cd473af6c1f5ac9281e9515ae554f27f1a885f20f5484c0a509", checksums.get("0"));
 
         DID did = DID.builder(OEP7_WORKFLOW_EXAMPLE_CONTENT);
         log.debug("Did generated from checksums: " + did.did);
@@ -153,8 +153,8 @@ public class DdoIT {
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_SERVICE_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(2, checksums.size());
-        assertEquals("613dd5a6ae2a544e594f4f191758ab11316d0dc475edc82efffbbdfc74eb0735", checksums.get("0"));
-        assertEquals("c3dfa5f742c5a6aa75dd005f5f24486ba790d370e3d8a108fce2217814ae177c", checksums.get("1"));
+        assertEquals("3efd72eea84b73dc501e9f7dc7b627a26bc5d95214c1ec0e366d55becaacaa99", checksums.get("0"));
+        assertEquals("d0110601aacf848d5d68ec5f48cbc7349f6ec09b643cc40f0ef3a1f82f348045", checksums.get("1"));
 
         DID did = DID.builder(OEP7_SERVICE_EXAMPLE_CONTENT);
         log.debug("Did generated from checksums: " + did.did);
