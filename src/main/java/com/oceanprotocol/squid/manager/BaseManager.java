@@ -117,13 +117,10 @@ public abstract class BaseManager {
             SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
 
             metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
-
-            String filesJson = metadataService.toJson(metadataService.attributes.main.files);
-            metadataService.attributes.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
             String signature = "";
 
             return new DDO(metadataService, address, signature);
-        } catch (DIDFormatException  | EncryptionException |CipherException | IOException e) {
+        } catch (DIDFormatException |CipherException | IOException e) {
             throw new DDOException("Error building DDO", e);
         }
 

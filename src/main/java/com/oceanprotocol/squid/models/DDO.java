@@ -6,6 +6,7 @@
 package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.common.helpers.CryptoHelper;
@@ -13,7 +14,9 @@ import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
+import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
+import com.oceanprotocol.squid.manager.SecretStoreManager;
 import com.oceanprotocol.squid.models.service.*;
 import com.oceanprotocol.squid.models.service.types.*;
 import org.apache.logging.log4j.LogManager;
@@ -316,6 +319,19 @@ public class DDO extends AbstractModel implements FromJsonToModel {
         } catch (Exception ex)  {
             throw new DDOException("Unable to generate service checksum: " + ex.getMessage());
         }
+        return this;
+    }
+
+    public DDO encryptFiles(SecretStoreManager secretStoreManager, int threshold) throws DDOException {
+
+        try {
+            Service metadataService = this.getMetadataService();
+            String filesJson = metadataService.toJson(metadataService.attributes.main.files);
+            metadataService.attributes.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
+        }catch (EncryptionException| JsonProcessingException e) {
+            throw new DDOException("Unable to encrypt files from DDL: " + e.getMessage(), e);
+        }
+
         return this;
     }
 

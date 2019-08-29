@@ -315,6 +315,10 @@ public class OceanManager extends BaseManager {
             // Generating the DDO.proof, checksums and calculating DID
             ddo.integrityBuilder(getKeeperService().getCredentials());
 
+            if (service instanceof AccessService)
+                ddo.encryptFiles(getSecretStoreManager(), threshold);
+
+
             // Initialize conditions
             ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
             List<Condition> conditions;
