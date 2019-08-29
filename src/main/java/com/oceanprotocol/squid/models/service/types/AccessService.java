@@ -5,6 +5,7 @@
 
 package com.oceanprotocol.squid.models.service.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.common.helpers.EncodingHelper;
@@ -20,7 +21,6 @@ import org.web3j.protocol.Web3j;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +28,20 @@ import java.util.List;
 @JsonPropertyOrder(alphabetic = true)
 public class AccessService extends Service {
 
+    @JsonIgnore
+    public static final int DEFAULT_INDEX = 3;
+
     private static final Logger log = LogManager.getLogger(AccessService.class);
 
     public AccessService() {
-        this.type = serviceTypes.access.toString();
+        this.index = DEFAULT_INDEX;
+        this.type= serviceTypes.access.toString();
+
     }
 
     public AccessService(String serviceEndpoint, int index, String templateId) {
         super(serviceTypes.access, serviceEndpoint, index);
+        this.type= serviceTypes.access.toString();
         this.templateId = templateId;
     }
 
@@ -45,6 +51,7 @@ public class AccessService extends Service {
                          String templateId
     ) {
         super(serviceTypes.access, serviceEndpoint, index);
+        this.type= serviceTypes.access.toString();
         this.templateId = templateId;
         this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
 

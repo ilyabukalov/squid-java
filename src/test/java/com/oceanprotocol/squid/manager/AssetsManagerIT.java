@@ -12,11 +12,13 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -33,7 +35,9 @@ public class AssetsManagerIT {
     private static AquariusService aquarius;
 
     private static final String METADATA_URL = "http://myaquarius.org/api/v1/provider/assets/metadata/{did}";
-    private static final String DDO_JSON_SAMPLE = "src/test/resources/examples/ddo-example.json";
+//    private static final String DDO_JSON_SAMPLE = "src/test/resources/examples/ddo-example.json";
+    private static final String DDO_JSON_SAMPLE = "https://raw.githubusercontent.com/oceanprotocol/OEPs/master/8/v0.4/ddo-example-access.json";
+
     private static String DDO_JSON_CONTENT;
 
     private static DDO ddoBase;
@@ -51,7 +55,8 @@ public class AssetsManagerIT {
         SecretStoreManager secretStore= ManagerHelper.getSecretStoreController(config, ManagerHelper.VmClient.parity);
         manager.setSecretStoreManager(secretStore);
 
-        DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
+//        DDO_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(DDO_JSON_SAMPLE)));
+        DDO_JSON_CONTENT=  IOUtils.toString(new URI(DDO_JSON_SAMPLE), "utf-8");
         ddoBase = DDO.fromJSON(new TypeReference<DDO>() {}, DDO_JSON_CONTENT);
 
     }
@@ -83,7 +88,7 @@ public class AssetsManagerIT {
         log.debug("Using random param for search: " + randomParam);
 
         ddo1.getMetadataService().attributes.main.type= randomParam;
-        ddo1.getMetadataService().attributes.main.type= randomParam;
+        ddo2.getMetadataService().attributes.main.type= randomParam;
         ddo1.getMetadataService().attributes.main.name = "random name";
 
         aquarius.createDDO(ddo1);

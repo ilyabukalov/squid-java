@@ -5,6 +5,7 @@
 
 package com.oceanprotocol.squid.models.service.types;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -15,15 +16,16 @@ import com.oceanprotocol.squid.models.service.Service;
 @JsonPropertyOrder(alphabetic = true)
 public class MetadataService extends Service {
 
-    public static final int DEFAULT_SERVICE_DEFINITION_ID = 0;
+    @JsonIgnore
+    public static final int DEFAULT_INDEX = 0;
 
     public MetadataService() {
-        this.type = serviceTypes.metadata.toString();
-        this.index = DEFAULT_SERVICE_DEFINITION_ID;
+        this.index = DEFAULT_INDEX;
+        this.type= serviceTypes.metadata.toString();
     }
 
     public MetadataService(AssetMetadata assetMetadata,String serviceEndpoint) {
-        this(assetMetadata, serviceEndpoint, DEFAULT_SERVICE_DEFINITION_ID);
+        this(assetMetadata, serviceEndpoint, DEFAULT_INDEX);
     }
 
     public MetadataService(AssetMetadata assetMetadata, String serviceEndpoint, int serviceDefinitionId) {

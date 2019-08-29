@@ -1,13 +1,11 @@
 package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.AgreementsAPI;
-import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.manager.AgreementsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
 import org.web3j.crypto.Keys;
@@ -40,9 +38,9 @@ public class AgreementsImpl implements AgreementsAPI {
     }
 
     @Override
-    public boolean create(DID did, String agreementId, int serviceDefinitionId, String consumerAddress) throws Exception {
+    public boolean create(DID did, String agreementId, int index, String consumerAddress) throws Exception {
         DDO ddo = oceanManager.resolveDID(did);
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
+        AccessService accessService = ddo.getAccessService(index);
         return agreementsManager.createAgreement(agreementId,
                 ddo,
                 accessService.generateConditionIds(agreementId, oceanManager, ddo, Keys.toChecksumAddress(consumerAddress)),

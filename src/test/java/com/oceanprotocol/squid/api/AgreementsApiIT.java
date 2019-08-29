@@ -7,9 +7,11 @@ import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -19,7 +21,9 @@ import static org.junit.Assert.assertTrue;
 public class AgreementsApiIT {
 
     private static OceanAPI oceanAPI;
-    private static String METADATA_JSON_SAMPLE = "src/test/resources/examples/metadata.json";
+    private static final String DDO_JSON_SAMPLE = "https://raw.githubusercontent.com/oceanprotocol/OEPs/master/8/v0.4/ddo-example-access.json";
+    private static String DDO_JSON_CONTENT;
+    //private static String METADATA_JSON_SAMPLE = "src/test/resources/examples/metadata.json";
     private static String METADATA_JSON_CONTENT;
     private static AssetMetadata metadataBase;
     private static ProviderConfig providerConfig;
@@ -30,7 +34,12 @@ public class AgreementsApiIT {
 
 
         Config config = ConfigFactory.load();
-        METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
+        DDO_JSON_CONTENT=  IOUtils.toString(new URI(DDO_JSON_SAMPLE), "utf-8");
+        DDO fullDDO = DDO.fromJSON(new TypeReference<DDO>() {
+        }, DDO_JSON_CONTENT);
+
+
+        METADATA_JSON_CONTENT = fullDDO.services.get(0).toJson();
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
 

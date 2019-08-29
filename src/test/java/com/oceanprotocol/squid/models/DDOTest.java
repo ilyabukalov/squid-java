@@ -190,11 +190,11 @@ public class DDOTest {
 
         String checksum1= ddo.services.get(0).attributes.main.checksum();
         log.debug("Checksum: " + checksum1);
-        assertEquals(64 + 2, checksum1.length());
+        assertEquals(64, checksum1.length());
 
         String checksum2= ddo.services.get(1).attributes.main.checksum();
         log.debug("Checksum: " + checksum2);
-        assertEquals(64 + 2, checksum2.length());
+        assertEquals(64, checksum2.length());
     }
 
 
