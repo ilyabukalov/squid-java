@@ -109,31 +109,13 @@ public abstract class BaseManager {
     }
 
 
-    protected DDO buildDDO(DID did, MetadataService metadataService, AuthorizationService authorizationService, String address, int threshold) throws DDOException {
-
-        try {
-
-            Credentials credentials = getKeeperService().getCredentials();
-            SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
-
-            metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
-            String signature = "";
-
-            return new DDO(metadataService, address, signature);
-        } catch (DIDFormatException |CipherException | IOException e) {
-            throw new DDOException("Error building DDO", e);
-        }
-
-    }
-
-
     protected DDO buildDDO(MetadataService metadataService, AuthorizationService authorizationService, String address, int threshold) throws DDOException {
 
         try {
-            DID did = DDO.generateDID();
-           return this.buildDDO(did, metadataService, authorizationService, address, threshold);
+            String signature = "";
 
-        } catch (DIDFormatException  e) {
+            return new DDO(metadataService, address, "");
+        } catch (DIDFormatException e) {
             throw new DDOException("Error building DDO", e);
         }
 

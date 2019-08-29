@@ -198,12 +198,12 @@ public class OceanManagerIT {
                 providerConfig,
                 0);
 
-        DID did= new DID(ddo.id);
+        DID did= ddo.getDid();
         DDO resolvedDDO= managerPublisher.resolveDID(did);
 
         assertEquals(ddo.id, resolvedDDO.id);
         assertEquals(metadataUrl.replace("{did}", did.toString()), resolvedDDO.services.get(0).serviceEndpoint);
-        assertTrue( resolvedDDO.services.size() == 3);
+        assertTrue( resolvedDDO.services.size() == 4);
 
     }
 

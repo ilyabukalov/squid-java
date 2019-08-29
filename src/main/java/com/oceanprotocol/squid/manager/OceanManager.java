@@ -309,11 +309,12 @@ public class OceanManager extends BaseManager {
             if (authorizationService != null)
                 ddo.addService(authorizationService);
 
-            // Add authentication
-            ddo.addAuthentication(ddo.id);
 
             // Generating the DDO.proof, checksums and calculating DID
-            ddo.integrityBuilder(getKeeperService().getCredentials());
+            ddo= ddo.integrityBuilder(getKeeperService().getCredentials());
+
+            // Add authentication
+            ddo.addAuthentication(ddo.id);
 
             if (service instanceof AccessService)
                 ddo.encryptFiles(getSecretStoreManager(), threshold);
@@ -330,7 +331,7 @@ public class OceanManager extends BaseManager {
                         lockRewardCondition.getContractAddress(),
                         accessSecretStoreCondition.getContractAddress());
             else if (service instanceof ComputingService)
-                // TODO Change accessSecretStoreCondition address for future execCOmpute Condition
+                // TODO Change accessSecretStoreCondition address for future execCompute Condition
                 conditionParams = ServiceBuilder.getComputingConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
                         escrowReward.getContractAddress(),
                         lockRewardCondition.getContractAddress(),

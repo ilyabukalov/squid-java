@@ -7,6 +7,7 @@ package com.oceanprotocol.squid.models;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
 import com.oceanprotocol.common.helpers.CryptoHelper;
@@ -202,14 +203,14 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
     }*/
 
-    public DDO() throws DIDFormatException {
-        this.did = generateDID();
+    public DDO() {
+        this.did = null;
         if (null == this.created)
             this.created = getDateNowFormatted();
         if (null == this.updated)
             this.updated = getDateNowFormatted();
 
-        this.id = this.did.toString();
+        this.id = "{did}";
     }
 
 
@@ -217,10 +218,13 @@ public class DDO extends AbstractModel implements FromJsonToModel {
 
         if (null == this.created)
             this.created = getDateNowFormatted();
+        if (null == this.updated)
+            this.updated = this.created;
+
         this.services.add(metadataService);
 
         this.proof = new Proof(UUID_PROOF_TYPE, publicKey, signature);
-        this.publicKeys.add(new DDO.PublicKey(this.id, ETHEREUM_KEY_TYPE, publicKey));
+        this.publicKeys.add(new DDO.PublicKey(publicKey, ETHEREUM_KEY_TYPE, publicKey));
     }
 
 
@@ -316,10 +320,15 @@ public class DDO extends AbstractModel implements FromJsonToModel {
             proof.creator= credentials.getAddress();
             proof.created= getDateNowFormatted();
 
+            // Replace any {did} entry in the JSON by the real DID generated
+            String ddoJson= this.toJson();
+
+            return DDO.fromJSON(new TypeReference<DDO>() {},
+                    ddoJson.replaceAll("\\{did}", this.id));
+
         } catch (Exception ex)  {
             throw new DDOException("Unable to generate service checksum: " + ex.getMessage());
         }
-        return this;
     }
 
     public DDO encryptFiles(SecretStoreManager secretStoreManager, int threshold) throws DDOException {
