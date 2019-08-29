@@ -84,9 +84,6 @@ public class ServiceMain extends AbstractModel {
     public ArrayList<AssetMetadata.File> files = new ArrayList<>();
 
     @JsonProperty
-    public String encryptedFiles = null;
-
-    @JsonProperty
     public String encryptedService = null;
 
     @JsonProperty

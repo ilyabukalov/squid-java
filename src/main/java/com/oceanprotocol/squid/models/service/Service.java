@@ -77,6 +77,9 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public static class Attributes {
 
         @JsonProperty
+        public String encryptedFiles = null;
+
+        @JsonProperty
         public ServiceMain main;
 
         @JsonProperty
