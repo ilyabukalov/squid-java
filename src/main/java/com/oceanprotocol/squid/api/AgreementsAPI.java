@@ -22,19 +22,6 @@ public interface AgreementsAPI {
     public Tuple2<String, String> prepare(DID did, int serviceDefinitionId, Account consumerAccount) throws Exception;
 
     /**
-     * Send a signed service agreement to the publisher Brizo instance to consume/access the service.
-     *
-     * @param did                 the did
-     * @param agreementId         the agreement id
-     * @param serviceDefinitionId the service definition id of the agreement
-     * @param signature           the signature
-     * @param consumerAccount     the account of the consumer
-     * @throws Exception Exception
-     */
-    @Deprecated
-    public void send(DID did, String agreementId, int serviceDefinitionId, String signature, Account consumerAccount) throws Exception;
-
-    /**
      * Create a service agreement.
      *
      * @param did                 the did

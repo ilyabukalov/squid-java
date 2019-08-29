@@ -47,7 +47,7 @@ public class ConditionsApiIT {
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
 
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
         oceanAPIConsumer = OceanAPI.getInstance(config);
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));

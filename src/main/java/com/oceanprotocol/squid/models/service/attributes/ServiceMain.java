@@ -35,9 +35,6 @@ public class ServiceMain extends AbstractModel {
 
     // Properties of AccessService
     @JsonProperty
-    public String purchaseEndpoint;
-
-    @JsonProperty
     public String name;
 
     @JsonProperty
@@ -87,17 +84,10 @@ public class ServiceMain extends AbstractModel {
     public ArrayList<AssetMetadata.File> files = new ArrayList<>();
 
     @JsonProperty
-    public String encryptedFiles = null;
-
-    @JsonProperty
     public String encryptedService = null;
 
     @JsonProperty
     public String price;
-
-    @JsonProperty
-    public String checksum;
-
 
     public ServiceMain(){}
 

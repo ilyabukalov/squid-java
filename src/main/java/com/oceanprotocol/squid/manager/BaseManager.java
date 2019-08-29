@@ -119,7 +119,7 @@ public abstract class BaseManager {
             metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
 
             String filesJson = metadataService.toJson(metadataService.attributes.main.files);
-            metadataService.attributes.main.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
+            metadataService.attributes.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
             String signature = "";
 
             return new DDO(metadataService, address, signature);
@@ -151,7 +151,7 @@ public abstract class BaseManager {
         AuthorizationService authorizationService = ddo.getAuthorizationService();
         SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
 
-        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.getMetadataService().attributes.main.encryptedFiles);
+        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.getMetadataService().attributes.encryptedFiles);
         return DDO.fromJSON(new TypeReference<ArrayList<AssetMetadata.File>>() {
         }, jsonFiles);
     }

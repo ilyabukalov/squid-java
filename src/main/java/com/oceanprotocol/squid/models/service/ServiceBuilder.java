@@ -71,7 +71,6 @@ public interface ServiceBuilder {
 
         computingService.attributes.main.provider = computingProvider;
 
-        computingService.attributes.main.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
         computingService.attributes.main.name = "dataAssetAccessServiceAgreement";
         computingService.attributes.main.price = price;
         computingService.attributes.main.creator = creator;
@@ -128,7 +127,6 @@ public interface ServiceBuilder {
                 Service.DEFAULT_ACCESS_INDEX,
                 serviceAgreementTemplate,
                 accessServiceTemplateId);
-        accessService.attributes.main.purchaseEndpoint = providerConfig.getPurchaseEndpoint();
         accessService.attributes.main.name = "dataAssetAccessServiceAgreement";
         accessService.attributes.main.price = price;
         accessService.attributes.main.creator = creator;

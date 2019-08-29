@@ -1,13 +1,11 @@
 package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.AgreementsAPI;
-import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.manager.AgreementsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
-import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
 import org.web3j.crypto.Keys;
@@ -37,20 +35,6 @@ public class AgreementsImpl implements AgreementsAPI {
         String agreementId = generateSlaId();
         String signature = this.sign(agreementId, did, serviceDefinitionId, consumerAccount);
         return new Tuple2<String, String>(agreementId, signature);
-    }
-
-    @Override
-    public void send(DID did, String agreementId, int serviceDefinitionId, String signature, Account consumerAccount) throws Exception {
-        DDO ddo = oceanManager.resolveDID(did);
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
-        InitializeAccessSLA initializePayload = new InitializeAccessSLA(
-                did.toString(),
-                "0x".concat(agreementId),
-                String.valueOf(serviceDefinitionId),
-                signature,
-                Keys.toChecksumAddress(consumerAccount.address)
-        );
-        BrizoService.initializeAccessServiceAgreement(accessService.attributes.main.purchaseEndpoint, initializePayload);
     }
 
     @Override
