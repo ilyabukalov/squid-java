@@ -384,6 +384,16 @@ public class DDO extends AbstractModel implements FromJsonToModel {
     }
 
     @JsonIgnore
+    public Service getService(int index) throws ServiceException {
+
+        return services.stream()
+                .filter(s -> s.index == index)
+                .findFirst()
+                .orElseThrow(() -> new ServiceException("Service with index=" + index + " not found"));
+
+    }
+
+    @JsonIgnore
     public AuthorizationService getAuthorizationService(int serviceDefinitionId) {
         for (Service service : services) {
             if (service.index == serviceDefinitionId && service.type.equals(Service.serviceTypes.authorization.toString())) {

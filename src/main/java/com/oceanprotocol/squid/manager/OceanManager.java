@@ -336,16 +336,15 @@ public class OceanManager extends BaseManager {
                         escrowReward.getContractAddress(),
                         lockRewardCondition.getContractAddress(),
                         accessSecretStoreCondition.getContractAddress());
-
-
             try {
                 conditions = sla.initializeConditions(conditionParams);
             }catch (InitializeConditionsException  e) {
                 throw new DDOException("Error registering Asset.", e);
             }
 
-            service.attributes.serviceAgreementTemplate.conditions = conditions;
-            service.attributes.main.timeout = service.calculateServiceTimeout();
+            Service theService = ddo.getService(service.index);
+            theService.attributes.serviceAgreementTemplate.conditions = conditions;
+            theService.attributes.main.timeout = theService.calculateServiceTimeout();
 
             // Registering DID
             registerDID(ddo.getDid(), metadataEndpoint, ddo.getDid().getHash(), providerConfig.getProviderAddresses());
@@ -353,7 +352,7 @@ public class OceanManager extends BaseManager {
             // Storing DDO
             return getAquariusService().createDDO(ddo);
 
-        } catch (DDOException | DIDRegisterException | IOException | CipherException e) {
+        } catch (DDOException | DIDRegisterException | IOException | CipherException | ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
