@@ -68,6 +68,9 @@ public class OceanConfigFactory {
         oceanConfig.setMainAccountPassword((String) properties.getOrDefault(OceanConfig.MAIN_ACCOUNT_PASSWORD, ""));
         oceanConfig.setMainAccountCredentialsFile((String) properties.getOrDefault(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE, ""));
 
+        oceanConfig.setEscrowComputeExecutionTemplateAddress((String) properties.getOrDefault(OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS, ""));
+        oceanConfig.setComputeExecutionConditionAddress((String) properties.getOrDefault(OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS, ""));
+
         return oceanConfig;
 
     }

@@ -358,5 +358,40 @@ public class OceanInitializationHelper {
         );
     }
 
+    /**
+     * Loads the EscrowComputeExecutionTemplate contract from Keeper
+     *
+     * @param keeper the keeper Service
+     * @return an instance of EscrowComputeExecutionTemplate contract deployed in keeper
+     * @throws IOException     IOException
+     * @throws CipherException CipherException
+     */
+    public EscrowComputeExecutionTemplate loadEscrowComputeExecutionTemplate(KeeperService keeper) throws IOException, CipherException {
+        return EscrowComputeExecutionTemplate.load(
+                oceanConfig.getEscrowComputeExecutionTemplateAddress(),
+                keeper.getWeb3(),
+//                keeper.getCredentials(),
+                keeper.getTxManager(),
+                keeper.getContractGasProvider());
+    }
+
+    /**
+     * Loads the ComputeExecutionCondition contract from Keeper
+     *
+     * @param keeper the keeper Service
+     * @return an instance of ComputeExecutionCondition contract deployed in keeper
+     * @throws IOException     IOException
+     * @throws CipherException CipherException
+     */
+    public ComputeExecutionCondition loadComputeExecutionCondition(KeeperService keeper) throws IOException, CipherException {
+        return ComputeExecutionCondition.load(
+                oceanConfig.getComputeExecutionConditionAddress(),
+                keeper.getWeb3(),
+//                keeper.getCredentials(),
+                keeper.getTxManager(),
+                keeper.getContractGasProvider()
+        );
+    }
+
 
 }

@@ -57,6 +57,8 @@ public abstract class BaseManager {
     protected TemplateStoreManager templateStoreManager;
     protected AgreementStoreManager agreementStoreManager;
     protected ConditionStoreManager conditionStoreManager;
+    protected ComputeExecutionCondition computeExecutionCondition;
+    protected EscrowComputeExecutionTemplate escrowComputeExecutionTemplate;
     protected ContractAddresses contractAddresses = new ContractAddresses();
     protected Config config = ConfigFactory.load();
 
@@ -386,6 +388,46 @@ public abstract class BaseManager {
      */
     public BaseManager setEscrowReward(EscrowReward escrowReward) {
         this.escrowReward = escrowReward;
+        return this;
+    }
+
+    /**
+     * It gets the ComputeExecutionCondition stub instance
+     *
+     * @return ComputeExecutionCondition instance
+     */
+    public ComputeExecutionCondition getComputeExecutionCondition() {
+        return computeExecutionCondition;
+    }
+
+    /**
+     * It sets the ComputeExecutionCondition instance
+     *
+     * @param computeExecutionCondition ComputeExecutionCondition instance
+     * @return BaseManager instance
+     */
+    public BaseManager setComputeExecutionCondition(ComputeExecutionCondition computeExecutionCondition) {
+        this.computeExecutionCondition = computeExecutionCondition;
+        return this;
+    }
+
+    /**
+     * It gets the EscrowComputeExecutionTemplate stub instance
+     *
+     * @return EscrowComputeExecutionTemplate instance
+     */
+    public EscrowComputeExecutionTemplate getEscrowComputeExecutionTemplate() {
+        return escrowComputeExecutionTemplate;
+    }
+
+    /**
+     * It sets the EscrowComputeExecutionTemplate instance
+     *
+     * @param escrowComputeExecutionTemplate EscrowComputeExecutionTemplate instance
+     * @return BaseManager instance
+     */
+    public BaseManager setEscrowComputeExecutionTemplate(EscrowComputeExecutionTemplate escrowComputeExecutionTemplate) {
+        this.escrowComputeExecutionTemplate = escrowComputeExecutionTemplate;
         return this;
     }
 
