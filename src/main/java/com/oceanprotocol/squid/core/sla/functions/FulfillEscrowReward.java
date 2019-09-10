@@ -8,7 +8,6 @@ package com.oceanprotocol.squid.core.sla.functions;
 import com.oceanprotocol.keeper.contracts.EscrowReward;
 import com.oceanprotocol.squid.exceptions.EscrowRewardException;
 import com.oceanprotocol.common.helpers.EncodingHelper;
-import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Keys;
@@ -26,7 +25,7 @@ public class FulfillEscrowReward {
      * @param escrowReward       the EscrowReward contract
      * @param serviceAgreementId the service agreement id
      * @param lockRewardAddress  the address of the lockReward contract
-     * @param assetInfo          basic info of the asset
+     * @param price          price of the asset
      * @param consumerAddress    the Address of the consumer
      * @param lockConditionId    the id of the lock condition
      * @param releaseConditionId the id of the release condition
@@ -36,11 +35,10 @@ public class FulfillEscrowReward {
     public static Boolean executeFulfill(EscrowReward escrowReward,
                                          String serviceAgreementId,
                                          String lockRewardAddress,
-                                         BasicAssetInfo assetInfo,
+                                         String price,
                                          String consumerAddress,
                                          String lockConditionId,
                                          String releaseConditionId) throws EscrowRewardException {
-
 
         byte[] serviceId;
         byte[] lockConditionIdBytes;
@@ -54,11 +52,9 @@ public class FulfillEscrowReward {
             lockConditionIdBytes = EncodingHelper.hexStringToBytes(lockConditionId);
             releaseConditionIdBytes = EncodingHelper.hexStringToBytes(releaseConditionId);
 
-            // TODO Calculate lockConditionId and releaseConditionId
-
             TransactionReceipt receipt = escrowReward.fulfill(
                     serviceId,
-                    new BigInteger(assetInfo.getPrice()),
+                    new BigInteger(price),
                     lockRewardAddressChecksum,
                     consumerAddress,
                     lockConditionIdBytes,

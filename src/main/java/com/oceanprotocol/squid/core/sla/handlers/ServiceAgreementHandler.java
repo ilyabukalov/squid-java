@@ -7,7 +7,9 @@ package com.oceanprotocol.squid.core.sla.handlers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
+import com.oceanprotocol.keeper.contracts.ComputeExecutionCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
+import com.oceanprotocol.keeper.contracts.EscrowComputeExecutionTemplate;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.common.helpers.CryptoHelper;
 import com.oceanprotocol.common.helpers.EncodingHelper;
@@ -60,9 +62,9 @@ public abstract class ServiceAgreementHandler {
      *
      * @param slaContract        the address of the service agreement contract
      * @param serviceAgreementId the service agreement Id
-     * @return a Flowable over the Event to handle it in an asynchronous fashion
+     * @return a Flowable to handle the in an asynchronous fashion
      */
-    public static Flowable<EscrowAccessSecretStoreTemplate.AgreementCreatedEventResponse> listenExecuteAgreement(EscrowAccessSecretStoreTemplate slaContract, String serviceAgreementId) {
+    public static Flowable<String> listenExecuteAgreement(EscrowAccessSecretStoreTemplate slaContract, String serviceAgreementId) {
         EthFilter slaFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
                 DefaultBlockParameterName.LATEST,
@@ -75,19 +77,45 @@ public abstract class ServiceAgreementHandler {
         slaFilter.addSingleTopic(eventSignature);
         slaFilter.addOptionalTopics(slaTopic);
 
-        return slaContract.agreementCreatedEventFlowable(slaFilter);
+        return slaContract.agreementCreatedEventFlowable(slaFilter)
+                .map(eventResponse -> EncodingHelper.toHexString(eventResponse._agreementId));
+    }
+
+
+
+    /**
+     * Define and execute a Filter over the Service Agreement Contract to listen for an AgreementInitialized event
+     *
+     * @param slaContract        the address of the service agreement contract
+     * @param serviceAgreementId the service agreement Id
+     * @return a Flowable to handle the event in an asynchronous fashion
+     */
+    public static Flowable<String> listenExecuteAgreement(EscrowComputeExecutionTemplate slaContract, String serviceAgreementId) {
+        EthFilter slaFilter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST,
+                DefaultBlockParameterName.LATEST,
+                slaContract.getContractAddress()
+        );
+
+        final Event event = slaContract.AGREEMENTCREATED_EVENT;
+        final String eventSignature = EventEncoder.encode(event);
+        String slaTopic = "0x" + serviceAgreementId;
+        slaFilter.addSingleTopic(eventSignature);
+        slaFilter.addOptionalTopics(slaTopic);
+
+        return slaContract.agreementCreatedEventFlowable(slaFilter)
+                .map(eventResponse -> EncodingHelper.toHexString(eventResponse._agreementId));
     }
 
 
     /**
      * Define and execute a Filter over the AccessSecretStoreCondition Contract to listen for an Fulfilled event
      *
-     * @param accessCondition    the address of the AccessSecretStoreCondition contract
+     * @param accessCondition     the AccessSecretStoreCondition contract
      * @param serviceAgreementId the serviceAgreement Id
-     * @return a Flowable over the Event to handle it in an asynchronous fashion
+     * @return a Flowable to handle the event in an asynchronous fashion
      */
-    public static Flowable<AccessSecretStoreCondition.FulfilledEventResponse> listenForFulfilledEvent(AccessSecretStoreCondition accessCondition,
-                                                                                                      String serviceAgreementId) {
+    public static Flowable<String> listenForFulfilledEvent(AccessSecretStoreCondition accessCondition, String serviceAgreementId) {
 
         EthFilter grantedFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,
@@ -103,7 +131,35 @@ public abstract class ServiceAgreementHandler {
         grantedFilter.addOptionalTopics(slaTopic);
 
 
-        return accessCondition.fulfilledEventFlowable(grantedFilter);
+        return accessCondition.fulfilledEventFlowable(grantedFilter)
+                .map(eventResponse ->  EncodingHelper.toHexString(eventResponse._agreementId));
+    }
+
+    /**
+     * Define and execute a Filter over the ComputeExecutionCondition Contract to listen for an Fulfilled event
+     *
+     * @param computeCondition    the ComputeExecutionCondition contract
+     * @param serviceAgreementId the serviceAgreement Id
+     * @return a Flowable to handle the event in an asynchronous fashion
+     */
+    public static Flowable<String> listenForFulfilledEvent(ComputeExecutionCondition computeCondition, String serviceAgreementId) {
+
+        EthFilter grantedFilter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST,
+                DefaultBlockParameterName.LATEST,
+                computeCondition.getContractAddress()
+        );
+
+        final Event event = ComputeExecutionCondition.FULFILLED_EVENT;
+        final String eventSignature = EventEncoder.encode(event);
+        String slaTopic = "0x" + serviceAgreementId;
+
+        grantedFilter.addSingleTopic(eventSignature);
+        grantedFilter.addOptionalTopics(slaTopic);
+
+
+        return computeCondition.fulfilledEventFlowable(grantedFilter)
+                .map(eventResponse ->  EncodingHelper.toHexString(eventResponse._agreementId));
     }
 
 

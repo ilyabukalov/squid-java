@@ -5,6 +5,7 @@ import com.oceanprotocol.squid.external.AquariusService;
 import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
+import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.Agreement;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
@@ -44,20 +45,20 @@ public class AgreementsManager extends BaseManager {
      * @param ddo the ddo
      * @param conditionIds   list with the conditions ids
      * @param accessConsumer eth address of the consumer of the agreement.
-     * @param accessService an instance of accessService
+     * @param service an instance of Service
      * @return a flag that is true if the agreement was successfully created.
      * @throws Exception exception
      */
     public Boolean createAgreement(String agreementId, DDO ddo, List<byte[]> conditionIds,
-                                   String accessConsumer, AccessService accessService) throws Exception {
+                                   String accessConsumer, Service service) throws Exception {
 
         log.debug("Creating agreement with id: " + agreementId);
         TransactionReceipt txReceipt = escrowAccessSecretStoreTemplate.createAgreement(
                 EncodingHelper.hexStringToBytes("0x" + agreementId),
                 EncodingHelper.hexStringToBytes("0x" + ddo.getDid().getHash()),
                 conditionIds,
-                accessService.retrieveTimeOuts(),
-                accessService.retrieveTimeLocks(),
+                service.retrieveTimeOuts(),
+                service.retrieveTimeLocks(),
                 accessConsumer).send();
         return txReceipt.isStatusOK();
     }

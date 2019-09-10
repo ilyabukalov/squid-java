@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
@@ -96,30 +97,6 @@ public class AccessService extends Service {
     }
 
 
-    public String generateLockRewardId(String serviceAgreementId, String escrowRewardAddress, String lockRewardConditionAddress) throws UnsupportedEncodingException {
-
-        Condition lockRewardCondition = this.getConditionbyName("lockReward");
-
-        Condition.ConditionParameter rewardAddress = lockRewardCondition.getParameterByName("_rewardAddress");
-        Condition.ConditionParameter amount = lockRewardCondition.getParameterByName("_amount");
-
-        String params = EthereumHelper.add0x(EthereumHelper.encodeParameterValue(rewardAddress.type, escrowRewardAddress)
-                + EthereumHelper.encodeParameterValue(amount.type, amount.value.toString())
-        );
-
-        String valuesHash = Hash.sha3(params);
-
-        return Hash.sha3(
-                EthereumHelper.add0x(
-                        EthereumHelper.encodeParameterValue("bytes32", serviceAgreementId)
-                                + EthereumHelper.encodeParameterValue("address", lockRewardConditionAddress)
-                                + EthereumHelper.encodeParameterValue("bytes32", valuesHash)
-                )
-        );
-
-    }
-
-
     public String generateAccessSecretStoreConditionId(String serviceAgreementId, String consumerAddress, String accessSecretStoreConditionAddress) throws UnsupportedEncodingException {
 
         Condition accessSecretStoreCondition = this.getConditionbyName("accessSecretStore");
@@ -144,35 +121,6 @@ public class AccessService extends Service {
     }
 
 
-    public String generateEscrowRewardConditionId(String serviceAgreementId, String consumerAddress, String publisherAddress, String escrowRewardConditionAddress,
-                                                  String lockConditionId, String releaseConditionId) throws UnsupportedEncodingException {
-
-        Condition accessSecretStoreCondition = this.getConditionbyName("escrowReward");
-
-        Condition.ConditionParameter amount = accessSecretStoreCondition.getParameterByName("_amount");
-        Condition.ConditionParameter receiver = accessSecretStoreCondition.getParameterByName("_receiver");
-        Condition.ConditionParameter sender = accessSecretStoreCondition.getParameterByName("_sender");
-        Condition.ConditionParameter lockCondition = accessSecretStoreCondition.getParameterByName("_lockCondition");
-        Condition.ConditionParameter releaseCondition = accessSecretStoreCondition.getParameterByName("_releaseCondition");
-
-        String params = EthereumHelper.add0x(EthereumHelper.encodeParameterValue(amount.type, amount.value.toString())
-                + EthereumHelper.encodeParameterValue(receiver.type, publisherAddress)
-                + EthereumHelper.encodeParameterValue(sender.type, consumerAddress)
-                + EthereumHelper.encodeParameterValue(lockCondition.type, lockConditionId)
-                + EthereumHelper.encodeParameterValue(releaseCondition.type, releaseConditionId));
-
-        String valuesHash = Hash.sha3(params);
-
-        return Hash.sha3(
-                EthereumHelper.add0x(
-                        EthereumHelper.encodeParameterValue("bytes32", serviceAgreementId)
-                                + EthereumHelper.encodeParameterValue("address", escrowRewardConditionAddress)
-                                + EthereumHelper.encodeParameterValue("bytes32", valuesHash)
-                )
-        );
-
-    }
-
     public String generateServiceAgreementSignature(Web3j web3, String consumerAddress, String consumerPassword, String publisherAddress, String serviceAgreementId,
                                                     String lockRewardConditionAddress, String accessSecretStoreConditionAddress, String escrowRewardAddress) throws IOException {
 
@@ -185,52 +133,19 @@ public class AccessService extends Service {
         return EthereumHelper.ethSignMessage(web3, hash, consumerAddress, consumerPassword);
     }
 
-    public String fetchConditionValues() throws UnsupportedEncodingException {
-
-        String data = "";
-
-        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
-            String token = "";
-
-            for (Condition.ConditionParameter param : condition.parameters) {
-                token = token + EthereumHelper.encodeParameterValue(param.type, param.value);
-            }
-
-            data = data + EthereumHelper.remove0x(Hash.sha3(token));
-        }
-
-        return data;
-    }
-
-    public String fetchTimeout() throws IOException {
-        String data = "";
-
-        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
-            data = data + EthereumHelper.remove0x(
-                    EncodingHelper.hexEncodeAbiType("uint256", condition.timeout));
-        }
-
-        return data;
-    }
 
 
-    public String fetchTimelock() throws IOException {
-        String data = "";
+    @Override
+    public List<byte[]> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, DDO ddo, String consumerAddress) throws Exception{
 
-        for (Condition condition : attributes.serviceAgreementTemplate.conditions) {
-            data = data + EthereumHelper.remove0x(
-                    EncodingHelper.hexEncodeAbiType("uint256", condition.timelock));
-        }
+        String escrowRewardAddress = conditionsAddresses.get("escrowRewardAddress");
+        String lockRewardConditionAddress = conditionsAddresses.get("lockRewardConditionAddress");
+        String accessSecretStoreConditionAddress = conditionsAddresses.get("accessSecretStoreConditionAddress");
 
-        return data;
-    }
-
-
-    public List<byte[]> generateConditionIds(String agreementId, OceanManager oceanManager, DDO ddo, String consumerAddress) throws Exception {
         List<byte[]> conditionIds = new ArrayList<byte[]>();
-        String lockRewardId = generateLockRewardId(agreementId, oceanManager.getEscrowReward().getContractAddress(), oceanManager.getLockRewardCondition().getContractAddress());
-        String accessSecretStoreId = generateAccessSecretStoreConditionId(agreementId, consumerAddress, oceanManager.getAccessSecretStoreCondition().getContractAddress());
-        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, ddo.proof.creator, oceanManager.getEscrowReward().getContractAddress(), lockRewardId, accessSecretStoreId);
+        String lockRewardId = generateLockRewardId(agreementId, escrowRewardAddress,lockRewardConditionAddress);
+        String accessSecretStoreId = generateAccessSecretStoreConditionId(agreementId, consumerAddress,accessSecretStoreConditionAddress);
+        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, ddo.proof.creator, escrowRewardAddress, lockRewardId, accessSecretStoreId);
         conditionIds.add(EncodingHelper.hexStringToBytes(accessSecretStoreId));
         conditionIds.add(EncodingHelper.hexStringToBytes(lockRewardId));
         conditionIds.add(EncodingHelper.hexStringToBytes(escrowRewardId));

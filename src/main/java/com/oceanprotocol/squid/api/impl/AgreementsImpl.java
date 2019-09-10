@@ -11,6 +11,8 @@ import com.oceanprotocol.squid.models.service.AgreementStatus;
 import org.web3j.crypto.Keys;
 import org.web3j.tuples.generated.Tuple2;
 
+import java.util.List;
+
 import static com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler.generateSlaId;
 
 public class AgreementsImpl implements AgreementsAPI {
@@ -39,11 +41,15 @@ public class AgreementsImpl implements AgreementsAPI {
 
     @Override
     public boolean create(DID did, String agreementId, int index, String consumerAddress) throws Exception {
+
         DDO ddo = oceanManager.resolveDID(did);
         AccessService accessService = ddo.getAccessService(index);
+
+        List<byte[]> conditionsId = oceanManager.generateServiceConditionsId(agreementId, Keys.toChecksumAddress(consumerAddress), ddo, index);
+
         return agreementsManager.createAgreement(agreementId,
                 ddo,
-                accessService.generateConditionIds(agreementId, oceanManager, ddo, Keys.toChecksumAddress(consumerAddress)),
+                conditionsId,
                 Keys.toChecksumAddress(consumerAddress),
                 accessService
         );

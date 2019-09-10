@@ -117,6 +117,9 @@ public class AssetsApiIT {
         properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
         properties.put(OceanConfig.PROVIDER_ADDRESS, config.getString("provider.address"));
 
+        properties.put(OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.ComputeExecutionCondition.address"));
+        properties.put(OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.EscrowComputeExecutionTemplate.address"));
+
         oceanAPIConsumer = OceanAPI.getInstance(properties);
 
         keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");

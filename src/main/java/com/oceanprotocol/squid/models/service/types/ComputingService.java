@@ -4,10 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.helpers.EthereumHelper;
+import com.oceanprotocol.squid.models.DDO;
+import com.oceanprotocol.squid.models.service.Condition;
 import com.oceanprotocol.squid.models.service.Service;
+import org.web3j.crypto.Hash;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
@@ -125,6 +132,46 @@ public class ComputingService extends Service {
         super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
         this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
+    }
+
+    @Override
+    public List<byte[]> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, DDO ddo, String consumerAddress) throws Exception{
+
+        String escrowRewardAddress = conditionsAddresses.get("escrowRewardAddress");
+        String lockRewardConditionAddress = conditionsAddresses.get("lockRewardConditionAddress");
+        String computeExecutionConditionAddress = conditionsAddresses.get("computeExecutionConditionAddress");
+
+        List<byte[]> conditionIds = new ArrayList<byte[]>();
+        String lockRewardId = generateLockRewardId(agreementId, escrowRewardAddress,lockRewardConditionAddress);
+        String accessSecretStoreId = generateComputeExecutionConditionId(agreementId, consumerAddress, computeExecutionConditionAddress);
+        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, ddo.proof.creator, escrowRewardAddress, lockRewardId, accessSecretStoreId);
+        conditionIds.add(EncodingHelper.hexStringToBytes(accessSecretStoreId));
+        conditionIds.add(EncodingHelper.hexStringToBytes(lockRewardId));
+        conditionIds.add(EncodingHelper.hexStringToBytes(escrowRewardId));
+        return conditionIds;
+    }
+
+    public String generateComputeExecutionConditionId(String serviceAgreementId, String consumerAddress, String computeExecutionConditionAddress) throws UnsupportedEncodingException {
+
+        Condition accessSecretStoreCondition = this.getConditionbyName("computeExecution");
+
+        Condition.ConditionParameter documentId = accessSecretStoreCondition.getParameterByName("_documentId");
+        Condition.ConditionParameter grantee = accessSecretStoreCondition.getParameterByName("_grantee");
+
+
+        String params = EthereumHelper.add0x(EthereumHelper.encodeParameterValue(documentId.type, documentId.value)
+                + EthereumHelper.encodeParameterValue(grantee.type, consumerAddress));
+
+        String valuesHash = Hash.sha3(params);
+
+        return Hash.sha3(
+                EthereumHelper.add0x(
+                        EthereumHelper.encodeParameterValue("bytes32", serviceAgreementId)
+                                + EthereumHelper.encodeParameterValue("address", computeExecutionConditionAddress)
+                                + EthereumHelper.encodeParameterValue("bytes32", valuesHash)
+                )
+        );
+
     }
 
 }

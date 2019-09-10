@@ -23,6 +23,7 @@ import com.oceanprotocol.squid.models.service.types.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
 
 import java.util.*;
@@ -317,7 +318,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
             // 4. Completing the DDO.proof signing the DID and adding the rest of the values
             Sign.SignatureData signatureData= EthereumHelper.signMessage(this.id, credentials);
             proof.signatureValue= EncodingHelper.signatureToString(signatureData);
-            proof.creator= credentials.getAddress();
+            proof.creator= Keys.toChecksumAddress(credentials.getAddress());
             proof.created= getDateNowFormatted();
 
             // Replace any {did} entry in the JSON by the real DID generated
