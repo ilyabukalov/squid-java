@@ -85,6 +85,8 @@ public class AgreementsManagerIT {
         properties.put(OceanConfig.TEMPLATE_STORE_MANAGER_ADDRESS, config.getString("contract.TemplateStoreManager.address"));
         properties.put(OceanConfig.TOKEN_ADDRESS, config.getString("contract.OceanToken.address"));
         properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
+        properties.put(OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.ComputeExecutionCondition.address"));
+        properties.put(OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.EscrowComputeExecutionTemplate.address"));
         properties.put(OceanConfig.PROVIDER_ADDRESS, config.getString("provider.address"));
         oceanAPIConsumer = OceanAPI.getInstance(properties);
         oceanAPIConsumer.getTokensAPI().request(BigInteger.TEN);
