@@ -9,8 +9,6 @@ import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.common.helpers.UrlHelper;
 import com.oceanprotocol.common.web3.KeeperService;
-import com.oceanprotocol.keeper.contracts.ComputeExecutionCondition;
-import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
@@ -453,7 +451,7 @@ public class OceanManager extends BaseManager {
         }
         else if  (service.type.equals(Service.serviceTypes.computing.name()))
         {
-            conditionsAddresses.put("computeExecutionCondition", computeExecutionCondition.getContractAddress());
+            conditionsAddresses.put("computeExecutionConditionAddress", computeExecutionCondition.getContractAddress());
             service = (ComputingService)service;
         }
         else
@@ -462,7 +460,7 @@ public class OceanManager extends BaseManager {
         List<byte[]> conditionsId;
 
         try {
-            conditionsId= service.generateConditionIds(serviceAgreementId, conditionsAddresses, ddo, Keys.toChecksumAddress(getMainAccount().getAddress()));
+            conditionsId= service.generateByteConditionIds(serviceAgreementId, conditionsAddresses, ddo.proof.creator, Keys.toChecksumAddress(consumerAddress));
         } catch (Exception e) {
             throw new ServiceAgreementException(serviceAgreementId, "Exception generating conditions id", e);
         }
@@ -506,12 +504,23 @@ public class OceanManager extends BaseManager {
 
             List<byte[]> conditionsId = generateServiceConditionsId(serviceAgreementId, Keys.toChecksumAddress(getMainAccount().getAddress()), ddo, serviceIndex);
 
-            result = this.agreementsManager.createAgreement(serviceAgreementId,
-                    ddo,
-                    conditionsId,
-                    Keys.toChecksumAddress(getMainAccount().getAddress()),
-                    accessService
-            );
+            if (service.type.equals(Service.serviceTypes.access.name()))
+                result = this.agreementsManager.createAccessAgreement(serviceAgreementId,
+                        ddo,
+                        conditionsId,
+                        Keys.toChecksumAddress(getMainAccount().getAddress()),
+                        accessService
+                );
+            else if  (service.type.equals(Service.serviceTypes.computing.name()))
+                result = this.agreementsManager.createComputeAgreement(serviceAgreementId,
+                        ddo,
+                        conditionsId,
+                        Keys.toChecksumAddress(getMainAccount().getAddress()),
+                        accessService
+                );
+            else
+                throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
+
 
             if (!result) {
                 int retries = 5;

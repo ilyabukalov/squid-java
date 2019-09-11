@@ -49,11 +49,36 @@ public class AgreementsManager extends BaseManager {
      * @return a flag that is true if the agreement was successfully created.
      * @throws Exception exception
      */
-    public Boolean createAgreement(String agreementId, DDO ddo, List<byte[]> conditionIds,
-                                   String accessConsumer, Service service) throws Exception {
+    public Boolean createAccessAgreement(String agreementId, DDO ddo, List<byte[]> conditionIds,
+                                         String accessConsumer, Service service) throws Exception {
 
         log.debug("Creating agreement with id: " + agreementId);
         TransactionReceipt txReceipt = escrowAccessSecretStoreTemplate.createAgreement(
+                EncodingHelper.hexStringToBytes("0x" + agreementId),
+                EncodingHelper.hexStringToBytes("0x" + ddo.getDid().getHash()),
+                conditionIds,
+                service.retrieveTimeOuts(),
+                service.retrieveTimeLocks(),
+                accessConsumer).send();
+        return txReceipt.isStatusOK();
+    }
+
+    /**
+     * Create an agreement using the escrowComputeExecutionTemplate. This method should be more specific in the future when we have more than one template.
+     *
+     * @param agreementId    the agreement id
+     * @param ddo the ddo
+     * @param conditionIds   list with the conditions ids
+     * @param accessConsumer eth address of the consumer of the agreement.
+     * @param service an instance of Service
+     * @return a flag that is true if the agreement was successfully created.
+     * @throws Exception exception
+     */
+    public Boolean createComputeAgreement(String agreementId, DDO ddo, List<byte[]> conditionIds,
+                                         String accessConsumer, Service service) throws Exception {
+
+        log.debug("Creating agreement with id: " + agreementId);
+        TransactionReceipt txReceipt = escrowComputeExecutionTemplate.createAgreement(
                 EncodingHelper.hexStringToBytes("0x" + agreementId),
                 EncodingHelper.hexStringToBytes("0x" + ddo.getDid().getHash()),
                 conditionIds,
@@ -114,6 +139,7 @@ public class AgreementsManager extends BaseManager {
         if (this.lockRewardCondition.getContractAddress().equals(address)) return "lockReward";
         else if (this.accessSecretStoreCondition.getContractAddress().equals(address)) return "accessSecretStore";
         else if (this.escrowReward.getContractAddress().equals(address)) return "escrowReward";
+        else if (this.computeExecutionCondition.getContractAddress().equals(address)) return "computeExecution";
         else log.error("The current address" + address + "is not a condition address.");
         throw new ConditionNotFoundException("The current address" + address + "is not a condition address.");
     }

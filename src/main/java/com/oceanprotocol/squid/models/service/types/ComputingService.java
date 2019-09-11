@@ -134,20 +134,21 @@ public class ComputingService extends Service {
         this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
     }
 
+
     @Override
-    public List<byte[]> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, DDO ddo, String consumerAddress) throws Exception{
+    public List<String> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, String publisherAddress, String consumerAddress)  throws Exception{
 
         String escrowRewardAddress = conditionsAddresses.get("escrowRewardAddress");
         String lockRewardConditionAddress = conditionsAddresses.get("lockRewardConditionAddress");
         String computeExecutionConditionAddress = conditionsAddresses.get("computeExecutionConditionAddress");
 
-        List<byte[]> conditionIds = new ArrayList<byte[]>();
+        List<String> conditionIds = new ArrayList<>();
         String lockRewardId = generateLockRewardId(agreementId, escrowRewardAddress,lockRewardConditionAddress);
-        String accessSecretStoreId = generateComputeExecutionConditionId(agreementId, consumerAddress, computeExecutionConditionAddress);
-        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, ddo.proof.creator, escrowRewardAddress, lockRewardId, accessSecretStoreId);
-        conditionIds.add(EncodingHelper.hexStringToBytes(accessSecretStoreId));
-        conditionIds.add(EncodingHelper.hexStringToBytes(lockRewardId));
-        conditionIds.add(EncodingHelper.hexStringToBytes(escrowRewardId));
+        String computeExecutionConditionId = generateComputeExecutionConditionId(agreementId, consumerAddress, computeExecutionConditionAddress);
+        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, publisherAddress, escrowRewardAddress, lockRewardId, computeExecutionConditionId);
+        conditionIds.add(computeExecutionConditionId);
+        conditionIds.add(lockRewardId);
+        conditionIds.add(escrowRewardId);
         return conditionIds;
     }
 

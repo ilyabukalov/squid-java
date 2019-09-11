@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
@@ -58,44 +60,6 @@ public class AccessService extends Service {
 
     }
 
-    /**
-     * Generates a Hash representing the Access Service Agreement
-     * The Hash is having the following parameters:
-     * (templateId, conditionKeys, conditionValues, timeout, serviceAgreementId)
-     *
-     * @param serviceAgreementId                Service Agreement Id
-     * @param consumerAddress                   the address of the consumer of the service
-     * @param publisherAddress                  the address of the publisher of the asset
-     * @param lockRewardConditionAddress        the address of the lockRewardCondition contract
-     * @param accessSecretStoreConditionAddress the address of the accessSecretStoreCondition contract
-     * @param escrowRewardAddress               the address of the escrowReward Contract
-     * @return Hash
-     * @throws IOException if the hash function fails
-     */
-    public String generateServiceAgreementHash(String serviceAgreementId, String consumerAddress, String publisherAddress,
-                                               String lockRewardConditionAddress, String accessSecretStoreConditionAddress, String escrowRewardAddress) throws IOException {
-
-        log.debug("Generating Service Agreement Hash: " + serviceAgreementId);
-
-        String lockRewardId = generateLockRewardId(serviceAgreementId, escrowRewardAddress, lockRewardConditionAddress);
-        String accessSecretStoreId = generateAccessSecretStoreConditionId(serviceAgreementId, consumerAddress, accessSecretStoreConditionAddress);
-        String escrowRewardId = generateEscrowRewardConditionId(serviceAgreementId, consumerAddress, publisherAddress, escrowRewardAddress, lockRewardId, accessSecretStoreId);
-
-        String params =
-                EthereumHelper.remove0x(
-                        templateId
-                                + accessSecretStoreId
-                                + lockRewardId
-                                + escrowRewardId
-                                + fetchTimelock()
-                                + fetchTimeout()
-                                + serviceAgreementId
-                );
-
-
-        return Hash.sha3(EthereumHelper.add0x(params));
-    }
-
 
     public String generateAccessSecretStoreConditionId(String serviceAgreementId, String consumerAddress, String accessSecretStoreConditionAddress) throws UnsupportedEncodingException {
 
@@ -121,34 +85,20 @@ public class AccessService extends Service {
     }
 
 
-    public String generateServiceAgreementSignature(Web3j web3, String consumerAddress, String consumerPassword, String publisherAddress, String serviceAgreementId,
-                                                    String lockRewardConditionAddress, String accessSecretStoreConditionAddress, String escrowRewardAddress) throws IOException {
-
-        String hash = generateServiceAgreementHash(serviceAgreementId, consumerAddress, publisherAddress, lockRewardConditionAddress, accessSecretStoreConditionAddress, escrowRewardAddress);
-        return this.generateServiceAgreementSignatureFromHash(web3, consumerAddress, consumerPassword, hash);
-    }
-
-
-    public String generateServiceAgreementSignatureFromHash(Web3j web3, String consumerAddress, String consumerPassword, String hash) throws IOException {
-        return EthereumHelper.ethSignMessage(web3, hash, consumerAddress, consumerPassword);
-    }
-
-
-
     @Override
-    public List<byte[]> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, DDO ddo, String consumerAddress) throws Exception{
+    public List<String> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, String publisherAddress, String consumerAddress)  throws Exception{
 
         String escrowRewardAddress = conditionsAddresses.get("escrowRewardAddress");
         String lockRewardConditionAddress = conditionsAddresses.get("lockRewardConditionAddress");
         String accessSecretStoreConditionAddress = conditionsAddresses.get("accessSecretStoreConditionAddress");
 
-        List<byte[]> conditionIds = new ArrayList<byte[]>();
+        List<String> conditionIds = new ArrayList<>();
         String lockRewardId = generateLockRewardId(agreementId, escrowRewardAddress,lockRewardConditionAddress);
         String accessSecretStoreId = generateAccessSecretStoreConditionId(agreementId, consumerAddress,accessSecretStoreConditionAddress);
-        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, ddo.proof.creator, escrowRewardAddress, lockRewardId, accessSecretStoreId);
-        conditionIds.add(EncodingHelper.hexStringToBytes(accessSecretStoreId));
-        conditionIds.add(EncodingHelper.hexStringToBytes(lockRewardId));
-        conditionIds.add(EncodingHelper.hexStringToBytes(escrowRewardId));
+        String escrowRewardId = generateEscrowRewardConditionId(agreementId, consumerAddress, publisherAddress, escrowRewardAddress, lockRewardId, accessSecretStoreId);
+        conditionIds.add(accessSecretStoreId);
+        conditionIds.add(lockRewardId);
+        conditionIds.add(escrowRewardId);
         return conditionIds;
     }
 

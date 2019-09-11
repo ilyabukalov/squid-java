@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
+import com.oceanprotocol.squid.exceptions.ServiceAgreementException;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.FromJsonToModel;
@@ -18,6 +19,7 @@ import com.oceanprotocol.squid.models.service.attributes.ServiceAdditionalInform
 import com.oceanprotocol.squid.models.service.attributes.ServiceCuration;
 import com.oceanprotocol.squid.models.service.attributes.ServiceMain;
 import org.web3j.crypto.Hash;
+import org.web3j.protocol.Web3j;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 //@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
@@ -227,7 +230,23 @@ public class Service extends AbstractModel implements FromJsonToModel {
         return data;
     }
 
-    public List<byte[]> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, DDO ddo, String consumerAddress) throws Exception{
+
+    private byte[] wrappedEncoder(String s) {
+        try {
+            return EncodingHelper.hexStringToBytes(s);
+        }
+        catch(UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<byte[]> generateByteConditionIds(String agreementId, Map<String, String> conditionsAddresses, String publisherAddress, String consumerAddress) throws Exception{
+
+        List<String> conditions = generateConditionIds(agreementId,  conditionsAddresses, publisherAddress,  consumerAddress);
+        return conditions.stream().map(this::wrappedEncoder).collect(Collectors.toList());
+    }
+
+    public List<String> generateConditionIds(String agreementId, Map<String, String> conditionsAddresses, String publisherAddress, String consumerAddress) throws Exception{
         return null;
     }
 
@@ -303,6 +322,52 @@ public class Service extends AbstractModel implements FromJsonToModel {
                 )
         );
 
+    }
+
+    public String generateServiceAgreementSignatureFromHash(Web3j web3, String consumerAddress, String consumerPassword, String hash) throws IOException {
+        return EthereumHelper.ethSignMessage(web3, hash, consumerAddress, consumerPassword);
+    }
+
+    /**
+     * Generates a Hash representing a Service Agreement
+     * The Hash is having the following parameters:
+     * (templateId, conditionKeys, conditionValues, timeout, serviceAgreementId)
+     *
+     * @param serviceAgreementId                Service Agreement Id
+     * @param consumerAddress                   the address of the consumer of the service
+     * @param publisherAddress                  the address of the publisher of the asset
+     * @param conditionsAddresses               addresses of the conditions
+     * @return Hash
+     * @throws IOException if the hash function fails
+     */
+    public String generateServiceAgreementHash(String serviceAgreementId, String consumerAddress, String publisherAddress,
+                                               Map<String, String> conditionsAddresses ) throws ServiceAgreementException {
+
+        String params = "";
+
+        try {
+            List<String> conditions = this.generateConditionIds(serviceAgreementId, conditionsAddresses, publisherAddress, consumerAddress);
+
+            String releaseId = conditions.get(0);
+            String lockRewardId = conditions.get(1);
+            String escrowRewardId = conditions.get(2);
+
+            params =
+                    EthereumHelper.remove0x(
+                            templateId
+                                    + releaseId
+                                    + lockRewardId
+                                    + escrowRewardId
+                                    + fetchTimelock()
+                                    + fetchTimeout()
+                                    + serviceAgreementId
+                    );
+
+        } catch (Exception e) {
+            throw new ServiceAgreementException(serviceAgreementId, "Error generating Service Agreement Hash ", e);
+        }
+
+        return Hash.sha3(EthereumHelper.add0x(params));
     }
 
 }

@@ -65,6 +65,7 @@ public class ConditionsManager extends BaseManager {
      * @throws Exception exception
      */
     public Boolean grantAccess(String agreementId, DID did, String granteeAddress) throws Exception {
+
         try {
             TransactionReceipt txReceipt = accessSecretStoreCondition.fulfill(EncodingHelper.hexStringToBytes(agreementId),
                     EncodingHelper.hexStringToBytes("0x" + did.getHash()),
@@ -72,6 +73,28 @@ public class ConditionsManager extends BaseManager {
             return txReceipt.isStatusOK();
         } catch (TransactionException e) {
             log.error("Error granting access to address" + granteeAddress + "to did" + did + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Grant compute to an address.
+     *
+     * @param agreementId    the agreement id.
+     * @param did            the did.
+     * @param granteeAddress an eth address.
+     * @return a flag true if was executed successfully.
+     * @throws Exception exception
+     */
+    public Boolean grantCompute(String agreementId, DID did, String granteeAddress) throws Exception {
+
+        try {
+            TransactionReceipt txReceipt = computeExecutionCondition.fulfill(EncodingHelper.hexStringToBytes(agreementId),
+                    EncodingHelper.hexStringToBytes("0x" + did.getHash()),
+                    granteeAddress).send();
+            return txReceipt.isStatusOK();
+        } catch (TransactionException e) {
+            log.error("Error granting compute to address" + granteeAddress + "to did" + did + e.getMessage());
             return false;
         }
     }
