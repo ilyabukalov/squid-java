@@ -160,38 +160,6 @@ public abstract class ServiceAgreementHandler {
     }
 
 
-    private static Tuple2<String, String> getAgreementData(String agreementId, EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate) throws Exception {
-
-        return escrowAccessSecretStoreTemplate.getAgreementData(EncodingHelper.hexStringToBytes(agreementId)).send();
-    }
-
-
-    public static Boolean checkAgreementStatus(String agreementId, String consumerAddress, EscrowAccessSecretStoreTemplate escrowAccessSecretStoreTemplate, Integer retries, Integer waitInMill)
-            throws Exception {
-
-        Tuple2<String, String> data;
-
-        for (int i = 0; i < retries + 1; i++) {
-
-            log.debug("Searching SA " + agreementId + " on-chain");
-
-            data = getAgreementData(agreementId, escrowAccessSecretStoreTemplate);
-            if (data.getValue1().equalsIgnoreCase(consumerAddress))
-                return true;
-
-            log.debug("SA " + agreementId + " not found on-chain");
-
-            if (i < retries) {
-                log.debug("Sleeping for " + waitInMill);
-                Thread.sleep(waitInMill);
-            }
-
-        }
-
-        return false;
-    }
-
-
     /**
      * gets the name of the file that contains a template for the conditions
      * @return the name of the template file

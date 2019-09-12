@@ -77,40 +77,4 @@ public class ServiceAgreementHandlerIT {
 
     }
 
-    @Test
-    public  void noAgreementOnchain() throws Exception {
-
-        // fake agreement Id
-        String agreementId = "0x0000000000000007b78b2e6e81b89c5b971cf8f8516e4603ada566e0bc8f891e";
-        Boolean result = ServiceAgreementHandler.checkAgreementStatus(agreementId, oceanAPIConsumer.getMainAccount().getAddress(), escrowAccessSecretStoreTemplate, 2, 500);
-
-        assertFalse(result);
-
-    }
-
-
-    @Test
-    public void checkAgreementOnchain() throws Exception {
-
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
-        DID did= new DID(ddo.id);
-
-        oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.valueOf(9000000));
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
-
-        OrderResult orderResult = response.blockingFirst();
-        assertNotNull(orderResult.getServiceAgreementId());
-        TimeUnit.SECONDS.sleep(2l);
-        assertEquals(true, orderResult.isAccessGranted());
-
-        Boolean result = ServiceAgreementHandler.checkAgreementStatus(orderResult.getServiceAgreementId(), oceanAPIConsumer.getMainAccount().getAddress(), escrowAccessSecretStoreTemplate, 2, 500);
-
-        assertTrue(result);
-
-    }
-
-
-
-
-
 }
