@@ -242,7 +242,7 @@ public class OceanAPI {
             oceanAPI.conditionsAPI = new ConditionsImpl(oceanAPI.conditionsManager);
             oceanAPI.tokensAPI = new TokensImpl(oceanAPI.accountsManager);
             oceanAPI.secretStoreAPI = new SecretStoreImpl(oceanAPI.secretStoreManager);
-            oceanAPI.assetsAPI = new AssetsImpl(oceanAPI.oceanManager, oceanAPI.assetsManager);
+            oceanAPI.assetsAPI = new AssetsImpl(oceanAPI.oceanManager, oceanAPI.assetsManager, oceanAPI.agreementsManager);
             oceanAPI.templatesAPI = new TemplatesImpl(oceanAPI.templatesManager);
 
             return oceanAPI;

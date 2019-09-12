@@ -774,48 +774,6 @@ public class OceanManager extends BaseManager {
         return Keys.toChecksumAddress(this.didRegistry.getDIDOwner(EncodingHelper.hexStringToBytes(did.getHash())).send());
     }
 
-    /**
-     * List of Asset objects purchased by consumerAddress
-     *
-     * @param consumerAddress ethereum address of consumer
-     * @return list of dids
-     * @throws ServiceException ServiceException
-     */
-    public List<DID> getConsumerAssets(String consumerAddress) throws ServiceException {
-        EthFilter didFilter = new EthFilter(
-                DefaultBlockParameterName.EARLIEST,
-                DefaultBlockParameterName.LATEST,
-                accessSecretStoreCondition.getContractAddress()
-        );
-        try {
-
-            final Event event = accessSecretStoreCondition.FULFILLED_EVENT;
-            final String eventSignature = EventEncoder.encode(event);
-            didFilter.addSingleTopic(eventSignature);
-            didFilter.addNullTopic();
-            didFilter.addNullTopic();
-            didFilter.addOptionalTopics(Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(consumerAddress), 64));
-
-            EthLog ethLog;
-
-            try {
-                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
-            } catch (IOException e) {
-                throw new EthereumException("Error creating consumedAssets filter.");
-            }
-
-            List<EthLog.LogResult> logs = ethLog.getLogs();
-            List<DID> DIDlist = new ArrayList<>();
-            for (int i = 0; i <= logs.size() - 1; i++) {
-                DIDlist.add(DID.getFromHash(Numeric.cleanHexPrefix((((EthLog.LogObject) logs.get(i)).getTopics().get(2)))));
-            }
-            return DIDlist;
-
-        } catch (Exception ex) {
-            log.error("Unable to retrieve assets consumed by " + consumerAddress + ex.getMessage());
-            throw new ServiceException("Unable to retrieve assets consumed by " + consumerAddress + ex.getMessage());
-        }
-    }
 
     /**
      * List of Asset objects published by ownerAddress

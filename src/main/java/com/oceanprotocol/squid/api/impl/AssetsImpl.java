@@ -7,6 +7,7 @@ package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.AssetsAPI;
 import com.oceanprotocol.squid.exceptions.*;
+import com.oceanprotocol.squid.manager.AgreementsManager;
 import com.oceanprotocol.squid.manager.AssetsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.models.DDO;
@@ -29,6 +30,7 @@ public class AssetsImpl implements AssetsAPI {
 
     private OceanManager oceanManager;
     private AssetsManager assetsManager;
+    private AgreementsManager agreementsManager;
 
     private static final int DEFAULT_OFFSET = 20;
     private static final int DEFAULT_PAGE = 1;
@@ -39,10 +41,11 @@ public class AssetsImpl implements AssetsAPI {
      * @param oceanManager  the oceanManager
      * @param assetsManager the assetsManager
      */
-    public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager) {
+    public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager, AgreementsManager agreementsManager) {
 
         this.oceanManager = oceanManager;
         this.assetsManager = assetsManager;
+        this.agreementsManager = agreementsManager;
     }
 
 
@@ -164,7 +167,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public List<DID> consumerAssets(String consumerAddress) throws ServiceException {
-        return oceanManager.getConsumerAssets(consumerAddress);
+        return agreementsManager.getConsumerAssets(consumerAddress);
     }
 
     @Override
