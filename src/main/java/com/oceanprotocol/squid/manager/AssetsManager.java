@@ -5,9 +5,9 @@
 
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.exceptions.DDOException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchQuery;

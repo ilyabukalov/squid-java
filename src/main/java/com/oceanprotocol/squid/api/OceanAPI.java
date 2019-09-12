@@ -5,6 +5,7 @@
 
 package com.oceanprotocol.squid.api;
 
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
@@ -15,7 +16,6 @@ import com.oceanprotocol.squid.api.impl.*;
 import com.oceanprotocol.squid.exceptions.InitializationException;
 import com.oceanprotocol.squid.exceptions.InvalidConfiguration;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.*;
 import com.oceanprotocol.squid.models.Account;
 import com.typesafe.config.Config;

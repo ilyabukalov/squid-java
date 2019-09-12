@@ -8,7 +8,6 @@ package com.oceanprotocol.squid.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.oceanprotocol.common.helpers.CryptoHelper;
-import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 

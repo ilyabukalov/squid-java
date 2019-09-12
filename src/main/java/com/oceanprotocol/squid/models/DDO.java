@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.api.client.util.Base64;
-import com.oceanprotocol.common.helpers.CryptoHelper;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.exceptions.DDOException;
@@ -18,7 +17,7 @@ import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.manager.SecretStoreManager;
-import com.oceanprotocol.squid.models.service.*;
+import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.types.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +28,6 @@ import org.web3j.crypto.Sign;
 import java.util.*;
 
 import static com.oceanprotocol.squid.models.DDO.PublicKey.ETHEREUM_KEY_TYPE;
-import static com.oceanprotocol.squid.models.service.Service.*;
 
 @JsonPropertyOrder(alphabetic = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -391,6 +389,17 @@ public class DDO extends AbstractModel implements FromJsonToModel {
                 .filter(s -> s.index == index)
                 .findFirst()
                 .orElseThrow(() -> new ServiceException("Service with index=" + index + " not found"));
+
+    }
+
+    @JsonIgnore
+    public Service getServiceByTemplate(String templateId) throws ServiceException {
+
+        // We assume there is only one service in the DDO with a specific templateId
+        return services.stream()
+                .filter(s -> s.templateId == templateId)
+                .findFirst()
+                .orElseThrow(() -> new ServiceException("Service with template=" + templateId + " not found"));
 
     }
 

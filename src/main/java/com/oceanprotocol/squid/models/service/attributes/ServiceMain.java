@@ -8,10 +8,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.CustomDateDeserializer;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.types.ComputingService;
-import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.metadata.Algorithm;
 import com.oceanprotocol.squid.models.service.metadata.Workflow;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -11,8 +11,8 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
-import com.oceanprotocol.squid.models.service.types.ComputingService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 import io.reactivex.Flowable;
 
 import java.io.InputStream;

@@ -1,12 +1,7 @@
 package com.oceanprotocol.squid.models.service;
 
-import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
-import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
-import com.oceanprotocol.squid.core.sla.handlers.ServiceComputingAgreementHandler;
 import com.oceanprotocol.squid.exceptions.DDOException;
-import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
-import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.types.ComputingService;
 

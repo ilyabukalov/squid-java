@@ -1,14 +1,13 @@
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.common.helpers.EncodingHelper;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.exceptions.ConditionNotFoundException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
-import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.service.Service;
-import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.oceanprotocol.squid.models.service.Agreement;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
+import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Keys;

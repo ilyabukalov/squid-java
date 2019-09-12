@@ -7,7 +7,6 @@ package com.oceanprotocol.squid.manager;
 
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
-import com.oceanprotocol.common.helpers.UrlHelper;
 import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
@@ -27,9 +26,7 @@ import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.abi.EventEncoder;
-import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.DefaultBlockParameterName;
@@ -93,59 +90,7 @@ public class OceanManager extends BaseManager {
         return DID.builder();
     }
 
-    /**
-     * Given a DID, scans the DIDRegistry events on-chain to resolve the
-     * Metadata API url and return the DDO found
-     *
-     * @param did the did
-     * @return DDO
-     * @throws EthereumException EthereumException
-     * @throws DDOException      DDOException
-     */
-    public DDO resolveDID(DID did) throws EthereumException, DDOException {
 
-        EthFilter didFilter = new EthFilter(
-                DefaultBlockParameterName.EARLIEST,
-                DefaultBlockParameterName.LATEST,
-                didRegistry.getContractAddress()
-        );
-
-        try {
-
-            final Event event = didRegistry.DIDATTRIBUTEREGISTERED_EVENT;
-            final String eventSignature = EventEncoder.encode(event);
-            didFilter.addSingleTopic(eventSignature);
-
-            String didTopic = "0x" + did.getHash();
-            didFilter.addOptionalTopics(didTopic);
-
-            EthLog ethLog;
-
-            try {
-                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
-            } catch (IOException e) {
-                throw new EthereumException("Error searching DID " + did.toString() + " onchain: " + e.getMessage());
-            }
-
-            List<EthLog.LogResult> logs = ethLog.getLogs();
-
-            int numLogs = logs.size();
-            if (numLogs < 1)
-                throw new DDOException("No events found for " + did.toString());
-
-            EthLog.LogResult logResult = logs.get(numLogs - 1);
-            List<Type> nonIndexed = FunctionReturnDecoder.decode(((EthLog.LogObject) logResult).getData(), event.getNonIndexedParameters());
-            String ddoUrl = nonIndexed.get(0).getValue().toString();
-            String didUrl = UrlHelper.parseDDOUrl(ddoUrl, did.toString());
-
-            AquariusService ddoAquariosDto = AquariusService.getInstance(UrlHelper.getBaseUrl(didUrl));
-            return ddoAquariosDto.getDDO(didUrl);
-
-        } catch (Exception ex) {
-            log.error("Unable to retrieve DDO " + ex.getMessage());
-            throw new DDOException("Unable to retrieve DDO " + ex.getMessage());
-        }
-    }
 
 
     /**

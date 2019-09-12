@@ -1,12 +1,7 @@
 package com.oceanprotocol.squid.core.sla.handlers;
 
-import com.oceanprotocol.common.helpers.EthereumHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ServiceComputingAgreementHandler extends ServiceAgreementHandler{
 

@@ -13,7 +13,6 @@ import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.exceptions.ServiceAgreementException;
 import com.oceanprotocol.squid.models.AbstractModel;
-import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.FromJsonToModel;
 import com.oceanprotocol.squid.models.service.attributes.ServiceAdditionalInformation;
 import com.oceanprotocol.squid.models.service.attributes.ServiceCuration;

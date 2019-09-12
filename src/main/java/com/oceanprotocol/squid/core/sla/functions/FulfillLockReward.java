@@ -5,9 +5,9 @@
 
 package com.oceanprotocol.squid.core.sla.functions;
 
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.keeper.contracts.LockRewardCondition;
 import com.oceanprotocol.squid.exceptions.LockRewardFulfillException;
-import com.oceanprotocol.common.helpers.EncodingHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Keys;

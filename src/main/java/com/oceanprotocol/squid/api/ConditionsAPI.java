@@ -31,6 +31,17 @@ public interface ConditionsAPI {
     public boolean grantAccess(String agreementId, DID did, String grantee) throws Exception;
 
     /**
+     * Grant compute to an address using the parity secret store.
+     *
+     * @param agreementId the agreement id
+     * @param did         the did
+     * @param grantee     the address that is going to be granted to execute the compute service.
+     * @return a flag if the execution was good
+     * @throws Exception Exception
+     */
+    public boolean grantCompute(String agreementId, DID did, String grantee) throws Exception;
+
+    /**
      * Release the payment to the provider address.
      *
      * @param agreementId the agreement id.

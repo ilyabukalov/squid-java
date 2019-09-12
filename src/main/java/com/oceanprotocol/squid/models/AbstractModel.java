@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.oceanprotocol.common.helpers.CryptoHelper;
-import com.oceanprotocol.common.helpers.EthereumHelper;
 
 import java.io.IOException;
 import java.text.DateFormat;

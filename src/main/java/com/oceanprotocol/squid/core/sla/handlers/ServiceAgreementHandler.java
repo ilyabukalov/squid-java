@@ -6,14 +6,13 @@
 package com.oceanprotocol.squid.core.sla.handlers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.common.helpers.CryptoHelper;
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.keeper.contracts.AccessSecretStoreCondition;
 import com.oceanprotocol.keeper.contracts.ComputeExecutionCondition;
 import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
 import com.oceanprotocol.keeper.contracts.EscrowComputeExecutionTemplate;
 import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
-import com.oceanprotocol.common.helpers.CryptoHelper;
-import com.oceanprotocol.common.helpers.EncodingHelper;
-import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.service.Condition;
 import io.reactivex.Flowable;
@@ -27,11 +26,9 @@ import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.tuples.generated.Tuple2;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
