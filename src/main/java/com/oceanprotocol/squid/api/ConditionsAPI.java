@@ -39,7 +39,7 @@ public interface ConditionsAPI {
      * @return a flag if the execution was good
      * @throws Exception Exception
      */
-    public boolean grantCompute(String agreementId, DID did, String grantee) throws Exception;
+    public boolean grantServiceExecution(String agreementId, DID did, String grantee) throws Exception;
 
     /**
      * Release the payment to the provider address.

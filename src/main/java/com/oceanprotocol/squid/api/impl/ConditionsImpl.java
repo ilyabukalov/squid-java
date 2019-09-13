@@ -32,7 +32,7 @@ public class ConditionsImpl implements ConditionsAPI {
     }
 
     @Override
-    public boolean grantCompute(String agreementId, DID did, String grantee) throws Exception {
+    public boolean grantServiceExecution(String agreementId, DID did, String grantee) throws Exception {
         return conditionsManager.grantCompute(agreementId, did, grantee);
     }
 
