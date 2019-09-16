@@ -150,7 +150,6 @@ public class AssetsApiIT {
     @Test
     public void createComputingService() throws Exception {
 
-        // TODO check the temmplate
         DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBaseAlgorithm, providerConfig, computingProvider);
 
         DID did = new DID(ddo.id);
@@ -303,6 +302,31 @@ public class AssetsApiIT {
 
         int consumedAssetsAfter = oceanAPI.getAssetsAPI().consumerAssets(oceanAPIConsumer.getMainAccount().address).size();
         assertEquals(consumedAssetsBefore + 1, consumedAssetsAfter);
+
+    }
+
+    @Test
+    public void checkPermissions() throws Exception {
+
+        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
+        String ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
+        assertEquals(oceanAPI.getMainAccount().address, ownerAddress);
+
+        Boolean consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(false, consumerPermission);
+
+        oceanAPI.getAssetsAPI().delegatePermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(true, consumerPermission);
+
+        oceanAPI.getAssetsAPI().revokePermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(false, consumerPermission);
+
+        oceanAPI.getAssetsAPI().transferOwnership(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
+        assertEquals(oceanAPIConsumer.getMainAccount().address, ownerAddress);
+
 
     }
 

@@ -235,7 +235,9 @@ public class OceanAPI {
                     .setEscrowComputeExecutionTemplate(oceanAPI.escrowComputeExecutionTemplate);
 
             oceanAPI.assetsManager = oceanInitializationHelper.getAssetsManager(oceanAPI.keeperService, oceanAPI.aquariusService);
-            oceanAPI.assetsManager.setMainAccount(oceanAPI.mainAccount);
+            oceanAPI.assetsManager
+                    .setMainAccount(oceanAPI.mainAccount)
+                    .setDidRegistryContract(oceanAPI.didRegistryContract);
 
             oceanAPI.accountsAPI = new AccountsImpl(oceanAPI.accountsManager);
             oceanAPI.agreementsAPI = new AgreementsImpl(oceanAPI.agreementsManager, oceanAPI.oceanManager);

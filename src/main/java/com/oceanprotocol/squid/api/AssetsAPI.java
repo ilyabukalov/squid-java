@@ -289,4 +289,44 @@ public interface AssetsAPI {
      */
     public Boolean validate(AssetMetadata metadata) throws DDOException;
 
+
+    /**
+     * Given a DID, transfer the ownership to a new owner. This function only will work if is called by the DID owner.
+     * @param did the did
+     * @param newOwnerAddress the address of the new ownership
+     * @return  a flag that indicates if the action was executed correctly
+     * @throws DDOException DDOException
+     */
+    public Boolean transferOwnership(DID did, String newOwnerAddress) throws DDOException;
+
+
+    /**
+     *  For a existing asset, the owner of the asset delegate to a subject read or access permiss
+     * @param did the did
+     * @param subjectAddress the address we want to delegate to
+     * @return a flag that indicates if the action was executed correctly
+     * @throws DDOException DDOException
+     */
+    public Boolean delegatePermissions(DID did, String subjectAddress) throws DDOException;
+
+    /**
+     * For a existing asset, the owner of the asset revoke the access grants of a subject.
+     * @param did the did
+     * @param subjectAddress the address we want to revoke to
+     * @return a flag that indicates if the action was executed correctly
+     * @throws DDOException DDOException
+     */
+    public Boolean revokePermissions(DID did, String subjectAddress) throws DDOException;
+
+
+    /**
+     * Check if an user has permissions in a specific DID
+     * @param did  the did
+     * @param subjectAddress the address
+     * @return a flag that indicates if the subject address has permissions
+     * @throws DDOException DDOException
+     */
+    public Boolean getPermissions(DID did, String subjectAddress) throws DDOException;
+
+
 }

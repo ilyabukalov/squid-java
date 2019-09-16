@@ -179,7 +179,7 @@ public abstract class BaseManager {
      * @throws EthereumException EthereumException
      * @throws DDOException      DDOException
      */
-    public DDO resolveDID(DID did) throws EthereumException, DDOException {
+    public DDO resolveDID(DID did) throws DDOException {
 
         EthFilter didFilter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST,

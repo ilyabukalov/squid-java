@@ -162,7 +162,7 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public List<DID> ownerAssets(String ownerAddress) throws ServiceException {
-        return oceanManager.getOwnerAssets(ownerAddress);
+        return assetsManager.getOwnerAssets(ownerAddress);
     }
 
     @Override
@@ -172,11 +172,31 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public String owner(DID did) throws Exception {
-        return oceanManager.getDIDOwner(did);
+        return assetsManager.getDIDOwner(did);
     }
 
     @Override
     public Boolean validate(AssetMetadata metadata) throws DDOException {
         return assetsManager.validateMetadata(metadata);
+    }
+
+    @Override
+    public Boolean transferOwnership(DID did, String newOwnerAddress) throws DDOException {
+        return assetsManager.transferOwnership(did, newOwnerAddress);
+    }
+
+    @Override
+    public Boolean delegatePermissions(DID did, String subjectAddress) throws DDOException {
+        return assetsManager.grantPermission(did, subjectAddress);
+    }
+
+    @Override
+    public Boolean revokePermissions(DID did, String subjectAddress) throws DDOException {
+        return assetsManager.revokePermission(did, subjectAddress);
+    }
+
+    @Override
+    public Boolean getPermissions(DID did, String subjectAddress) throws DDOException {
+        return assetsManager.getPermission(did, subjectAddress);
     }
 }

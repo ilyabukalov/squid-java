@@ -25,15 +25,9 @@ import com.oceanprotocol.squid.models.service.types.*;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.datatypes.Event;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Keys;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.EthFilter;
-import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.utils.Numeric;
 
 import java.io.File;
 import java.io.IOException;
@@ -318,7 +312,7 @@ public class OceanManager extends BaseManager {
         try {
 
             ddo = resolveDID(did);
-        } catch (DDOException | EthereumException e) {
+        } catch (DDOException  e) {
             log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
             throw new OrderException("Error processing Order with DID " + did.getDid(), e);
         }
@@ -611,7 +605,7 @@ public class OceanManager extends BaseManager {
             data.put("serviceEndpoint", serviceEndpoint);
             data.put("files", files);
 
-        } catch (EthereumException | DDOException | ServiceException | EncryptionException | IOException e) {
+        } catch (DDOException | ServiceException | EncryptionException | IOException e) {
             String msg = "Error getting the data form the  asset with DID " + did.toString();
             log.error(msg + ": " + e.getMessage());
             throw new ConsumeServiceException(msg, e);
@@ -763,58 +757,6 @@ public class OceanManager extends BaseManager {
     }
 
 
-    /**
-     * Get the owner of a did already registered.
-     *
-     * @param did the did
-     * @return owner address
-     * @throws Exception Exception
-     */
-    public String getDIDOwner(DID did) throws Exception {
-        return Keys.toChecksumAddress(this.didRegistry.getDIDOwner(EncodingHelper.hexStringToBytes(did.getHash())).send());
-    }
 
-
-    /**
-     * List of Asset objects published by ownerAddress
-     *
-     * @param ownerAddress ethereum address of owner/publisher
-     * @return list of dids
-     * @throws ServiceException ServiceException
-     */
-    public List<DID> getOwnerAssets(String ownerAddress) throws ServiceException {
-        EthFilter didFilter = new EthFilter(
-                DefaultBlockParameterName.EARLIEST,
-                DefaultBlockParameterName.LATEST,
-                didRegistry.getContractAddress()
-        );
-        try {
-
-            final Event event = didRegistry.DIDATTRIBUTEREGISTERED_EVENT;
-            final String eventSignature = EventEncoder.encode(event);
-            didFilter.addSingleTopic(eventSignature);
-            didFilter.addNullTopic();
-            didFilter.addOptionalTopics(Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(ownerAddress), 64));
-
-            EthLog ethLog;
-
-            try {
-                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
-            } catch (IOException e) {
-                throw new EthereumException("Error creating ownerAssets filter.");
-            }
-
-            List<EthLog.LogResult> logs = ethLog.getLogs();
-            List<DID> DIDlist = new ArrayList<>();
-            for (int i = 0; i <= logs.size() - 1; i++) {
-                DIDlist.add(DID.getFromHash(Numeric.cleanHexPrefix((((EthLog.LogObject) logs.get(i)).getTopics().get(1)))));
-            }
-            return DIDlist;
-
-        } catch (Exception ex) {
-            log.error("Unable to retrieve assets owned by " + ownerAddress + ex.getMessage());
-            throw new ServiceException("Unable to retrieve assets owned by " + ownerAddress + ex.getMessage());
-        }
-    }
 
 }
