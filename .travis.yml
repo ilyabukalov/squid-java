@@ -26,7 +26,6 @@ before_install:
   - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
   - sudo apt-get install jq
   - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
-  - cd ..
   - |
       for i in $(seq 1 50); do
         sleep 5
