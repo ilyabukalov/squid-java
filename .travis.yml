@@ -26,14 +26,14 @@ before_install:
 - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 - sudo apt-get install jq
 - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
-- |
-    for i in $(seq 1 50); do
-      sleep 5
-      [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
-    done
-    ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
+  - |
+      for i in $(seq 1 100); do
+        sleep 5
+        [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
+      done
+      ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
 
-    /bin/bash src/test/resources/scripts/updateConfAddresses.sh
+- /bin/bash src/test/resources/scripts/updateConfAddresses.sh
 
 install:
 #- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # Unit tests only
