@@ -33,10 +33,10 @@ before_install:
       done
       ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
 
-- /bin/bash src/test/resources/scripts/updateConfAddresses.sh
 
 install:
 #- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # Unit tests only
+- /bin/bash src/test/resources/scripts/updateConfAddresses.sh
 - mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
 - mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
 - export project_version=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
