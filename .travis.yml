@@ -27,7 +27,7 @@ before_install:
   - sudo apt-get install jq
   - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
   - |
-      for i in $(seq 1 50); do
+      for i in $(seq 1 150); do
         sleep 5
         [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
       done
@@ -36,6 +36,7 @@ before_install:
 
 install:
   #- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # Unit tests only
+  - ls -R ${HOME}/.ocean/keeper-contracts/
   - /bin/bash src/test/resources/scripts/updateConfAddresses.sh
   - mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
   - mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
