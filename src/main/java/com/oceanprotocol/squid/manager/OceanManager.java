@@ -20,6 +20,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.brizo.ExecuteService;
 import com.oceanprotocol.squid.models.service.*;
 import com.oceanprotocol.squid.models.service.types.*;
 import io.reactivex.Flowable;
@@ -742,6 +743,28 @@ public class OceanManager extends BaseManager {
             log.error(msg + ": " + e.getMessage());
             throw new ConsumeServiceException(msg, e);
         }
+
+    }
+
+
+    /**
+     * Executes a remote service associated with an asset and serviceAgreementId
+     * @param agreementId the agreement id
+     * @param did the did
+     * @param index the index of the service
+     * @param workflowId the workflow id
+     * @return an execution id
+     * @throws ServiceException ServiceException
+     */
+    public String executeComputeService(String agreementId, DID did, String index, String workflowId) throws ServiceException {
+
+        ExecuteService executeService = new ExecuteService(agreementId, did.getDid(), index, workflowId, getMainAccount().address);
+        // TODO What is the url??
+        BrizoService.ServiceExecutionResult result = BrizoService.initializeServiceExecution("url", executeService);
+        if (!result.getOk())
+            throw new ServiceException("There was a problem initializing the execution of the service. HTTP Code: " + result.getCode());
+
+        return result.getExecutionId();
 
     }
 

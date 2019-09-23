@@ -329,4 +329,16 @@ public interface AssetsAPI {
     public Boolean getPermissions(DID did, String subjectAddress) throws DDOException;
 
 
+    /**
+     * Executes a remote service associated with an asset and serviceAgreementId
+     * @param agreementId the agreement id
+     * @param did the did
+     * @param index the index of the service
+     * @param workflowId the workflow id
+     * @return an execution id
+     * @throws ServiceException ServiceException
+     */
+    public String execute(String agreementId, DID did, String index, String workflowId) throws ServiceException;
+
+
 }
