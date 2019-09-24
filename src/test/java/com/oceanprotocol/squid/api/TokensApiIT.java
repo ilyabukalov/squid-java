@@ -42,8 +42,8 @@ public class TokensApiIT {
     @Test
     public void transfer() throws Exception {
 
-        String receiverAddress= config.getString("account.parity.address");
-        String receiverPasswd= config.getString("account.parity.password");
+        String receiverAddress= config.getString("account.parity.address2");
+        String receiverPasswd= config.getString("account.parity.password2");
 
         Account receiverAccount= new Account(receiverAddress, receiverPasswd);
 
