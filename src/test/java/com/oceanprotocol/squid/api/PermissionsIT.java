@@ -1,14 +1,16 @@
 package com.oceanprotocol.squid.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.api.config.OceanConfig;
-import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
+import com.oceanprotocol.squid.models.Balance;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.AgreementStatus;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,26 +18,33 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class ConditionsApiIT {
+public class PermissionsIT {
 
-    private static OceanAPI oceanAPI;
-    private static OceanAPI oceanAPIConsumer;
+
+    private static final Logger log = LogManager.getLogger(PermissionsIT.class);
+
     private static String METADATA_JSON_SAMPLE = "src/test/resources/examples/metadata.json";
     private static String METADATA_JSON_CONTENT;
     private static AssetMetadata metadataBase;
-    private static ProviderConfig providerConfig;
 
+    private static ProviderConfig providerConfig;
+    private static OceanAPI oceanAPI;
+    private static OceanAPI oceanAPIConsumer;
+
+    private static KeeperService keeper;
+
+    private static Config config;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
+        config = ConfigFactory.load();
 
-        Config config = ConfigFactory.load();
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
@@ -43,12 +52,16 @@ public class ConditionsApiIT {
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
         String provenanceUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl = config.getString("brizo.url") + "/api/v1/brizo/services/consume";
-        String purchaseEndpoint = config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
 
         providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
-        oceanAPIConsumer = OceanAPI.getInstance(config);
+
+        oceanAPI = OceanAPI.getInstance(config);
+
+        assertNotNull(oceanAPI.getAssetsAPI());
+        assertNotNull(oceanAPI.getMainAccount());
+
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
         properties.put(OceanConfig.KEEPER_GAS_LIMIT, config.getString("keeper.gasLimit"));
@@ -73,61 +86,62 @@ public class ConditionsApiIT {
         properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
         properties.put(OceanConfig.PROVIDER_ADDRESS, config.getString("provider.address"));
 
+        properties.put(OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.ComputeExecutionCondition.address"));
+        properties.put(OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.EscrowComputeExecutionTemplate.address"));
 
-        oceanAPI = OceanAPI.getInstance(properties);
+        oceanAPIConsumer = OceanAPI.getInstance(properties);
+
         oceanAPIConsumer.getTokensAPI().request(BigInteger.TEN);
-        oceanAPI.getTokensAPI().request(BigInteger.TEN);
-
-
-        assertNotNull(oceanAPI.getAssetsAPI());
-        assertNotNull(oceanAPI.getMainAccount());
+        Balance balance = oceanAPIConsumer.getAccountsAPI().balance(oceanAPIConsumer.getMainAccount());
+        log.debug("Account " + oceanAPIConsumer.getMainAccount().address + " balance is: " + balance.toString());
 
     }
 
-
-    // TODO: Review what's happening with this test
-    @Ignore
     @Test
-    public void executeConditions() throws Exception {
+    public void checkPermissions() throws Exception {
+
+        metadataBase.attributes.main.dateCreated = new Date();
+
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
-        String agreementId = ServiceAgreementHandler.generateSlaId();
-        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, 1, oceanAPIConsumer.getMainAccount().address));
-        AgreementStatus initialStatus = oceanAPI.getAgreementsAPI().status(agreementId);
-        assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("lockReward"));
-        assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("accessSecretStore"));
-        assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("escrowReward"));
+        String ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
+        assertEquals(oceanAPI.getMainAccount().address, ownerAddress);
 
-        oceanAPI.getConditionsAPI().lockReward(agreementId, BigInteger.TEN);
-        AgreementStatus statusAfterLockReward = oceanAPI.getAgreementsAPI().status(agreementId);
-        assertEquals(BigInteger.TWO, statusAfterLockReward.conditions.get(0).conditions.get("lockReward"));
-      //  assertEquals(BigInteger.TWO, statusAfterLockReward.conditions.get(0).conditions.get("accessSecretStore"));
-        assertEquals(BigInteger.ONE, statusAfterLockReward.conditions.get(0).conditions.get("escrowReward"));
+        Boolean consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(false, consumerPermission);
 
-        int retries= 10;
-        long sleepSeconds= 1l;
+        oceanAPI.getAssetsAPI().delegatePermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(true, consumerPermission);
 
-        for (int counter=0; counter< retries; counter++)    {
-            try {
-                oceanAPI.getConditionsAPI().grantAccess(agreementId, ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-                break;
-            } catch (Exception e)   {
-                TimeUnit.SECONDS.sleep(sleepSeconds);
-            }
-        }
+        oceanAPI.getAssetsAPI().revokePermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(false, consumerPermission);
 
-        AgreementStatus statusAfterAccessGranted = oceanAPI.getAgreementsAPI().status(agreementId);
-        assertEquals(BigInteger.TWO, statusAfterAccessGranted.conditions.get(0).conditions.get("lockReward"));
-        assertEquals(BigInteger.TWO, statusAfterAccessGranted.conditions.get(0).conditions.get("accessSecretStore"));
-        assertEquals(BigInteger.ONE, statusAfterAccessGranted.conditions.get(0).conditions.get("escrowReward"));
+    }
 
+    @Test
+    @Ignore
+    public void transferOwnership() throws Exception {
 
-        oceanAPI.getConditionsAPI().releaseReward(agreementId, BigInteger.TEN);
-        AgreementStatus statusAfterReleaseReward = oceanAPI.getAgreementsAPI().status(agreementId);
-        assertEquals(BigInteger.TWO, statusAfterReleaseReward.conditions.get(0).conditions.get("lockReward"));
-        assertEquals(BigInteger.TWO, statusAfterReleaseReward.conditions.get(0).conditions.get("accessSecretStore"));
-        assertEquals(BigInteger.TWO, statusAfterReleaseReward.conditions.get(0).conditions.get("escrowReward"));
+        metadataBase.attributes.main.dateCreated = new Date();
 
+        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
+        String ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
+        assertEquals(oceanAPI.getMainAccount().address, ownerAddress);
+
+        Boolean consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        assertEquals(false, consumerPermission);
+
+        oceanAPI.getAssetsAPI().transferOwnership(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
+        ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
+        assertEquals(oceanAPIConsumer.getMainAccount().address, ownerAddress);
+
+        oceanAPIConsumer.getAssetsAPI().transferOwnership(ddo.getDid(), oceanAPI.getMainAccount().address);
+        ownerAddress = oceanAPIConsumer.getAssetsAPI().owner(ddo.getDid());
+        assertEquals(oceanAPI.getMainAccount().address, ownerAddress);
 
 
     }
+
+
 }

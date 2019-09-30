@@ -53,7 +53,7 @@ public class AgreementsManagerIT {
 
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
 
-        keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
+        keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
         aquarius = ManagerHelper.getAquarius(config);
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
         String provenanceUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";

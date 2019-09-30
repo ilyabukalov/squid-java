@@ -32,10 +32,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -138,6 +135,7 @@ public class AssetsApiIT {
     @Test
     public void create() throws Exception {
 
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
 
         DID did = new DID(ddo.id);
@@ -150,6 +148,7 @@ public class AssetsApiIT {
     @Test
     public void createComputingService() throws Exception {
 
+        metadataBaseAlgorithm.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBaseAlgorithm, providerConfig, computingProvider);
 
         DID did = new DID(ddo.id);
@@ -162,6 +161,10 @@ public class AssetsApiIT {
     @Test
     public void order() throws Exception {
 
+
+        log.info("PROVIDER ADDRESS: " + config.getString("provider.address"));
+
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         DID did = new DID(ddo.id);
 
@@ -187,6 +190,7 @@ public class AssetsApiIT {
     @Test
     public void search() throws Exception {
 
+        metadataBase.attributes.main.dateCreated = new Date();
         oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -200,6 +204,7 @@ public class AssetsApiIT {
     @Test
     public void query() throws Exception {
 
+        metadataBase.attributes.main.dateCreated = new Date();
         oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -215,18 +220,15 @@ public class AssetsApiIT {
     @Test
     public void consumeBinary() throws Exception {
 
-        providerConfig.setSecretStoreEndpoint(config.getString("secretstore.url"));
+        metadataBase.attributes.main.dateCreated = new Date();
+        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
+        DID did = new DID(ddo.id);
 
-        AssetMetadata metadata = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
-        //metadata.base.files.get(0).url= "https://speed.hetzner.de/100MB.bin";
+        oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.TEN);
+        Balance balance = oceanAPIConsumer.getAccountsAPI().balance(oceanAPIConsumer.getMainAccount());
+        log.debug("Account " + oceanAPIConsumer.getMainAccount().address + " balance is: " + balance.toString());
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadata, providerConfig);
-        DID did= new DID(ddo.id);
-
-        log.debug("DDO registered!");
-
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did,  Service.DEFAULT_ACCESS_INDEX);
-
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
         OrderResult orderResult = response.blockingFirst();
         assertNotNull(orderResult.getServiceAgreementId());
         assertEquals(true, orderResult.isAccessGranted());
@@ -245,6 +247,7 @@ public class AssetsApiIT {
 
     @Test
     public void owner() throws Exception {
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -254,6 +257,7 @@ public class AssetsApiIT {
 
     @Test(expected = DDOException.class)
     public void retire() throws Exception {
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
         assertTrue(oceanAPI.getAssetsAPI().retire(ddo.getDid()));
@@ -264,6 +268,7 @@ public class AssetsApiIT {
     public void ownerAssets() throws Exception {
         int assetsOwnedBefore = (oceanAPI.getAssetsAPI().ownerAssets(oceanAPI.getMainAccount().address)).size();
 
+        metadataBase.attributes.main.dateCreated = new Date();
         oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -279,6 +284,7 @@ public class AssetsApiIT {
         String basePath = config.getString("consume.basePath");
         AssetMetadata metadata = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
+        metadata.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadata, providerConfig);
         DID did = new DID(ddo.id);
 
@@ -302,31 +308,6 @@ public class AssetsApiIT {
 
         int consumedAssetsAfter = oceanAPI.getAssetsAPI().consumerAssets(oceanAPIConsumer.getMainAccount().address).size();
         assertEquals(consumedAssetsBefore + 1, consumedAssetsAfter);
-
-    }
-
-    @Test
-    public void checkPermissions() throws Exception {
-
-        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
-        String ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
-        assertEquals(oceanAPI.getMainAccount().address, ownerAddress);
-
-        Boolean consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-        assertEquals(false, consumerPermission);
-
-        oceanAPI.getAssetsAPI().delegatePermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-        consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-        assertEquals(true, consumerPermission);
-
-        oceanAPI.getAssetsAPI().revokePermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-        consumerPermission = oceanAPI.getAssetsAPI().getPermissions(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-        assertEquals(false, consumerPermission);
-
-        oceanAPI.getAssetsAPI().transferOwnership(ddo.getDid(), oceanAPIConsumer.getMainAccount().address);
-        ownerAddress = oceanAPI.getAssetsAPI().owner(ddo.getDid());
-        assertEquals(oceanAPIConsumer.getMainAccount().address, ownerAddress);
-
 
     }
 
