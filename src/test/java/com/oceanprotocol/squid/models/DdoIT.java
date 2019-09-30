@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
@@ -57,6 +58,7 @@ public class DdoIT {
     }
 
     @Test
+    @Ignore
     public void TestOEP12Computing() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP12_COMPUTING_EXAMPLE_CONTENT);
@@ -72,7 +74,9 @@ public class DdoIT {
 
     }
 
+
     @Test
+    @Ignore
     public void TestOEP12Workflow() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP12_WORKFLOW_EXAMPLE_CONTENT);
@@ -89,6 +93,7 @@ public class DdoIT {
 
 
     @Test
+    @Ignore
     public void testDDOServicesOrder() throws Exception {
 
         DDO ddoFromJson = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
@@ -101,7 +106,8 @@ public class DdoIT {
         assertEquals(1, ddo.services.get(1).index);
     }
 
-        @Test
+    @Test
+    @Ignore
     public void testOEP7DatasetMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
@@ -118,6 +124,7 @@ public class DdoIT {
     }
 
     @Test
+    @Ignore
     public void testOEP7AlgorithmMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_ALGORITHM_EXAMPLE_CONTENT);
@@ -133,6 +140,7 @@ public class DdoIT {
     }
 
     @Test
+    @Ignore
     public void testOEP7WorkflowMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_WORKFLOW_EXAMPLE_CONTENT);
@@ -148,6 +156,7 @@ public class DdoIT {
     }
 
     @Test
+    @Ignore
     public void testOEP7ServiceMetadata() throws Exception {
 
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_SERVICE_EXAMPLE_CONTENT);
