@@ -139,10 +139,8 @@ public class OceanManager extends BaseManager {
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("providerConfig", providerConfig);
         configuration.put("computingProvider", computingProvider);
-        // TODO Define template to use
-        configuration.put("computingServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
-        // TODO Define contract to use
-        configuration.put("execComputeConditionAddress", accessSecretStoreCondition.getContractAddress());
+        configuration.put("computingServiceTemplateId", escrowComputeExecutionTemplate.getContractAddress());
+        configuration.put("execComputeConditionAddress", computeExecutionCondition.getContractAddress());
         configuration.put("price", price);
         configuration.put("creator", creatorAddress);
 
