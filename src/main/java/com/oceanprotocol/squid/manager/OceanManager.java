@@ -745,28 +745,6 @@ public class OceanManager extends BaseManager {
     }
 
 
-    /**
-     * Executes a remote service associated with an asset and serviceAgreementId
-     * @param agreementId the agreement id
-     * @param did the did
-     * @param index the index of the service
-     * @param workflowId the workflow id
-     * @return an execution id
-     * @throws ServiceException ServiceException
-     */
-    public String executeComputeService(String agreementId, DID did, String index, String workflowId) throws ServiceException {
-
-        ExecuteService executeService = new ExecuteService(agreementId, did.getDid(), index, workflowId, getMainAccount().address);
-        // TODO What is the url??
-        BrizoService.ServiceExecutionResult result = BrizoService.initializeServiceExecution("url", executeService);
-        if (!result.getOk())
-            throw new ServiceException("There was a problem initializing the execution of the service. HTTP Code: " + result.getCode());
-
-        return result.getExecutionId();
-
-    }
-
-
     // TODO: to be implemented
     public Order getOrder(String orderId) {
         return null;
