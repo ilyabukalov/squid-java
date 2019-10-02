@@ -36,12 +36,12 @@ public class Service extends AbstractModel implements FromJsonToModel {
     /**
      * Type of service in the DDO
      */
-    public enum serviceTypes {access, metadata, authorization, computing, provenance}
+    public enum ServiceTypes {access, metadata, authorization, computing, provenance}
 
     /**
      * Type of Asset. Represented in the base.type attribute
      */
-    public enum assetTypes {dataset, algorithm, workflow, service}
+    public enum AssetTypes {dataset, algorithm, workflow, service}
 
 
     @JsonIgnore
@@ -149,7 +149,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     public Service() {
     }
 
-    public Service(serviceTypes type, String serviceEndpoint, int index) {
+    public Service(ServiceTypes type, String serviceEndpoint, int index) {
         this.type = type.toString();
         this.index = index;
         this.serviceEndpoint = serviceEndpoint;

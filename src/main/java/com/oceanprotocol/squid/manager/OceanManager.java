@@ -20,7 +20,6 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
-import com.oceanprotocol.squid.models.brizo.ExecuteService;
 import com.oceanprotocol.squid.models.service.*;
 import com.oceanprotocol.squid.models.service.types.*;
 import io.reactivex.Flowable;
@@ -165,7 +164,7 @@ public class OceanManager extends BaseManager {
 
              Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, metadata.attributes.main.price, getMainAccount().address);
              Service accessService = ServiceBuilder
-                    .getServiceBuilder(Service.serviceTypes.access)
+                    .getServiceBuilder(Service.ServiceTypes.access)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, accessService, threshold);
@@ -193,7 +192,7 @@ public class OceanManager extends BaseManager {
 
             Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, metadata.attributes.main.price, getMainAccount().address);
             Service computingService = ServiceBuilder
-                    .getServiceBuilder(Service.serviceTypes.computing)
+                    .getServiceBuilder(Service.ServiceTypes.computing)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, computingService, threshold);
@@ -320,7 +319,7 @@ public class OceanManager extends BaseManager {
 
             Service service = ddo.getService(serviceIndex);
 
-            return this.initializeServiceAgreement(did, ddo, serviceIndex, serviceAgreementId)
+            return this.initializeServiceAgreement(ddo, serviceIndex, serviceAgreementId)
                     .firstOrError()
                     .toFlowable()
                     .switchMap(eventServiceAgreementId -> {
@@ -340,9 +339,9 @@ public class OceanManager extends BaseManager {
                             this.fulfillLockReward(ddo, serviceIndex, eventServiceAgreementId);
                             Flowable<String> conditionFulilledEvent = null;
 
-                            if (service.type.equals(Service.serviceTypes.access.name()))
+                            if (service.type.equals(Service.ServiceTypes.access.name()))
                                 conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(accessSecretStoreCondition, serviceAgreementId);
-                            else if  (service.type.equals(Service.serviceTypes.computing.name()))
+                            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
                                 conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(computeExecutionCondition, serviceAgreementId);
                             else
                                 throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -383,11 +382,11 @@ public class OceanManager extends BaseManager {
         conditionsAddresses.put("escrowRewardAddress", escrowReward.getContractAddress());
         conditionsAddresses.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
 
-        if (service.type.equals(Service.serviceTypes.access.name())) {
+        if (service.type.equals(Service.ServiceTypes.access.name())) {
             conditionsAddresses.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
             service = (AccessService)service;
         }
-        else if  (service.type.equals(Service.serviceTypes.computing.name()))
+        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
         {
             conditionsAddresses.put("computeExecutionConditionAddress", computeExecutionCondition.getContractAddress());
             service = (ComputingService)service;
@@ -410,7 +409,6 @@ public class OceanManager extends BaseManager {
     /**
      * Initialize a new ServiceExecutionAgreement between a publisher and a consumer
      *
-     * @param did                 the did
      * @param ddo                 the ddi
      * @param serviceIndex      the service index
      * @param serviceAgreementId  the service agreement id
@@ -418,7 +416,7 @@ public class OceanManager extends BaseManager {
      * @throws ServiceException          ServiceException
      * @throws ServiceAgreementException ServiceAgreementException
      */
-    private Flowable<String> initializeServiceAgreement(DID did, DDO ddo, int serviceIndex, String serviceAgreementId)
+    private Flowable<String> initializeServiceAgreement(DDO ddo, int serviceIndex, String serviceAgreementId)
             throws  ServiceException, ServiceAgreementException {
 
         Service service = ddo.getService(serviceIndex);
@@ -442,14 +440,14 @@ public class OceanManager extends BaseManager {
 
             List<byte[]> conditionsId = generateServiceConditionsId(serviceAgreementId, Keys.toChecksumAddress(getMainAccount().getAddress()), ddo, serviceIndex);
 
-            if (service.type.equals(Service.serviceTypes.access.name()))
+            if (service.type.equals(Service.ServiceTypes.access.name()))
                 result = this.agreementsManager.createAccessAgreement(serviceAgreementId,
                         ddo,
                         conditionsId,
                         Keys.toChecksumAddress(getMainAccount().getAddress()),
                         accessService
                 );
-            else if  (service.type.equals(Service.serviceTypes.computing.name()))
+            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
                 result = this.agreementsManager.createComputeAgreement(serviceAgreementId,
                         ddo,
                         conditionsId,
@@ -485,9 +483,9 @@ public class OceanManager extends BaseManager {
         // 4. Listening of events
         Flowable<String> executeAgreementFlowable = null;
 
-        if (service.type.equals(Service.serviceTypes.access.name()))
+        if (service.type.equals(Service.ServiceTypes.access.name()))
             executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowAccessSecretStoreTemplate, serviceAgreementId);
-        else if  (service.type.equals(Service.serviceTypes.computing.name()))
+        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
             executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowComputeExecutionTemplate, serviceAgreementId);
         else
             throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -539,11 +537,11 @@ public class OceanManager extends BaseManager {
             String conditionAddress;
             String conditionName;
 
-            if (service.type.equals(Service.serviceTypes.access.name())) {
+            if (service.type.equals(Service.ServiceTypes.access.name())) {
                 conditionAddress =  accessSecretStoreCondition.getContractAddress();
                 conditionName = "accessSecretStore";
             }
-            else if  (service.type.equals(Service.serviceTypes.computing.name())) {
+            else if  (service.type.equals(Service.ServiceTypes.computing.name())) {
                 conditionAddress =  computeExecutionCondition.getContractAddress();
                 conditionName = "computeExecution";
             }

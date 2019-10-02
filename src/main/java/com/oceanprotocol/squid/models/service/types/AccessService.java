@@ -11,8 +11,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.models.service.Condition;
 import com.oceanprotocol.squid.models.service.Service;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Hash;
 
 import java.io.UnsupportedEncodingException;
@@ -27,17 +25,15 @@ public class AccessService extends Service {
     @JsonIgnore
     public static final int DEFAULT_INDEX = 3;
 
-    private static final Logger log = LogManager.getLogger(AccessService.class);
-
     public AccessService() {
         this.index = DEFAULT_INDEX;
-        this.type= serviceTypes.access.toString();
+        this.type= ServiceTypes.access.toString();
 
     }
 
     public AccessService(String serviceEndpoint, int index, String templateId) {
-        super(serviceTypes.access, serviceEndpoint, index);
-        this.type= serviceTypes.access.toString();
+        super(ServiceTypes.access, serviceEndpoint, index);
+        this.type= ServiceTypes.access.toString();
         this.templateId = templateId;
     }
 
@@ -46,8 +42,8 @@ public class AccessService extends Service {
                          ServiceAgreementTemplate serviceAgreementTemplate,
                          String templateId
     ) {
-        super(serviceTypes.access, serviceEndpoint, index);
-        this.type= serviceTypes.access.toString();
+        super(ServiceTypes.access, serviceEndpoint, index);
+        this.type= ServiceTypes.access.toString();
         this.templateId = templateId;
         this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
 

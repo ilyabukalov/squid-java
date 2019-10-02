@@ -17,6 +17,9 @@ import java.util.List;
 @JsonPropertyOrder(alphabetic = true)
 public class Workflow {
 
+    @JsonProperty
+    public List<Workflow.Stage> stages;
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class Stage {
@@ -109,9 +112,6 @@ public class Workflow {
 
         public Output() {}
     }
-
-    @JsonProperty
-    public List<Workflow.Stage> stages;
 
     public Workflow(){}
 

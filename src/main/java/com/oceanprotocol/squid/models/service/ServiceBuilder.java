@@ -14,7 +14,7 @@ public interface ServiceBuilder {
 
     Service buildService( Map<String, Object> serviceConfiguration) throws DDOException;
 
-    static ServiceBuilder getServiceBuilder(Service.serviceTypes serviceType) throws ServiceException {
+    static ServiceBuilder getServiceBuilder(Service.ServiceTypes serviceType) throws ServiceException {
 
         switch (serviceType) {
             case access: return accessServiceBuilder();

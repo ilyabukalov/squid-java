@@ -20,7 +20,7 @@ public class MetadataService extends Service {
 
     public MetadataService() {
         this.index = DEFAULT_INDEX;
-        this.type= serviceTypes.metadata.toString();
+        this.type= ServiceTypes.metadata.toString();
     }
 
     public MetadataService(AssetMetadata assetMetadata,String serviceEndpoint) {
@@ -28,7 +28,7 @@ public class MetadataService extends Service {
     }
 
     public MetadataService(AssetMetadata assetMetadata, String serviceEndpoint, int serviceDefinitionId) {
-        super(serviceTypes.metadata, serviceEndpoint, serviceDefinitionId);
+        super(ServiceTypes.metadata, serviceEndpoint, serviceDefinitionId);
         this.attributes = assetMetadata.attributes;
     }
 

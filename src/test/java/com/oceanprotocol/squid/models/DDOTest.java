@@ -256,7 +256,7 @@ public class DDOTest {
 
         AuthorizationService authorizationService = ddo.getAuthorizationService();
         assertEquals("http://localhost:12001", authorizationService.serviceEndpoint);
-        assertEquals(Service.serviceTypes.authorization.name(), authorizationService.type);
+        assertEquals(Service.ServiceTypes.authorization.name(), authorizationService.type);
     }
 
     @Test
@@ -280,7 +280,7 @@ public class DDOTest {
         ddo.authentication.add(auth);
         ddo.authentication.add(auth);
 
-        Service metadataService = new Service(Service.serviceTypes.metadata, "http://disney.com", 0);
+        Service metadataService = new Service(Service.ServiceTypes.metadata, "http://disney.com", 0);
         metadataService.attributes.main.name = "test name";
 
         AccessService accessService = new AccessService("http://ocean.com", 1, "0x00000000");

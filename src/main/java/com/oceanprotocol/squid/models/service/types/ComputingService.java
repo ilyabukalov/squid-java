@@ -24,6 +24,15 @@ public class ComputingService extends Service {
     @JsonPropertyOrder(alphabetic = true)
     public static class Provider {
 
+        @JsonProperty
+        public String type;
+
+        @JsonProperty
+        public String description;
+
+        @JsonProperty
+        public Enviroment environment;
+
         @JsonPropertyOrder(alphabetic = true)
         public static class Container {
 
@@ -100,34 +109,23 @@ public class ComputingService extends Service {
             public Enviroment(){}
         }
 
-
-        @JsonProperty
-        public String type;
-
-        @JsonProperty
-        public String description;
-
-        @JsonProperty
-        public Enviroment environment;
-
-
         public Provider(){}
 
     }
 
     public ComputingService() {
         this.index = DEFAULT_INDEX;
-        type= serviceTypes.computing.toString();
+        type= ServiceTypes.computing.toString();
     }
 
     public ComputingService(String serviceEndpoint, int serviceDefinitionId, String templateId) {
-        super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
+        super(ServiceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
 
     }
 
     public ComputingService(String serviceEndpoint, int serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
-        super(serviceTypes.computing, serviceEndpoint, serviceDefinitionId);
+        super(ServiceTypes.computing, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
         this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
     }

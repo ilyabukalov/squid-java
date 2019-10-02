@@ -118,8 +118,7 @@ public abstract class BaseManager {
 
         try {
             String signature = "";
-
-            return new DDO(metadataService, address, "");
+            return new DDO(metadataService, address, signature);
         } catch (DIDFormatException e) {
             throw new DDOException("Error building DDO", e);
         }

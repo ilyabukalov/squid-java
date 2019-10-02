@@ -36,8 +36,6 @@ public class PermissionsIT {
     private static OceanAPI oceanAPI;
     private static OceanAPI oceanAPIConsumer;
 
-    private static KeeperService keeper;
-
     private static Config config;
 
     @BeforeClass

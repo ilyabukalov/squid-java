@@ -57,7 +57,7 @@ public class DdoIT {
     }
 
     @Test
-    public void TestOEP12Computing() throws Exception {
+    public void testOEP12Computing() throws Exception {
 
         log.debug("TestOEP12Computing");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP12_COMPUTING_EXAMPLE_CONTENT);
@@ -75,7 +75,7 @@ public class DdoIT {
 
 
     @Test
-    public void TestOEP12Workflow() throws Exception {
+    public void testOEP12Workflow() throws Exception {
 
         log.debug("TestOEP12Workflow");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP12_WORKFLOW_EXAMPLE_CONTENT);

@@ -52,14 +52,14 @@ public class AgreementsImpl implements AgreementsAPI {
 
         List<byte[]> conditionsId = oceanManager.generateServiceConditionsId(agreementId, Keys.toChecksumAddress(consumerAddress), ddo, index);
 
-        if (service.type.equals(Service.serviceTypes.access.name()))
+        if (service.type.equals(Service.ServiceTypes.access.name()))
             return agreementsManager.createAccessAgreement(agreementId,
                     ddo,
                     conditionsId,
                     Keys.toChecksumAddress(consumerAddress),
                     service
             );
-        else  if (service.type.equals(Service.serviceTypes.computing.name()))
+        else  if (service.type.equals(Service.ServiceTypes.computing.name()))
             return agreementsManager.createComputeAgreement(agreementId,
                     ddo,
                     conditionsId,
@@ -84,11 +84,11 @@ public class AgreementsImpl implements AgreementsAPI {
         conditionsAddresses.put("escrowRewardAddress", this.agreementsManager.getEscrowReward().getContractAddress());
         conditionsAddresses.put("lockRewardConditionAddress", this.agreementsManager.getLockRewardCondition().getContractAddress());
 
-        if (service.type.equals(Service.serviceTypes.access.name())) {
+        if (service.type.equals(Service.ServiceTypes.access.name())) {
             service = (AccessService) service;
             conditionsAddresses.put("accessSecretStoreConditionAddress",  this.agreementsManager.getAccessSecretStoreCondition().getContractAddress());
         }
-        else if (service.type.equals(Service.serviceTypes.computing.name())) {
+        else if (service.type.equals(Service.ServiceTypes.computing.name())) {
             service = (ComputingService) service;
             conditionsAddresses.put("computeExecutionCondition", this.agreementsManager.getComputeExecutionCondition().getContractAddress());
         }

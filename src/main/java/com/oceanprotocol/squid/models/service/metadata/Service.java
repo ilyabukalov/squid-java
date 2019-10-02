@@ -31,7 +31,7 @@ public class Service {
     @JsonPropertyOrder(alphabetic = true)
     public static class Auth {
 
-        public enum authType {basic, bearer, digest, hoba, mutual, negotiate, oauth, scram_sha_1, scram_sha_256, vapid};
+        public enum AuthType {basic, bearer, digest, hoba, mutual, negotiate, oauth, scramSha1, scramSha256, vapid};
 
         @JsonProperty
         public String type;

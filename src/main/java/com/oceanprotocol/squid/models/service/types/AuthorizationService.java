@@ -23,16 +23,16 @@ public class AuthorizationService extends Service {
 
     public AuthorizationService() {
         this.index= DEFAULT_INDEX;
-        this.type= serviceTypes.authorization.toString();
+        this.type= ServiceTypes.authorization.toString();
     }
 
     public AuthorizationService(String serviceEndpoint, int index, String service) {
-        super(serviceTypes.authorization, serviceEndpoint, index);
+        super(ServiceTypes.authorization, serviceEndpoint, index);
         this.attributes.main.service = service;
     }
 
     public AuthorizationService(String serviceEndpoint, int index) {
-        super(serviceTypes.authorization, serviceEndpoint, index);
+        super(ServiceTypes.authorization, serviceEndpoint, index);
         this.attributes.main.service = DEFAULT_SERVICE;
     }
 
