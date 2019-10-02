@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.oceanprotocol.common.helpers.CryptoHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -22,6 +24,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public abstract class AbstractModel {
+
+    private static final Logger log = LogManager.getLogger(AbstractModel.class);
 
     private static ObjectMapper objectMapper = null;
 
@@ -55,7 +59,15 @@ public abstract class AbstractModel {
 
     public String checksum() throws JsonProcessingException {
         //return EthereumHelper.add0x(CryptoHelper.sha3_256(toJson()));
-        return CryptoHelper.sha3_256(toJson());
+
+        String json = toJson();
+        log.debug("Calculating checksum for JSON: " + json);
+        String checksum =  CryptoHelper.sha3_256(json);
+        log.debug("CHECKSUM CALCULATED: " + checksum);
+
+        return checksum;
+
+        //return CryptoHelper.sha3_256(toJson());
     }
 
     public String toJson() throws JsonProcessingException {
