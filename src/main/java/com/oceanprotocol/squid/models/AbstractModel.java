@@ -58,16 +58,7 @@ public abstract class AbstractModel {
     }
 
     public String checksum() throws JsonProcessingException {
-        //return EthereumHelper.add0x(CryptoHelper.sha3_256(toJson()));
-
-        String json = toJson();
-        log.debug("Calculating checksum for JSON: " + json);
-        String checksum =  CryptoHelper.sha3_256(json);
-        log.debug("CHECKSUM CALCULATED: " + checksum);
-
-        return checksum;
-
-        //return CryptoHelper.sha3_256(toJson());
+        return CryptoHelper.sha3_256(toJson());
     }
 
     public String toJson() throws JsonProcessingException {
