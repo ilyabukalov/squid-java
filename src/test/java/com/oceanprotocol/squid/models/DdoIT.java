@@ -59,6 +59,7 @@ public class DdoIT {
     @Test
     public void TestOEP12Computing() throws Exception {
 
+        log.debug("TestOEP12Computing");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP12_COMPUTING_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(2, checksums.size());
@@ -76,6 +77,7 @@ public class DdoIT {
     @Test
     public void TestOEP12Workflow() throws Exception {
 
+        log.debug("TestOEP12Workflow");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP12_WORKFLOW_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(1, checksums.size());
@@ -92,6 +94,7 @@ public class DdoIT {
     @Test
     public void testDDOServicesOrder() throws Exception {
 
+        log.debug("testDDOServicesOrder");
         DDO ddoFromJson = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
         DDO ddo= ddoFromJson.integrityBuilder(credentials);
 
@@ -105,6 +108,7 @@ public class DdoIT {
     @Test
     public void testOEP7DatasetMetadata() throws Exception {
 
+        log.debug("testOEP7DatasetMetadata");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_DATASET_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(2, checksums.size());
@@ -121,6 +125,7 @@ public class DdoIT {
     @Test
     public void testOEP7AlgorithmMetadata() throws Exception {
 
+        log.debug("testOEP7AlgorithmMetadata");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_ALGORITHM_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(1, checksums.size());
@@ -136,6 +141,7 @@ public class DdoIT {
     @Test
     public void testOEP7WorkflowMetadata() throws Exception {
 
+        log.debug("testOEP7WorkflowMetadata");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_WORKFLOW_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(1, checksums.size());
@@ -151,6 +157,7 @@ public class DdoIT {
     @Test
     public void testOEP7ServiceMetadata() throws Exception {
 
+        log.debug("testOEP7ServiceMetadata");
         DDO ddo = DDO.fromJSON(new TypeReference<DDO>() {}, OEP7_SERVICE_EXAMPLE_CONTENT);
         SortedMap<String, String> checksums = ddo.generateChecksums();
         assertEquals(2, checksums.size());
