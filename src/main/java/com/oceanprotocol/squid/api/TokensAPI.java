@@ -35,4 +35,14 @@ public interface TokensAPI {
      */
     TransactionReceipt transfer(String receiverAccount, BigInteger amount) throws EthereumException;
 
+    /**
+     * Approve token to be transferred by another account
+     *
+     * @param spenderAccount  Address to be approved to spend tokens
+     * @param amount          Amount of tokens to approve
+     * @return TransactionReceipt tx receipt
+     * @throws EthereumException if the EVM throws an exception
+     */
+    TransactionReceipt approve(String spenderAccount, BigInteger amount) throws EthereumException;
+
 }

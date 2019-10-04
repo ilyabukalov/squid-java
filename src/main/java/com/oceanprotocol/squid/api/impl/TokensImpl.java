@@ -35,4 +35,9 @@ public class TokensImpl implements TokensAPI {
     public TransactionReceipt transfer(String receiverAccount, BigInteger amount) throws EthereumException {
         return accountsManager.transfer(receiverAccount, amount);
     }
+
+    @Override
+    public TransactionReceipt approve(String spenderAccount, BigInteger amount) throws EthereumException {
+        return accountsManager.approve(spenderAccount, amount);
+    }
 }
