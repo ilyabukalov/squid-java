@@ -1,7 +1,6 @@
 package com.oceanprotocol.squid.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.api.config.OceanConfig;
 import com.oceanprotocol.squid.models.Balance;
 import com.oceanprotocol.squid.models.DDO;

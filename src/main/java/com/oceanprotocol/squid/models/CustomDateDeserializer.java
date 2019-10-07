@@ -21,14 +21,18 @@ public class CustomDateDeserializer extends StdDeserializer<Date> {
 
     public static final String ALT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private SimpleDateFormat formatter;
-    {
-        formatter = new SimpleDateFormat(DATE_PATTERN);
-        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+    private SimpleDateFormat formatter = initializeFormatter(DATE_PATTERN);
 
-    private SimpleDateFormat altFormatter =
-            new SimpleDateFormat(ALT_DATE_PATTERN);
+    private SimpleDateFormat altFormatter = initializeFormatter(ALT_DATE_PATTERN);
+
+    private SimpleDateFormat initializeFormatter(String pattern) {
+
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        return formatter;
+
+    }
 
     public CustomDateDeserializer() {
         this(null);
