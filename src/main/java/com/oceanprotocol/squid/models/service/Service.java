@@ -100,7 +100,6 @@ public class Service extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public ServiceCuration curation;
 
-        public Attributes(){}
     }
 
     //@JsonIgnoreProperties(ignoreUnknown = true)
@@ -125,8 +124,6 @@ public class Service extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public List<Condition> conditions = new ArrayList<>();
 
-        public ServiceAgreementTemplate() {
-        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -142,8 +139,6 @@ public class Service extends AbstractModel implements FromJsonToModel {
         @JsonProperty
         public List<String> escrowReward = Arrays.asList("lockReward", "accessSecretStore");
 
-        public ConditionDependency() {
-        }
     }
 
     public Service() {

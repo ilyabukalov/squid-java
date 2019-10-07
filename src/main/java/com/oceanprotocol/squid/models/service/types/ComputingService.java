@@ -45,8 +45,6 @@ public class ComputingService extends Service {
             @JsonProperty
             public String checksum;
 
-            public Container() {}
-
         }
 
         @JsonPropertyOrder(alphabetic = true)
@@ -76,8 +74,6 @@ public class ComputingService extends Service {
             @JsonProperty
             public Integer maxExecutionTime;
 
-            public Server() {}
-
         }
 
 
@@ -90,7 +86,6 @@ public class ComputingService extends Service {
             @JsonProperty
             public String url;
 
-            public Cluster(){}
         }
 
 
@@ -106,10 +101,7 @@ public class ComputingService extends Service {
             @JsonProperty
             public List<Server> supportedServers = new ArrayList<>();
 
-            public Enviroment(){}
         }
-
-        public Provider(){}
 
     }
 

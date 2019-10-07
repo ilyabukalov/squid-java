@@ -40,9 +40,6 @@ public class Algorithm {
         @JsonProperty
         public String version;
 
-        public Requirement() {}
     }
-
-    public Algorithm(){}
 
 }

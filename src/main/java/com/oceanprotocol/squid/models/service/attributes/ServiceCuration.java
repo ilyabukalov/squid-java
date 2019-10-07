@@ -20,6 +20,4 @@ public class ServiceCuration {
     @JsonProperty
     public boolean isListed;
 
-    public ServiceCuration() {
-    }
 }

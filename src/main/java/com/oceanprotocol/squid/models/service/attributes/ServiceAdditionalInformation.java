@@ -35,6 +35,4 @@ public class ServiceAdditionalInformation extends AbstractModel {
     @JsonProperty
     public String inLanguage;
 
-    public ServiceAdditionalInformation(){}
-
 }

@@ -24,7 +24,6 @@ public class Service {
         @JsonProperty
         public List<Endpoint> endpoints;
 
-        public Definition() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,7 +44,6 @@ public class Service {
         @JsonProperty
         public String token;
 
-        public Auth() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -64,7 +62,6 @@ public class Service {
         @JsonProperty
         public List<String> contentTypes;
 
-        public Endpoint() {}
     }
 
 }

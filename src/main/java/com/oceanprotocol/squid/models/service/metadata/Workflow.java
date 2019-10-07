@@ -42,7 +42,6 @@ public class Workflow {
         @JsonProperty
         public Output output;
 
-        public Stage() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -52,7 +51,6 @@ public class Workflow {
         @JsonProperty
         public Container container;
 
-        public Requirements() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -68,7 +66,6 @@ public class Workflow {
         @JsonProperty
         public String checksum;
 
-        public Container() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -81,7 +78,6 @@ public class Workflow {
         @JsonProperty
         public DID id;
 
-        public Input() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -91,7 +87,6 @@ public class Workflow {
         @JsonProperty
         public DID id;
 
-        public Transformation() {}
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -110,9 +105,6 @@ public class Workflow {
         @JsonProperty
         public AssetMetadata metadata;
 
-        public Output() {}
     }
-
-    public Workflow(){}
 
 }

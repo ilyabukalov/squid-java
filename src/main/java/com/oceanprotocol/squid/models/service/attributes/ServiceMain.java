@@ -88,7 +88,5 @@ public class ServiceMain extends AbstractModel {
     @JsonProperty
     public String price;
 
-    public ServiceMain(){}
-
 
 }
