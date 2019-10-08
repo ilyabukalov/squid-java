@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
+import com.oceanprotocol.squid.exceptions.OceanRuntimeException;
 import com.oceanprotocol.squid.exceptions.ServiceAgreementException;
 import com.oceanprotocol.squid.models.AbstractModel;
 import com.oceanprotocol.squid.models.FromJsonToModel;
@@ -230,7 +231,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
             return EncodingHelper.hexStringToBytes(s);
         }
         catch(UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new OceanRuntimeException("There was a problem enconding a string ", e);
         }
     }
 

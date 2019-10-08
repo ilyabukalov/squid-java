@@ -38,41 +38,58 @@ public class AgreementsImpl implements AgreementsAPI {
     }
 
     @Override
-    public Tuple2<String, String> prepare(DID did, int serviceDefinitionId, Account consumerAccount) throws Exception {
-        String agreementId = generateSlaId();
-        String signature = this.sign(agreementId, did, serviceDefinitionId, consumerAccount);
-        return new Tuple2<String, String>(agreementId, signature);
+    public Tuple2<String, String> prepare(DID did, int serviceDefinitionId, Account consumerAccount) throws ServiceAgreementException {
+
+        String agreementId = "";
+        String signature;
+
+        try {
+            agreementId = generateSlaId();
+            signature = this.sign(agreementId, did, serviceDefinitionId, consumerAccount);
+            return new Tuple2<String, String>(agreementId, signature);
+        }catch (Exception e) {
+            throw new ServiceAgreementException(agreementId, "There was a problem preparing the agreement", e);
+        }
     }
 
     @Override
-    public boolean create(DID did, String agreementId, int index, String consumerAddress) throws Exception {
+    public boolean create(DID did, String agreementId, int index, String consumerAddress) throws ServiceAgreementException {
 
-        DDO ddo = oceanManager.resolveDID(did);
-        Service service = ddo.getService(index);
+        try {
+            DDO ddo = oceanManager.resolveDID(did);
+            Service service = ddo.getService(index);
 
-        List<byte[]> conditionsId = oceanManager.generateServiceConditionsId(agreementId, Keys.toChecksumAddress(consumerAddress), ddo, index);
+            List<byte[]> conditionsId = oceanManager.generateServiceConditionsId(agreementId, Keys.toChecksumAddress(consumerAddress), ddo, index);
 
-        if (service.type.equals(Service.ServiceTypes.access.name()))
-            return agreementsManager.createAccessAgreement(agreementId,
-                    ddo,
-                    conditionsId,
-                    Keys.toChecksumAddress(consumerAddress),
-                    service
-            );
-        else  if (service.type.equals(Service.ServiceTypes.computing.name()))
-            return agreementsManager.createComputeAgreement(agreementId,
-                    ddo,
-                    conditionsId,
-                    Keys.toChecksumAddress(consumerAddress),
-                    service
-            );
+            if (service.type.equals(Service.ServiceTypes.access.name()))
+                return agreementsManager.createAccessAgreement(agreementId,
+                        ddo,
+                        conditionsId,
+                        Keys.toChecksumAddress(consumerAddress),
+                        service
+                );
+            else if (service.type.equals(Service.ServiceTypes.computing.name()))
+                return agreementsManager.createComputeAgreement(agreementId,
+                        ddo,
+                        conditionsId,
+                        Keys.toChecksumAddress(consumerAddress),
+                        service
+                );
+            else
+                throw new Exception("Service type not supported");
+        } catch (Exception e){
+            throw new ServiceAgreementException(agreementId, "There was a problem creating the agreement", e);
+        }
 
-        throw new Exception("Service type not supported");
     }
 
     @Override
-    public AgreementStatus status(String agreementId) throws Exception {
-        return agreementsManager.getStatus(agreementId);
+    public AgreementStatus status(String agreementId) throws ServiceAgreementException {
+        try {
+            return agreementsManager.getStatus(agreementId);
+        }catch (Exception e) {
+            throw new ServiceAgreementException(agreementId, "There was a problem getting the status of the agreement", e);
+        }
     }
 
     public String sign(String agreementId, DID did, int serviceDefinitionId, Account consumerAccount) throws Exception {
