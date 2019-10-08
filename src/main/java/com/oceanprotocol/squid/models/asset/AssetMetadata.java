@@ -28,10 +28,6 @@ public class AssetMetadata extends AbstractModel {
     @JsonProperty
     public Service.Attributes attributes;
 
-
-    public AssetMetadata() {
-    }
-
     public static AssetMetadata builder() {
         AssetMetadata assetMetadata = new AssetMetadata();
         assetMetadata.attributes = new Service.Attributes();

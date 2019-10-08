@@ -23,7 +23,6 @@ import org.web3j.abi.EventEncoder;
 import org.web3j.abi.datatypes.Event;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.EthFilter;
-import org.web3j.tuples.generated.Tuple2;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
