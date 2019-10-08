@@ -499,11 +499,9 @@ public class OceanManager extends BaseManager {
 
     }
 
-
     private Boolean checkAgreementStatus(String serviceAgreementId) throws ServiceAgreementException{
 
         Boolean result = false;
-
         try {
             if (!result) {
                 int retries = 5;
@@ -526,9 +524,7 @@ public class OceanManager extends BaseManager {
             throw new ServiceAgreementException(serviceAgreementId, "The create Agreement Transaction has failed");
 
         return true;
-
     }
-
 
     /**
      * Executes the fulfill of the LockRewardCondition
