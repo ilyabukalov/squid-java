@@ -18,12 +18,18 @@ import com.oceanprotocol.squid.exceptions.EncryptionException;
 import com.oceanprotocol.squid.exceptions.ServiceException;
 import com.oceanprotocol.squid.manager.SecretStoreManager;
 import com.oceanprotocol.squid.models.service.Service;
-import com.oceanprotocol.squid.models.service.types.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
+import com.oceanprotocol.squid.models.service.types.MetadataService;
+import com.oceanprotocol.squid.models.service.types.ProvenanceService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
+import com.oceanprotocol.squid.models.service.types.DDOServiceIndexSorter;
+
 
 import java.util.*;
 

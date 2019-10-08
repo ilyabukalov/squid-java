@@ -76,7 +76,7 @@ public class AgreementsImpl implements AgreementsAPI {
                         service
                 );
             else
-                throw new Exception("Service type not supported");
+                throw new ServiceAgreementException(agreementId, "There was a problem creating the agreement. Service Type not supported");
         } catch (Exception e){
             throw new ServiceAgreementException(agreementId, "There was a problem creating the agreement", e);
         }
