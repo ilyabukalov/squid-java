@@ -476,22 +476,8 @@ public class OceanManager extends BaseManager {
             else
                 throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
 
-
-            if (!result) {
-                int retries = 5;
-                int sleepTime = 2000;
-                for(int i=0; i<retries&&!result;i++){
-                    log.debug("Checking if the agreement is on-chain...");
-                    Agreement agreement = agreementsManager.getAgreement(serviceAgreementId);
-                    if(!agreement.templateId.equals("0x0000000000000000000000000000000000000000")){
-                        result = true;
-                        break;
-                    }
-                    Thread.sleep(sleepTime);
-                }
-                if (!result)
-                    throw new ServiceAgreementException(serviceAgreementId, "The create Agreement Transaction has failed");
-            }
+            if (!result)
+                checkAgreementStatus(serviceAgreementId);
 
         } catch (Exception e) {
             String msg = "Error creating Service Agreement: " + serviceAgreementId;
@@ -510,6 +496,36 @@ public class OceanManager extends BaseManager {
             throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
 
         return executeAgreementFlowable;
+
+    }
+
+
+    private Boolean checkAgreementStatus(String serviceAgreementId) throws ServiceAgreementException{
+
+        Boolean result = false;
+
+        try {
+            if (!result) {
+                int retries = 5;
+                int sleepTime = 2000;
+                for (int i = 0; i < retries && !result; i++) {
+                    log.debug("Checking if the agreement is on-chain...");
+                    Agreement agreement = agreementsManager.getAgreement(serviceAgreementId);
+                    if (!agreement.templateId.equals("0x0000000000000000000000000000000000000000")) {
+                        result = true;
+                        break;
+                    }
+                    Thread.sleep(sleepTime);
+                }
+            }
+        } catch (Exception e){
+            throw new ServiceAgreementException(serviceAgreementId, "There was a problem checking the status", e);
+        }
+
+        if (!result)
+            throw new ServiceAgreementException(serviceAgreementId, "The create Agreement Transaction has failed");
+
+        return true;
 
     }
 
