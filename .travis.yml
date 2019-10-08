@@ -29,6 +29,7 @@ before_install:
   - |
       for i in $(seq 1 150); do
         sleep 5
+        echo "Iteration: ${i}"
         [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
       done
       ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
