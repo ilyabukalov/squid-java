@@ -23,17 +23,17 @@
         "actorType": "publisher",
         "handler": {
           "moduleName": "lockRewardCondition",
-          "functionName": "fulfillAccessSecretStoreCondition",
+          "functionName": "fulfillComputeExecutionCondition",
           "version": "0.1"
         }
       }
     ]
   },
   {
-    "name": "accessSecretStore",
+    "name": "computeExecution",
     "timelock": 0,
     "timeout": 0,
-    "contractName": "AccessSecretStoreCondition",
+    "contractName": "ComputeExecutionCondition",
     "functionName": "fulfill",
     "parameters": [
       {
@@ -52,7 +52,7 @@
         "name": "Fulfilled",
         "actorType": "publisher",
         "handler": {
-          "moduleName": "accessSecretStore",
+          "moduleName": "execCompute",
           "functionName": "fulfillEscrowRewardCondition",
           "version": "0.1"
         }
@@ -61,7 +61,7 @@
         "name": "TimedOut",
         "actorType": "consumer",
         "handler": {
-          "moduleName": "accessSecretStore",
+          "moduleName": "execCompute",
           "functionName": "fulfillEscrowRewardCondition",
           "version": "0.1"
         }
@@ -98,7 +98,7 @@
       {
         "name": "_releaseCondition",
         "type": "bytes32",
-        "value": "{contract.AccessSecretStoreCondition.address}"
+        "value": "{contract.ExecComputeCondition.address}"
       }
     ],
     "events": [
