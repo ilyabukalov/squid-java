@@ -13,30 +13,30 @@ import java.util.List;
 public class ProviderConfig {
 
     private String accessEndpoint;
-    private String purchaseEndpoint;
     private String metadataEndpoint;
+    private String provenanceEndpoint;
     private String secretStoreEndpoint;
     private List<String> providerAddresses = new ArrayList<>();
 
-    public ProviderConfig(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint) {
+    public ProviderConfig(String accessEndpoint, String metadataEndpoint, String provenanceEndpoint) {
         this.accessEndpoint = accessEndpoint;
-        this.purchaseEndpoint = purchaseEndpoint;
         this.metadataEndpoint = metadataEndpoint;
+        this.provenanceEndpoint= provenanceEndpoint;
     }
 
-    public ProviderConfig(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint, String secretStoreEndpoint) {
-        this(accessEndpoint, purchaseEndpoint, metadataEndpoint);
+    public ProviderConfig(String accessEndpoint, String metadataEndpoint, String provenanceEndpoint, String secretStoreEndpoint) {
+        this(accessEndpoint, metadataEndpoint, provenanceEndpoint);
         this.secretStoreEndpoint = secretStoreEndpoint;
     }
 
-    public ProviderConfig(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint, String secretStoreEndpoint, List<String> providers) {
-        this(accessEndpoint, purchaseEndpoint, metadataEndpoint);
+    public ProviderConfig(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint, String provenanceEndpoint, String secretStoreEndpoint, List<String> providers) {
+        this(accessEndpoint, purchaseEndpoint, metadataEndpoint, provenanceEndpoint);
         setSecretStoreEndpoint(secretStoreEndpoint);
         setProviderAddresses(providers);
     }
 
-    public ProviderConfig(String accessEndpoint, String purchaseEndpoint, String metadataEndpoint, String secretStoreEndpoint, String provider) {
-        this(accessEndpoint, purchaseEndpoint, metadataEndpoint, secretStoreEndpoint);
+    public ProviderConfig(String accessEndpoint,  String metadataEndpoint, String provenanceEndpoint, String secretStoreEndpoint, String provider) {
+        this(accessEndpoint, metadataEndpoint, provenanceEndpoint, secretStoreEndpoint);
         this.addProvider(provider);
     }
 
@@ -62,14 +62,6 @@ public class ProviderConfig {
         return this;
     }
 
-    public String getPurchaseEndpoint() {
-        return purchaseEndpoint;
-    }
-
-    public ProviderConfig setPurchaseEndpoint(String purchaseEndpoint) {
-        this.purchaseEndpoint = purchaseEndpoint;
-        return this;
-    }
 
     public String getMetadataEndpoint() {
         return metadataEndpoint;
@@ -77,6 +69,15 @@ public class ProviderConfig {
 
     public ProviderConfig setMetadataEndpoint(String metadataEndpoint) {
         this.metadataEndpoint = metadataEndpoint;
+        return this;
+    }
+
+    public String getProvenanceEndpoint() {
+        return provenanceEndpoint;
+    }
+
+    public ProviderConfig setProvenanceEndpoint(String provenanceEndpoint) {
+        this.provenanceEndpoint = provenanceEndpoint;
         return this;
     }
 

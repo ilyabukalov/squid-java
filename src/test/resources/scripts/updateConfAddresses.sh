@@ -15,6 +15,8 @@ declare -a contracts=(
     "ConditionStoreManager"
     "TemplateStoreManager"
     "AgreementStoreManager"
+    "ComputeExecutionCondition"
+    "EscrowComputeExecutionTemplate"
 )
 
 for c in "${contracts[@]}"

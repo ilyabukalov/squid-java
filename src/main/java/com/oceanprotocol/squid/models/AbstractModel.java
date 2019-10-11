@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.oceanprotocol.common.helpers.CryptoHelper;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -50,6 +51,10 @@ public abstract class AbstractModel {
 
     public static <T> T fromJSON(final TypeReference<T> type, final String json) throws IOException {
         return getMapperInstance().readValue(json, type);
+    }
+
+    public String checksum() throws JsonProcessingException {
+        return CryptoHelper.sha3_256(toJson());
     }
 
     public String toJson() throws JsonProcessingException {

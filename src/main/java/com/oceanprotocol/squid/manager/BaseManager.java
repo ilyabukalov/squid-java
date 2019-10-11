@@ -6,32 +6,36 @@
 package com.oceanprotocol.squid.manager;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.oceanprotocol.common.helpers.UrlHelper;
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
-import com.oceanprotocol.squid.exceptions.DDOException;
-import com.oceanprotocol.squid.exceptions.DIDFormatException;
-import com.oceanprotocol.squid.exceptions.EncryptionException;
-import com.oceanprotocol.squid.exceptions.TokenApproveException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
-import com.oceanprotocol.common.helpers.EncodingHelper;
-import com.oceanprotocol.common.helpers.EthereumHelper;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.service.AuthorizationService;
-import com.oceanprotocol.squid.models.service.MetadataService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
+import com.oceanprotocol.squid.models.service.types.MetadataService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.Credentials;
+import org.web3j.abi.EventEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.datatypes.Event;
+import org.web3j.abi.datatypes.Type;
 import org.web3j.crypto.Keys;
-import org.web3j.crypto.Sign;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.EthFilter;
+import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import com.oceanprotocol.squid.exceptions.DDOException;
+import com.oceanprotocol.squid.exceptions.DIDFormatException;
+import com.oceanprotocol.squid.exceptions.EncryptionException;
+import com.oceanprotocol.squid.exceptions.TokenApproveException;
+import com.oceanprotocol.squid.exceptions.EthereumException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -60,6 +64,8 @@ public abstract class BaseManager {
     protected TemplateStoreManager templateStoreManager;
     protected AgreementStoreManager agreementStoreManager;
     protected ConditionStoreManager conditionStoreManager;
+    protected ComputeExecutionCondition computeExecutionCondition;
+    protected EscrowComputeExecutionTemplate escrowComputeExecutionTemplate;
     protected ContractAddresses contractAddresses = new ContractAddresses();
     protected Config config = ConfigFactory.load();
 
@@ -112,37 +118,12 @@ public abstract class BaseManager {
     }
 
 
-    protected DDO buildDDO(DID did, MetadataService metadataService, AuthorizationService authorizationService, String address, int threshold) throws DDOException {
-
-        try {
-
-            Credentials credentials = getKeeperService().getCredentials();
-
-            String filesJson = metadataService.metadata.toJson(metadataService.metadata.base.files);
-
-            SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
-            metadataService.serviceEndpoint = metadataService.serviceEndpoint.replace("{did}", did.toString());
-            metadataService.metadata.base.encryptedFiles = secretStoreManager.encryptDocument(did.getHash(), filesJson, threshold);
-            metadataService.metadata.base.checksum = metadataService.metadata.generateMetadataChecksum(did.getDid());
-
-            Sign.SignatureData signatureSource = EthereumHelper.signMessage(metadataService.metadata.base.checksum, credentials);
-            String signature = EncodingHelper.signatureToString(signatureSource);
-
-            return new DDO(did, metadataService, address, signature);
-        } catch (DIDFormatException | EncryptionException | CipherException | IOException e) {
-            throw new DDOException("Error building DDO", e);
-        }
-
-    }
-
-
     protected DDO buildDDO(MetadataService metadataService, AuthorizationService authorizationService, String address, int threshold) throws DDOException {
 
         try {
-            DID did = DDO.generateDID();
-           return this.buildDDO(did, metadataService, authorizationService, address, threshold);
-
-        } catch (DIDFormatException  e) {
+            String signature = "";
+            return new DDO(metadataService, address, signature);
+        } catch (DIDFormatException e) {
             throw new DDOException("Error building DDO", e);
         }
 
@@ -157,7 +138,7 @@ public abstract class BaseManager {
         AuthorizationService authorizationService = ddo.getAuthorizationService();
         SecretStoreManager secretStoreManager = getSecretStoreInstance(authorizationService);
 
-        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.metadata.base.encryptedFiles);
+        String jsonFiles = secretStoreManager.decryptDocument(ddo.getDid().getHash(), ddo.getMetadataService().attributes.encryptedFiles);
         return DDO.fromJSON(new TypeReference<ArrayList<AssetMetadata.File>>() {
         }, jsonFiles);
     }
@@ -189,6 +170,61 @@ public abstract class BaseManager {
             throw new TokenApproveException(msg, e);
         }
 
+    }
+
+
+    /**
+     * Given a DID, scans the DIDRegistry events on-chain to resolve the
+     * Metadata API url and return the DDO found
+     *
+     * @param did the did
+     * @return DDO
+     * @throws EthereumException EthereumException
+     * @throws DDOException      DDOException
+     */
+    public DDO resolveDID(DID did) throws DDOException {
+
+        EthFilter didFilter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST,
+                DefaultBlockParameterName.LATEST,
+                didRegistry.getContractAddress()
+        );
+
+        try {
+
+            final Event event = didRegistry.DIDATTRIBUTEREGISTERED_EVENT;
+            final String eventSignature = EventEncoder.encode(event);
+            didFilter.addSingleTopic(eventSignature);
+
+            String didTopic = "0x" + did.getHash();
+            didFilter.addOptionalTopics(didTopic);
+
+            EthLog ethLog;
+
+            try {
+                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
+            } catch (IOException e) {
+                throw new EthereumException("Error searching DID " + did.toString() + " onchain: " + e.getMessage());
+            }
+
+            List<EthLog.LogResult> logs = ethLog.getLogs();
+
+            int numLogs = logs.size();
+            if (numLogs < 1)
+                throw new DDOException("No events found for " + did.toString());
+
+            EthLog.LogResult logResult = logs.get(numLogs - 1);
+            List<Type> nonIndexed = FunctionReturnDecoder.decode(((EthLog.LogObject) logResult).getData(), event.getNonIndexedParameters());
+            String ddoUrl = nonIndexed.get(0).getValue().toString();
+            String didUrl = UrlHelper.parseDDOUrl(ddoUrl, did.toString());
+
+            AquariusService ddoAquariosDto = AquariusService.getInstance(UrlHelper.getBaseUrl(didUrl));
+            return ddoAquariosDto.getDDO(didUrl);
+
+        } catch (Exception ex) {
+            log.error("Unable to retrieve DDO " + ex.getMessage());
+            throw new DDOException("Unable to retrieve DDO " + ex.getMessage());
+        }
     }
 
 
@@ -413,6 +449,46 @@ public abstract class BaseManager {
      */
     public BaseManager setEscrowReward(EscrowReward escrowReward) {
         this.escrowReward = escrowReward;
+        return this;
+    }
+
+    /**
+     * It gets the ComputeExecutionCondition stub instance
+     *
+     * @return ComputeExecutionCondition instance
+     */
+    public ComputeExecutionCondition getComputeExecutionCondition() {
+        return computeExecutionCondition;
+    }
+
+    /**
+     * It sets the ComputeExecutionCondition instance
+     *
+     * @param computeExecutionCondition ComputeExecutionCondition instance
+     * @return BaseManager instance
+     */
+    public BaseManager setComputeExecutionCondition(ComputeExecutionCondition computeExecutionCondition) {
+        this.computeExecutionCondition = computeExecutionCondition;
+        return this;
+    }
+
+    /**
+     * It gets the EscrowComputeExecutionTemplate stub instance
+     *
+     * @return EscrowComputeExecutionTemplate instance
+     */
+    public EscrowComputeExecutionTemplate getEscrowComputeExecutionTemplate() {
+        return escrowComputeExecutionTemplate;
+    }
+
+    /**
+     * It sets the EscrowComputeExecutionTemplate instance
+     *
+     * @param escrowComputeExecutionTemplate EscrowComputeExecutionTemplate instance
+     * @return BaseManager instance
+     */
+    public BaseManager setEscrowComputeExecutionTemplate(EscrowComputeExecutionTemplate escrowComputeExecutionTemplate) {
+        this.escrowComputeExecutionTemplate = escrowComputeExecutionTemplate;
         return this;
     }
 

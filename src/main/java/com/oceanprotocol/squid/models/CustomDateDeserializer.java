@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static com.oceanprotocol.squid.models.AbstractModel.DATE_PATTERN;
 
@@ -20,11 +21,18 @@ public class CustomDateDeserializer extends StdDeserializer<Date> {
 
     public static final String ALT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private SimpleDateFormat formatter =
-            new SimpleDateFormat(DATE_PATTERN);
+    private SimpleDateFormat formatter = initializeFormatter(DATE_PATTERN);
 
-    private SimpleDateFormat altFormatter =
-            new SimpleDateFormat(ALT_DATE_PATTERN);
+    private SimpleDateFormat altFormatter = initializeFormatter(ALT_DATE_PATTERN);
+
+    private SimpleDateFormat initializeFormatter(String pattern) {
+
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        return formatter;
+
+    }
 
     public CustomDateDeserializer() {
         this(null);

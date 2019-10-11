@@ -53,14 +53,14 @@ public class AgreementsManagerIT {
 
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
 
-        keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity);
+        keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "2");
         aquarius = ManagerHelper.getAquarius(config);
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
+        String provenanceUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl = config.getString("brizo.url") + "/api/v1/brizo/services/consume";
-        String purchaseEndpoint = config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
         oceanAPI = OceanAPI.getInstance(config);
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
@@ -84,6 +84,8 @@ public class AgreementsManagerIT {
         properties.put(OceanConfig.TEMPLATE_STORE_MANAGER_ADDRESS, config.getString("contract.TemplateStoreManager.address"));
         properties.put(OceanConfig.TOKEN_ADDRESS, config.getString("contract.OceanToken.address"));
         properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
+        properties.put(OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.ComputeExecutionCondition.address"));
+        properties.put(OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.EscrowComputeExecutionTemplate.address"));
         properties.put(OceanConfig.PROVIDER_ADDRESS, config.getString("provider.address"));
         oceanAPIConsumer = OceanAPI.getInstance(properties);
         oceanAPIConsumer.getTokensAPI().request(BigInteger.TEN);
@@ -115,7 +117,7 @@ public class AgreementsManagerIT {
         log.debug("DDO registered!");
         oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.valueOf(9000000));
         log.info("Consumer balance: " + oceanAPIConsumer.getAccountsAPI().balance(oceanAPIConsumer.getMainAccount()));
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         OrderResult orderResult = response.blockingFirst();
         agreementsManager.getAgreement(orderResult.getServiceAgreementId());

@@ -5,10 +5,9 @@
 
 package com.oceanprotocol.squid.core.sla.functions;
 
+import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.keeper.contracts.LockRewardCondition;
 import com.oceanprotocol.squid.exceptions.LockRewardFulfillException;
-import com.oceanprotocol.common.helpers.EncodingHelper;
-import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.Keys;
@@ -26,14 +25,14 @@ public class FulfillLockReward {
      * @param lockRewardCondition LockRewardCondition contract
      * @param serviceAgreementId  the service agreement id
      * @param escrowRewardAddress the address of the EscrowReward Contract
-     * @param assetInfo           basic info of the asset
+     * @param price               price of the asset
      * @return a flag that indicates if the function was executed correctly
      * @throws LockRewardFulfillException LockRewardFulfillException
      */
     public static Boolean executeFulfill(final LockRewardCondition lockRewardCondition,
                                          final String serviceAgreementId,
                                          final String escrowRewardAddress,
-                                         final BasicAssetInfo assetInfo) throws LockRewardFulfillException {
+                                         final String price) throws LockRewardFulfillException {
 
         byte[] serviceId;
 
@@ -45,12 +44,12 @@ public class FulfillLockReward {
             log.debug("service Agreement String: " + serviceAgreementId);
             log.debug("serviceID Bytes:" + serviceId);
             log.debug("EscrowRewardAddress: " + escrowRewardAddressChecksum);
-            log.debug("Price: " + assetInfo.getPrice());
+            log.debug("Price: " + price);
 
             TransactionReceipt receipt = lockRewardCondition.fulfill(
                     serviceId,
                     escrowRewardAddressChecksum,
-                    new BigInteger(assetInfo.getPrice())
+                    new BigInteger(price)
             ).send();
 
             if (!receipt.getStatus().equals("0x1")) {

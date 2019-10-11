@@ -17,6 +17,7 @@ import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.oceanprotocol.squid.models.service.Service;
 import com.typesafe.config.Config;
@@ -31,10 +32,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -46,6 +44,14 @@ public class AssetsApiIT {
     private static String METADATA_JSON_SAMPLE = "src/test/resources/examples/metadata.json";
     private static String METADATA_JSON_CONTENT;
     private static AssetMetadata metadataBase;
+
+    private static String METADATA_ALG_JSON_SAMPLE = "src/test/resources/examples/metadata-algorithm.json";
+    private static String METADATA_ALG_JSON_CONTENT;
+    private static AssetMetadata metadataBaseAlgorithm;
+
+    private static String COMPUTING_PROVIDER_JSON_SAMPLE = "src/test/resources/examples/computing-provider-example.json";
+    private static String COMPUTING_PROVIDER_JSON_CONTENT;
+    private static ComputingService.Provider computingProvider;
     private static ProviderConfig providerConfig;
     private static OceanAPI oceanAPI;
     private static OceanAPI oceanAPIConsumer;
@@ -58,17 +64,26 @@ public class AssetsApiIT {
     public static void setUp() throws Exception {
 
         config = ConfigFactory.load();
+
         METADATA_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_JSON_SAMPLE)));
         metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
 
+        METADATA_ALG_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(METADATA_ALG_JSON_SAMPLE)));
+        metadataBaseAlgorithm = DDO.fromJSON(new TypeReference<AssetMetadata>() {
+        }, METADATA_ALG_JSON_CONTENT);
+
+        COMPUTING_PROVIDER_JSON_CONTENT = new String(Files.readAllBytes(Paths.get(COMPUTING_PROVIDER_JSON_SAMPLE)));
+        computingProvider = DDO.fromJSON(new TypeReference<ComputingService.Provider>() {
+        },  COMPUTING_PROVIDER_JSON_CONTENT);
+
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
+        String provenanceUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl = config.getString("brizo.url") + "/api/v1/brizo/services/consume";
-        String purchaseEndpoint = config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
 
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
 
         oceanAPI = OceanAPI.getInstance(config);
 
@@ -99,6 +114,9 @@ public class AssetsApiIT {
         properties.put(OceanConfig.DISPENSER_ADDRESS, config.getString("contract.Dispenser.address"));
         properties.put(OceanConfig.PROVIDER_ADDRESS, config.getString("provider.address"));
 
+        properties.put(OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.ComputeExecutionCondition.address"));
+        properties.put(OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS, config.getString("contract.EscrowComputeExecutionTemplate.address"));
+
         oceanAPIConsumer = OceanAPI.getInstance(properties);
 
         keeper = ManagerHelper.getKeeper(config, ManagerHelper.VmClient.parity, "");
@@ -117,18 +135,36 @@ public class AssetsApiIT {
     @Test
     public void create() throws Exception {
 
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
 
         DID did = new DID(ddo.id);
         DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
         assertEquals(ddo.id, resolvedDDO.id);
-        assertTrue(resolvedDDO.services.size() == 3);
+        assertTrue(resolvedDDO.services.size() == 4);
+
+    }
+
+    @Test
+    public void createComputingService() throws Exception {
+
+        metadataBaseAlgorithm.attributes.main.dateCreated = new Date();
+        DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBaseAlgorithm, providerConfig, computingProvider);
+
+        DID did = new DID(ddo.id);
+        DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
+        assertEquals(ddo.id, resolvedDDO.id);
+        assertTrue(resolvedDDO.services.size() == 4);
 
     }
 
     @Test
     public void order() throws Exception {
 
+
+        log.info("PROVIDER ADDRESS: " + config.getString("provider.address"));
+
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         DID did = new DID(ddo.id);
 
@@ -137,7 +173,7 @@ public class AssetsApiIT {
 
         log.debug("Account " + oceanAPIConsumer.getMainAccount().address + " balance is: " + balance.toString());
 
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         //Balance balanceAfter= oceanAPIConsumer.getAccountsAPI().balance(oceanAPIConsumer.getMainAccount());
 
@@ -154,6 +190,7 @@ public class AssetsApiIT {
     @Test
     public void search() throws Exception {
 
+        metadataBase.attributes.main.dateCreated = new Date();
         oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -167,6 +204,7 @@ public class AssetsApiIT {
     @Test
     public void query() throws Exception {
 
+        metadataBase.attributes.main.dateCreated = new Date();
         oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -182,18 +220,15 @@ public class AssetsApiIT {
     @Test
     public void consumeBinary() throws Exception {
 
-        providerConfig.setSecretStoreEndpoint(config.getString("secretstore.url"));
+        metadataBase.attributes.main.dateCreated = new Date();
+        DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
+        DID did = new DID(ddo.id);
 
-        AssetMetadata metadata = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
-        //metadata.base.files.get(0).url= "https://speed.hetzner.de/100MB.bin";
+        oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.TEN);
+        Balance balance = oceanAPIConsumer.getAccountsAPI().balance(oceanAPIConsumer.getMainAccount());
+        log.debug("Account " + oceanAPIConsumer.getMainAccount().address + " balance is: " + balance.toString());
 
-        DDO ddo= oceanAPI.getAssetsAPI().create(metadata, providerConfig);
-        DID did= new DID(ddo.id);
-
-        log.debug("DDO registered!");
-
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did,  Service.DEFAULT_ACCESS_SERVICE_ID);
-
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
         OrderResult orderResult = response.blockingFirst();
         assertNotNull(orderResult.getServiceAgreementId());
         assertEquals(true, orderResult.isAccessGranted());
@@ -202,7 +237,7 @@ public class AssetsApiIT {
         InputStream result = oceanAPIConsumer.getAssetsAPI().consumeBinary(
                 orderResult.getServiceAgreementId(),
                 did,
-                Service.DEFAULT_ACCESS_SERVICE_ID,
+                Service.DEFAULT_ACCESS_INDEX,
                 0);
 
         assertNotNull(result);
@@ -212,6 +247,7 @@ public class AssetsApiIT {
 
     @Test
     public void owner() throws Exception {
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -221,6 +257,7 @@ public class AssetsApiIT {
 
     @Test(expected = DDOException.class)
     public void retire() throws Exception {
+        metadataBase.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
         assertTrue(oceanAPI.getAssetsAPI().retire(ddo.getDid()));
@@ -231,6 +268,7 @@ public class AssetsApiIT {
     public void ownerAssets() throws Exception {
         int assetsOwnedBefore = (oceanAPI.getAssetsAPI().ownerAssets(oceanAPI.getMainAccount().address)).size();
 
+        metadataBase.attributes.main.dateCreated = new Date();
         oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         log.debug("DDO registered!");
 
@@ -246,12 +284,13 @@ public class AssetsApiIT {
         String basePath = config.getString("consume.basePath");
         AssetMetadata metadata = DDO.fromJSON(new TypeReference<AssetMetadata>() {
         }, METADATA_JSON_CONTENT);
+        metadata.attributes.main.dateCreated = new Date();
         DDO ddo = oceanAPI.getAssetsAPI().create(metadata, providerConfig);
         DID did = new DID(ddo.id);
 
         log.debug("DDO registered!");
         oceanAPIConsumer.getAccountsAPI().requestTokens(BigInteger.TEN);
-        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_SERVICE_ID);
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         TimeUnit.SECONDS.sleep(2l);
 
@@ -263,7 +302,7 @@ public class AssetsApiIT {
         boolean result = oceanAPIConsumer.getAssetsAPI().consume(
                 orderResult.getServiceAgreementId(),
                 did,
-                Service.DEFAULT_ACCESS_SERVICE_ID, basePath);
+                Service.DEFAULT_ACCESS_INDEX, basePath);
         assertTrue(result);
 
 

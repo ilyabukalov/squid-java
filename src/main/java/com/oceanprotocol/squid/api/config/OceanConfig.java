@@ -36,8 +36,9 @@ public class OceanConfig {
     public static final String ACCESS_SS_CONDITIONS_ADDRESS = "contract.AccessSecretStoreCondition.address";
     public static final String TOKEN_ADDRESS = "contract.OceanToken.address";
     public static final String DISPENSER_ADDRESS = "contract.Dispenser.address";
+    public static final String COMPUTE_EXECUTION_CONDITION_ADDRESS = "contract.ComputeExecutionCondition.address";
+    public static final String ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS = "contract.EscrowComputeExecutionTemplate.address";
     public static final String CONSUME_BASE_PATH = "consume.basePath";
-
 
     private String keeperUrl;
     private BigInteger keeperGasLimit;
@@ -60,6 +61,8 @@ public class OceanConfig {
     private String tokenAddress;
     private String templateStoreManagerAddress;
     private String dispenserAddress;
+    private String computeExecutionConditionAddress;
+    private String escrowComputeExecutionTemplateAddress;
     private String consumeBasePath;
 
     /**
@@ -149,6 +152,18 @@ public class OceanConfig {
             validation.setValid(false);
             validation.addErrorMessage("The Address of TemplateStoreManager Contract must be set with the property "
                     + OceanConfig.TEMPLATE_STORE_MANAGER_ADDRESS);
+        }
+
+        if (oceanConfig.getComputeExecutionConditionAddress() == null || oceanConfig.getComputeExecutionConditionAddress().isEmpty()) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Address of ComputeExecutionCondition Contract must be set with the property "
+                    + OceanConfig.COMPUTE_EXECUTION_CONDITION_ADDRESS);
+        }
+
+        if (oceanConfig.getEscrowComputeExecutionTemplateAddress()== null || oceanConfig.getEscrowComputeExecutionTemplateAddress().isEmpty()) {
+            validation.setValid(false);
+            validation.addErrorMessage("The Address of EscrowComputeExecutionTemplate Contract must be set with the property "
+                    + OceanConfig.ESCROW_COMPUTE_EXECUTION_CONDITION_ADDRESS);
         }
 
         if (oceanConfig.getMainAccountAddress() == null || oceanConfig.getMainAccountAddress().isEmpty()) {
@@ -373,5 +388,21 @@ public class OceanConfig {
 
     public void setProviderAddress(String providerAddress) {
         this.providerAddress = providerAddress;
+    }
+
+    public String getComputeExecutionConditionAddress() {
+        return computeExecutionConditionAddress;
+    }
+
+    public void setComputeExecutionConditionAddress(String computeExecutionConditionAddress) {
+        this.computeExecutionConditionAddress = computeExecutionConditionAddress;
+    }
+
+    public String getEscrowComputeExecutionTemplateAddress() {
+        return escrowComputeExecutionTemplateAddress;
+    }
+
+    public void setEscrowComputeExecutionTemplateAddress(String escrowComputeExecutionTemplate) {
+        this.escrowComputeExecutionTemplateAddress = escrowComputeExecutionTemplate;
     }
 }

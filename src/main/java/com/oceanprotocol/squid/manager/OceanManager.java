@@ -5,37 +5,48 @@
 
 package com.oceanprotocol.squid.manager;
 
-import com.oceanprotocol.keeper.contracts.EscrowAccessSecretStoreTemplate;
-import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
-import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
-import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
-import com.oceanprotocol.squid.exceptions.*;
-import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.squid.external.BrizoService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.common.helpers.EncodingHelper;
 import com.oceanprotocol.common.helpers.EthereumHelper;
-import com.oceanprotocol.common.helpers.UrlHelper;
+import com.oceanprotocol.common.web3.KeeperService;
+import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
+import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
+import com.oceanprotocol.squid.exceptions.DIDFormatException;
+import com.oceanprotocol.squid.exceptions.DIDRegisterException;
+import com.oceanprotocol.squid.exceptions.DDOException;
+import com.oceanprotocol.squid.exceptions.ServiceException;
+import com.oceanprotocol.squid.exceptions.InitializeConditionsException;
+import com.oceanprotocol.squid.exceptions.OrderException;
+import com.oceanprotocol.squid.exceptions.ServiceAgreementException;
+import com.oceanprotocol.squid.exceptions.EthereumException;
+import com.oceanprotocol.squid.exceptions.LockRewardFulfillException;
+import com.oceanprotocol.squid.exceptions.EscrowRewardException;
+import com.oceanprotocol.squid.exceptions.ConsumeServiceException;
+import com.oceanprotocol.squid.exceptions.EncryptionException;
+import com.oceanprotocol.squid.external.AquariusService;
+import com.oceanprotocol.squid.external.BrizoService;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
-import com.oceanprotocol.squid.models.asset.BasicAssetInfo;
 import com.oceanprotocol.squid.models.asset.OrderResult;
-import com.oceanprotocol.squid.models.service.*;
+import com.oceanprotocol.squid.models.service.ProviderConfig;
+import com.oceanprotocol.squid.models.service.Service;
+import com.oceanprotocol.squid.models.service.ServiceBuilder;
+import com.oceanprotocol.squid.models.service.Condition;
+import com.oceanprotocol.squid.models.service.Agreement;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
+import com.oceanprotocol.squid.models.service.types.MetadataService;
+import com.oceanprotocol.squid.models.service.types.ProvenanceService;
+import com.oceanprotocol.squid.models.service.types.AuthorizationService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
 import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.web3j.abi.EventEncoder;
-import org.web3j.abi.FunctionReturnDecoder;
-import org.web3j.abi.datatypes.Event;
-import org.web3j.abi.datatypes.Type;
+import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Keys;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.EthFilter;
-import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.utils.Numeric;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,59 +103,7 @@ public class OceanManager extends BaseManager {
         return DID.builder();
     }
 
-    /**
-     * Given a DID, scans the DIDRegistry events on-chain to resolve the
-     * Metadata API url and return the DDO found
-     *
-     * @param did the did
-     * @return DDO
-     * @throws EthereumException EthereumException
-     * @throws DDOException      DDOException
-     */
-    public DDO resolveDID(DID did) throws EthereumException, DDOException {
 
-        EthFilter didFilter = new EthFilter(
-                DefaultBlockParameterName.EARLIEST,
-                DefaultBlockParameterName.LATEST,
-                didRegistry.getContractAddress()
-        );
-
-        try {
-
-            final Event event = didRegistry.DIDATTRIBUTEREGISTERED_EVENT;
-            final String eventSignature = EventEncoder.encode(event);
-            didFilter.addSingleTopic(eventSignature);
-
-            String didTopic = "0x" + did.getHash();
-            didFilter.addOptionalTopics(didTopic);
-
-            EthLog ethLog;
-
-            try {
-                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
-            } catch (IOException e) {
-                throw new EthereumException("Error searching DID " + did.toString() + " onchain: " + e.getMessage());
-            }
-
-            List<EthLog.LogResult> logs = ethLog.getLogs();
-
-            int numLogs = logs.size();
-            if (numLogs < 1)
-                throw new DDOException("No events found for " + did.toString());
-
-            EthLog.LogResult logResult = logs.get(numLogs - 1);
-            List<Type> nonIndexed = FunctionReturnDecoder.decode(((EthLog.LogObject) logResult).getData(), event.getNonIndexedParameters());
-            String ddoUrl = nonIndexed.get(0).getValue().toString();
-            String didUrl = UrlHelper.parseDDOUrl(ddoUrl, did.toString());
-
-            AquariusService ddoAquariosDto = AquariusService.getInstance(UrlHelper.getBaseUrl(didUrl));
-            return ddoAquariosDto.getDDO(didUrl);
-
-        } catch (Exception ex) {
-            log.error("Unable to retrieve DDO " + ex.getMessage());
-            throw new DDOException("Unable to retrieve DDO " + ex.getMessage());
-        }
-    }
 
 
     /**
@@ -179,16 +138,29 @@ public class OceanManager extends BaseManager {
     }
 
 
-    private  Map<String, Object> buildBasicServiceConfiguration(ProviderConfig providerConfig, String did, String price) {
+    private  Map<String, Object> buildBasicAccessServiceConfiguration(ProviderConfig providerConfig, String price, String creatorAddress) {
 
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("providerConfig", providerConfig);
         configuration.put("accessServiceTemplateId", escrowAccessSecretStoreTemplate.getContractAddress());
-        configuration.put("escrowRewardAddress", escrowReward.getContractAddress());
-        configuration.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
         configuration.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
-        configuration.put("did", did);
         configuration.put("price", price);
+        configuration.put("creator", creatorAddress);
+
+        return configuration;
+
+    }
+
+
+    private  Map<String, Object> buildBasicComputingServiceConfiguration(ProviderConfig providerConfig, ComputingService.Provider computingProvider, String price, String creatorAddress) {
+
+        Map<String, Object> configuration = new HashMap<>();
+        configuration.put("providerConfig", providerConfig);
+        configuration.put("computingProvider", computingProvider);
+        configuration.put("computingServiceTemplateId", escrowComputeExecutionTemplate.getContractAddress());
+        configuration.put("execComputeConditionAddress", computeExecutionCondition.getContractAddress());
+        configuration.put("price", price);
+        configuration.put("creator", creatorAddress);
 
         return configuration;
 
@@ -207,16 +179,44 @@ public class OceanManager extends BaseManager {
 
         try {
 
-             DID did = DDO.generateDID();
+             //DID did = DDO.generateDID();
 
-             Map<String, Object> configuration = buildBasicServiceConfiguration(providerConfig, did.toString(), metadata.base.price);
+             Map<String, Object> configuration = buildBasicAccessServiceConfiguration(providerConfig, metadata.attributes.main.price, getMainAccount().address);
              Service accessService = ServiceBuilder
-                    .getServiceBuilder(Service.serviceTypes.Access)
+                    .getServiceBuilder(Service.ServiceTypes.access)
                     .buildService(configuration);
 
-            return registerAsset(metadata, providerConfig, did, accessService, threshold);
+            return registerAsset(metadata, providerConfig, accessService, threshold);
 
-        } catch ( DIDFormatException | ServiceException e) {
+        } catch (ServiceException e) {
+            throw new DDOException("Error registering Asset.", e);
+        }
+
+    }
+
+
+    /**
+     * Creates a new DDO with a ComputeService
+     *
+     * @param metadata       the metadata
+     * @param providerConfig the service Endpoints
+     * @param computingProvider
+     * @param threshold      secret store threshold
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO registerComputingServiceAsset(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider, int threshold) throws DDOException {
+
+        try {
+
+            Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, metadata.attributes.main.price, getMainAccount().address);
+            Service computingService = ServiceBuilder
+                    .getServiceBuilder(Service.ServiceTypes.computing)
+                    .buildService(configuration);
+
+            return registerAsset(metadata, providerConfig, computingService, threshold);
+
+        } catch ( ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
@@ -227,13 +227,12 @@ public class OceanManager extends BaseManager {
      *
      * @param metadata       the metadata
      * @param providerConfig the service Endpoints
-     * @param did            the did
      * @param service        the service
      * @param threshold      secret store threshold
      * @return an instance of the DDO created
      * @throws DDOException DDOException
      */
-    private DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, DID did, Service service, int threshold) throws DDOException {
+    private DDO registerAsset(AssetMetadata metadata, ProviderConfig providerConfig, Service service, int threshold) throws DDOException {
 
         try {
 
@@ -245,32 +244,68 @@ public class OceanManager extends BaseManager {
                 metadataEndpoint = providerConfig.getMetadataEndpoint();
 
             // Initialization of services supported for this asset
-            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_SERVICE_ID);
+            MetadataService metadataService = new MetadataService(metadata, metadataEndpoint, Service.DEFAULT_METADATA_INDEX);
 
+            ProvenanceService provenanceService= new ProvenanceService(providerConfig.getMetadataEndpoint(), Service.DEFAULT_PROVENANCE_INDEX);
             AuthorizationService authorizationService = null;
             //Adding the authorization service if the endpoint is defined
             if (providerConfig.getSecretStoreEndpoint() != null && !providerConfig.getSecretStoreEndpoint().equals("")) {
-                authorizationService = new AuthorizationService(Service.serviceTypes.Authorization, providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_SERVICE_ID);
+                authorizationService = new AuthorizationService(providerConfig.getSecretStoreEndpoint(), Service.DEFAULT_AUTHORIZATION_INDEX);
             }
 
             // Initializing DDO
-            DDO ddo = this.buildDDO(did, metadataService, authorizationService, getMainAccount().address, threshold);
+            DDO ddo = this.buildDDO(metadataService, authorizationService, getMainAccount().address, threshold);
 
             // Adding services to DDO
             ddo.addService(service);
+            ddo.addService(provenanceService);
+
             if (authorizationService != null)
                 ddo.addService(authorizationService);
+
+
+            // Generating the DDO.proof, checksums and calculating DID
+            ddo= ddo.integrityBuilder(getKeeperService().getCredentials());
 
             // Add authentication
             ddo.addAuthentication(ddo.id);
 
+            if (service instanceof AccessService)
+                ddo.encryptFiles(getSecretStoreManager(), threshold);
+
+
+            // Initialize conditions
+            ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
+            List<Condition> conditions;
+            Map<String, Object> conditionParams = null;
+
+            if (service instanceof AccessService)
+                conditionParams = ServiceBuilder.getAccessConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
+                        escrowReward.getContractAddress(),
+                        lockRewardCondition.getContractAddress(),
+                        accessSecretStoreCondition.getContractAddress());
+            else if (service instanceof ComputingService)
+                conditionParams = ServiceBuilder.getComputingConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
+                        escrowReward.getContractAddress(),
+                        lockRewardCondition.getContractAddress(),
+                        computeExecutionCondition.getContractAddress());
+            try {
+                conditions = sla.initializeConditions(conditionParams);
+            }catch (InitializeConditionsException  e) {
+                throw new DDOException("Error registering Asset.", e);
+            }
+
+            Service theService = ddo.getService(service.index);
+            theService.attributes.serviceAgreementTemplate.conditions = conditions;
+            theService.attributes.main.timeout = theService.calculateServiceTimeout();
+
             // Registering DID
-            registerDID(ddo.getDid(), metadataEndpoint, metadata.base.checksum, providerConfig.getProviderAddresses());
+            registerDID(ddo.getDid(), metadataEndpoint, ddo.getDid().getHash(), providerConfig.getProviderAddresses());
 
             // Storing DDO
             return getAquariusService().createDDO(ddo);
 
-        } catch (DDOException | DIDRegisterException e) {
+        } catch (DDOException | DIDRegisterException | IOException | CipherException | ServiceException e) {
             throw new DDOException("Error registering Asset.", e);
         }
 
@@ -280,11 +315,11 @@ public class OceanManager extends BaseManager {
      * Purchases an Asset represented by a DID. It implies to initialize a Service Agreement between publisher and consumer
      *
      * @param did                 the did
-     * @param serviceDefinitionId the service definition id
+     * @param serviceIndex the index of the service
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
      * @throws OrderException OrderException
      */
-    public Flowable<OrderResult> purchaseAsset(DID did, String serviceDefinitionId)
+    public Flowable<OrderResult> purchaseAsset(DID did, int serviceIndex)
             throws OrderException {
 
         String serviceAgreementId = ServiceAgreementHandler.generateSlaId();
@@ -294,15 +329,16 @@ public class OceanManager extends BaseManager {
         try {
 
             ddo = resolveDID(did);
-        } catch (DDOException | EthereumException e) {
+        } catch (DDOException  e) {
             log.error("Error resolving did[" + did.getHash() + "]: " + e.getMessage());
             throw new OrderException("Error processing Order with DID " + did.getDid(), e);
         }
 
         try {
 
-            return this.initializeServiceAgreement(did, ddo, serviceDefinitionId, serviceAgreementId)
-                    .map(event -> EncodingHelper.toHexString(event._agreementId))
+            Service service = ddo.getService(serviceIndex);
+
+            return this.initializeServiceAgreement(ddo, serviceIndex, serviceAgreementId)
                     .firstOrError()
                     .toFlowable()
                     .switchMap(eventServiceAgreementId -> {
@@ -310,16 +346,26 @@ public class OceanManager extends BaseManager {
                             return Flowable.empty();
                         else {
                             log.debug("Received AgreementCreated Event with Id: " + eventServiceAgreementId);
-                            tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), ddo.metadata.base.price);
+                            String price = ddo.getMetadataService().attributes.main.price;
+                            tokenApprove(this.tokenContract, lockRewardCondition.getContractAddress(), price);
                             BigInteger balance = this.tokenContract.balanceOf(getMainAccount().address).send();
-                            if (balance.compareTo(new BigInteger(ddo.metadata.base.price)) < 0) {
+                            if (balance.compareTo(new BigInteger(price)) < 0) {
                                 log.warn("Consumer account does not have sufficient token balance to fulfill the " +
                                         "LockRewardCondition. Do `requestTokens` using the `dispenser` contract then try this again.");
-                                log.info("token balance is: " + balance + " price is: " + ddo.metadata.base.price);
+                                log.info("token balance is: " + balance + " price is: " + price);
                                 throw new Exception("LockRewardCondition.fulfill will fail due to insufficient token balance in the consumer account.");
                             }
-                            this.fulfillLockReward(ddo, serviceDefinitionId, eventServiceAgreementId);
-                            return ServiceAgreementHandler.listenForFulfilledEvent(accessSecretStoreCondition, serviceAgreementId);
+                            this.fulfillLockReward(ddo, serviceIndex, eventServiceAgreementId);
+                            Flowable<String> conditionFulilledEvent = null;
+
+                            if (service.type.equals(Service.ServiceTypes.access.name()))
+                                conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(accessSecretStoreCondition, serviceAgreementId);
+                            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+                                conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(computeExecutionCondition, serviceAgreementId);
+                            else
+                                throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
+
+                            return conditionFulilledEvent;
                         }
                     })
                     .map(event -> new OrderResult(serviceAgreementId, true, false))
@@ -328,9 +374,9 @@ public class OceanManager extends BaseManager {
                     .onErrorReturn(throwable -> {
 
                         if (throwable instanceof TimeoutException) {
-                            // If we get a timeout listening for an AccessSecretStoreCondition Fulfilled Event,
+                            // If we get a timeout listening for a Condition Fulfilled Event,
                             // we must perform a refund executing escrowReward.fulfill
-                            this.fulfillEscrowReward(ddo, serviceDefinitionId, serviceAgreementId);
+                            this.fulfillEscrowReward(ddo, serviceIndex, serviceAgreementId);
                             return new OrderResult(serviceAgreementId, false, true);
                         }
 
@@ -346,59 +392,92 @@ public class OceanManager extends BaseManager {
 
     }
 
+
+    public List<byte[]> generateServiceConditionsId(String serviceAgreementId, String consumerAddress, DDO ddo, int serviceIndex) throws ServiceAgreementException, ServiceException {
+
+        Service service = ddo.getService(serviceIndex);
+
+        Map<String, String> conditionsAddresses = new HashMap<>();
+        conditionsAddresses.put("escrowRewardAddress", escrowReward.getContractAddress());
+        conditionsAddresses.put("lockRewardConditionAddress", lockRewardCondition.getContractAddress());
+
+        if (service.type.equals(Service.ServiceTypes.access.name())) {
+            conditionsAddresses.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
+            service = (AccessService)service;
+        }
+        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+        {
+            conditionsAddresses.put("computeExecutionConditionAddress", computeExecutionCondition.getContractAddress());
+            service = (ComputingService)service;
+        }
+        else
+            throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
+
+        List<byte[]> conditionsId;
+
+        try {
+            conditionsId= service.generateByteConditionIds(serviceAgreementId, conditionsAddresses, ddo.proof.creator, Keys.toChecksumAddress(consumerAddress));
+        } catch (Exception e) {
+            throw new ServiceAgreementException(serviceAgreementId, "Exception generating conditions id", e);
+        }
+
+        return conditionsId;
+
+    }
+
     /**
      * Initialize a new ServiceExecutionAgreement between a publisher and a consumer
      *
-     * @param did                 the did
      * @param ddo                 the ddi
-     * @param serviceDefinitionId the service definition id
+     * @param serviceIndex      the service index
      * @param serviceAgreementId  the service agreement id
      * @return a Flowable over an AgreementInitializedEventResponse
      * @throws ServiceException          ServiceException
      * @throws ServiceAgreementException ServiceAgreementException
      */
-    private Flowable<EscrowAccessSecretStoreTemplate.AgreementCreatedEventResponse> initializeServiceAgreement(DID did, DDO ddo, String serviceDefinitionId, String serviceAgreementId)
+    private Flowable<String> initializeServiceAgreement(DDO ddo, int serviceIndex, String serviceAgreementId)
             throws  ServiceException, ServiceAgreementException {
+
+        Service service = ddo.getService(serviceIndex);
 
         Boolean isTemplateApproved;
         try {
-            isTemplateApproved = templatesManager.isTemplateApproved(escrowAccessSecretStoreTemplate.getContractAddress());
+            isTemplateApproved = templatesManager.isTemplateApproved(service.templateId);
         } catch (EthereumException e) {
-            String msg = "Error creating Service Agreement: " + serviceAgreementId + ". Error verifying template";
+            String msg = "Error creating Service Agreement: " + serviceAgreementId + ". Error verifying template " + service.templateId;
             log.error(msg + ": " + e.getMessage());
             throw new ServiceAgreementException(serviceAgreementId, msg, e);
         }
 
         if (!isTemplateApproved)
-            throw new ServiceAgreementException(serviceAgreementId, "The template is not approved");
+            throw new ServiceAgreementException(serviceAgreementId, "The template " + service.templateId + " is not approved");
 
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
+        AccessService accessService = ddo.getAccessService(serviceIndex);
         Boolean result = false;
 
         try {
-            List<byte[]> conditionsId = accessService.generateConditionIds(serviceAgreementId, this, ddo, Keys.toChecksumAddress(getMainAccount().getAddress()));
-            result = this.agreementsManager.createAgreement(serviceAgreementId,
-                    ddo,
-                    conditionsId,
-                    Keys.toChecksumAddress(getMainAccount().getAddress()),
-                    accessService
-            );
 
-            if (!result) {
-                int retries = 5;
-                int sleepTime = 2000;
-                for(int i=0; i<retries&&!result;i++){
-                    log.debug("Checking if the agreement is on-chain...");
-                    Agreement agreement = agreementsManager.getAgreement(serviceAgreementId);
-                    if(!agreement.templateId.equals("0x0000000000000000000000000000000000000000")){
-                        result = true;
-                        break;
-                    }
-                    Thread.sleep(sleepTime);
-                }
-                if (!result)
-                    throw new ServiceAgreementException(serviceAgreementId, "The create Agreement Transaction has failed");
-            }
+            List<byte[]> conditionsId = generateServiceConditionsId(serviceAgreementId, Keys.toChecksumAddress(getMainAccount().getAddress()), ddo, serviceIndex);
+
+            if (service.type.equals(Service.ServiceTypes.access.name()))
+                result = this.agreementsManager.createAccessAgreement(serviceAgreementId,
+                        ddo,
+                        conditionsId,
+                        Keys.toChecksumAddress(getMainAccount().getAddress()),
+                        accessService
+                );
+            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+                result = this.agreementsManager.createComputeAgreement(serviceAgreementId,
+                        ddo,
+                        conditionsId,
+                        Keys.toChecksumAddress(getMainAccount().getAddress()),
+                        accessService
+                );
+            else
+                throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
+
+            if (!result)
+                checkAgreementStatus(serviceAgreementId);
 
         } catch (Exception e) {
             String msg = "Error creating Service Agreement: " + serviceAgreementId;
@@ -407,63 +486,112 @@ public class OceanManager extends BaseManager {
         }
 
         // 4. Listening of events
-        return ServiceAgreementHandler.listenExecuteAgreement(escrowAccessSecretStoreTemplate, serviceAgreementId);
+        Flowable<String> executeAgreementFlowable = null;
+
+        if (service.type.equals(Service.ServiceTypes.access.name()))
+            executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowAccessSecretStoreTemplate, serviceAgreementId);
+        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+            executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowComputeExecutionTemplate, serviceAgreementId);
+        else
+            throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
+
+        return executeAgreementFlowable;
 
     }
 
+    private Boolean checkAgreementStatus(String serviceAgreementId) throws ServiceAgreementException{
+
+        Boolean result = false;
+        try {
+            if (!result) {
+                int retries = 5;
+                int sleepTime = 2000;
+                for (int i = 0; i < retries && !result; i++) {
+                    log.debug("Checking if the agreement is on-chain...");
+                    Agreement agreement = agreementsManager.getAgreement(serviceAgreementId);
+                    if (!agreement.templateId.equals("0x0000000000000000000000000000000000000000")) {
+                        result = true;
+                        break;
+                    }
+                    Thread.sleep(sleepTime);
+                }
+            }
+        } catch (Exception e){
+            throw new ServiceAgreementException(serviceAgreementId, "There was a problem checking the status", e);
+        }
+
+        if (!result)
+            throw new ServiceAgreementException(serviceAgreementId, "The create Agreement Transaction has failed");
+
+        return true;
+    }
 
     /**
      * Executes the fulfill of the LockRewardCondition
      *
      * @param ddo                 the ddo
-     * @param serviceDefinitionId the serviceDefinition id
+     * @param serviceIndex the index of the service
      * @param serviceAgreementId  service agreement id
      * @return a flag that indicates if the function was executed correctly
      * @throws ServiceException           ServiceException
      * @throws LockRewardFulfillException LockRewardFulfillException
      */
-    private boolean fulfillLockReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, LockRewardFulfillException {
+    private boolean fulfillLockReward(DDO ddo, int serviceIndex, String serviceAgreementId) throws ServiceException, LockRewardFulfillException {
 
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
-        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+        Service service = ddo.getService(serviceIndex);
+        String price = service.attributes.main.price;
 
-        return FulfillLockReward.executeFulfill(lockRewardCondition, serviceAgreementId, this.escrowReward.getContractAddress(), assetInfo);
+        return FulfillLockReward.executeFulfill(lockRewardCondition, serviceAgreementId, this.escrowReward.getContractAddress(), price);
     }
 
     /**
      * Executes the fulfill of the EscrowReward
      *
      * @param ddo                 the ddo
-     * @param serviceDefinitionId the serviceDefinition id
+     * @param serviceIndex the index of the service
      * @param serviceAgreementId  service agreement id
      * @return a flag that indicates if the function was executed correctly
      * @throws ServiceException      ServiceException
      * @throws EscrowRewardException EscrowRewardException
      */
-    private boolean fulfillEscrowReward(DDO ddo, String serviceDefinitionId, String serviceAgreementId) throws ServiceException, EscrowRewardException {
+    private boolean fulfillEscrowReward(DDO ddo, int serviceIndex, String serviceAgreementId) throws ServiceException, EscrowRewardException {
 
-        AccessService accessService = ddo.getAccessService(serviceDefinitionId);
-        BasicAssetInfo assetInfo = getBasicAssetInfo(accessService);
+        Service service = ddo.getService(serviceIndex);
+        String price = service.attributes.main.price;
 
         String lockRewardConditionId = "";
-        String accessSecretStoreConditionId = "";
+        String releaseConditionId = "";
 
         try {
 
-            lockRewardConditionId = accessService.generateLockRewardId(serviceAgreementId, escrowReward.getContractAddress(), lockRewardCondition.getContractAddress());
-            accessSecretStoreConditionId = accessService.generateAccessSecretStoreConditionId(serviceAgreementId, getMainAccount().getAddress(), accessSecretStoreCondition.getContractAddress());
+            lockRewardConditionId = service.generateLockRewardId(serviceAgreementId, escrowReward.getContractAddress(), lockRewardCondition.getContractAddress());
+            String conditionAddress;
+            String conditionName;
+
+            if (service.type.equals(Service.ServiceTypes.access.name())) {
+                conditionAddress =  accessSecretStoreCondition.getContractAddress();
+                conditionName = "accessSecretStore";
+            }
+            else if  (service.type.equals(Service.ServiceTypes.computing.name())) {
+                conditionAddress =  computeExecutionCondition.getContractAddress();
+                conditionName = "computeExecution";
+            }
+            else
+                throw new ServiceException("Service type not supported");
+
+            releaseConditionId = service.generateReleaseConditionId(serviceAgreementId, getMainAccount().getAddress(), conditionAddress, conditionName);
+
         } catch (UnsupportedEncodingException e) {
             throw new EscrowRewardException("Error generating the condition Ids ", e);
         }
 
-
         return FulfillEscrowReward.executeFulfill(escrowReward,
                 serviceAgreementId,
                 this.lockRewardCondition.getContractAddress(),
-                assetInfo,
+                price,
                 this.getMainAccount().address,
                 lockRewardConditionId,
-                accessSecretStoreConditionId);
+                releaseConditionId);
     }
 
 
@@ -477,7 +605,7 @@ public class OceanManager extends BaseManager {
      * @return a Map with the data needed to consume the asset
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    private Map<String, Object> getConsumeData(DID did, String serviceDefinitionId, Boolean isIndexDownload, Integer index) throws ConsumeServiceException {
+    private Map<String, Object> getConsumeData(DID did, int serviceDefinitionId, Boolean isIndexDownload, Integer index) throws ConsumeServiceException {
 
         DDO ddo;
         String serviceEndpoint;
@@ -505,7 +633,7 @@ public class OceanManager extends BaseManager {
             data.put("serviceEndpoint", serviceEndpoint);
             data.put("files", files);
 
-        } catch (EthereumException | DDOException | ServiceException | EncryptionException | IOException e) {
+        } catch (DDOException | ServiceException | EncryptionException | IOException e) {
             String msg = "Error getting the data form the  asset with DID " + did.toString();
             log.error(msg + ": " + e.getMessage());
             throw new ConsumeServiceException(msg, e);
@@ -525,7 +653,7 @@ public class OceanManager extends BaseManager {
      * @return a flag that indicates if the consume operation was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException {
+    public boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath) throws ConsumeServiceException {
 
         return consume(serviceAgreementId, did, serviceDefinitionId, false, -1, basePath, 0);
     }
@@ -544,7 +672,7 @@ public class OceanManager extends BaseManager {
      * @return a flag that indicates if the consume operation was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Boolean isIndexDownload, Integer index, String basePath, int threshold) throws ConsumeServiceException {
+    public boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Boolean isIndexDownload, Integer index, String basePath, int threshold) throws ConsumeServiceException {
 
 
         Map<String, Object> consumeData = getConsumeData(did, serviceDefinitionId, isIndexDownload, index);
@@ -594,7 +722,7 @@ public class OceanManager extends BaseManager {
      * @return an InputStream that represents the binary content
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException {
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException {
         return consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, false, 0, 0, threshold);
     }
 
@@ -612,7 +740,7 @@ public class OceanManager extends BaseManager {
      * @return an InputStream that represents the binary content
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Boolean isRangeRequest, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException {
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Boolean isRangeRequest, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException {
 
 
         Map<String, Object> consumeData = getConsumeData(did, serviceDefinitionId, true, index);
@@ -657,131 +785,6 @@ public class OceanManager extends BaseManager {
     }
 
 
-    /**
-     * Gets some basic info of an Access Service
-     *
-     * @param accessService the access service
-     * @return BasicAssetInfo
-     */
-    private BasicAssetInfo getBasicAssetInfo(AccessService accessService) {
 
-        BasicAssetInfo assetInfo = new BasicAssetInfo();
-
-        try {
-
-            Condition lockRewardCondition = accessService.getConditionbyName("lockReward");
-            Condition.ConditionParameter amount = lockRewardCondition.getParameterByName("_amount");
-
-            Condition accessSecretStoreCondition = accessService.getConditionbyName("accessSecretStore");
-            Condition.ConditionParameter documentId = accessSecretStoreCondition.getParameterByName("_documentId");
-
-            assetInfo.setPrice(amount.value.toString());
-            assetInfo.setAssetId(EncodingHelper.hexStringToBytes((String) documentId.value));
-
-
-        } catch (UnsupportedEncodingException e) {
-            log.error("Exception encoding serviceAgreement " + e.getMessage());
-
-        }
-
-        return assetInfo;
-
-    }
-
-    /**
-     * Get the owner of a did already registered.
-     *
-     * @param did the did
-     * @return owner address
-     * @throws Exception Exception
-     */
-    public String getDIDOwner(DID did) throws Exception {
-        return Keys.toChecksumAddress(this.didRegistry.getDIDOwner(EncodingHelper.hexStringToBytes(did.getHash())).send());
-    }
-
-    /**
-     * List of Asset objects purchased by consumerAddress
-     *
-     * @param consumerAddress ethereum address of consumer
-     * @return list of dids
-     * @throws ServiceException ServiceException
-     */
-    public List<DID> getConsumerAssets(String consumerAddress) throws ServiceException {
-        EthFilter didFilter = new EthFilter(
-                DefaultBlockParameterName.EARLIEST,
-                DefaultBlockParameterName.LATEST,
-                accessSecretStoreCondition.getContractAddress()
-        );
-        try {
-
-            final Event event = accessSecretStoreCondition.FULFILLED_EVENT;
-            final String eventSignature = EventEncoder.encode(event);
-            didFilter.addSingleTopic(eventSignature);
-            didFilter.addNullTopic();
-            didFilter.addNullTopic();
-            didFilter.addOptionalTopics(Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(consumerAddress), 64));
-
-            EthLog ethLog;
-
-            try {
-                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
-            } catch (IOException e) {
-                throw new EthereumException("Error creating consumedAssets filter.");
-            }
-
-            List<EthLog.LogResult> logs = ethLog.getLogs();
-            List<DID> DIDlist = new ArrayList<>();
-            for (int i = 0; i <= logs.size() - 1; i++) {
-                DIDlist.add(DID.getFromHash(Numeric.cleanHexPrefix((((EthLog.LogObject) logs.get(i)).getTopics().get(2)))));
-            }
-            return DIDlist;
-
-        } catch (Exception ex) {
-            log.error("Unable to retrieve assets consumed by " + consumerAddress + ex.getMessage());
-            throw new ServiceException("Unable to retrieve assets consumed by " + consumerAddress + ex.getMessage());
-        }
-    }
-
-    /**
-     * List of Asset objects published by ownerAddress
-     *
-     * @param ownerAddress ethereum address of owner/publisher
-     * @return list of dids
-     * @throws ServiceException ServiceException
-     */
-    public List<DID> getOwnerAssets(String ownerAddress) throws ServiceException {
-        EthFilter didFilter = new EthFilter(
-                DefaultBlockParameterName.EARLIEST,
-                DefaultBlockParameterName.LATEST,
-                didRegistry.getContractAddress()
-        );
-        try {
-
-            final Event event = didRegistry.DIDATTRIBUTEREGISTERED_EVENT;
-            final String eventSignature = EventEncoder.encode(event);
-            didFilter.addSingleTopic(eventSignature);
-            didFilter.addNullTopic();
-            didFilter.addOptionalTopics(Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(ownerAddress), 64));
-
-            EthLog ethLog;
-
-            try {
-                ethLog = getKeeperService().getWeb3().ethGetLogs(didFilter).send();
-            } catch (IOException e) {
-                throw new EthereumException("Error creating ownerAssets filter.");
-            }
-
-            List<EthLog.LogResult> logs = ethLog.getLogs();
-            List<DID> DIDlist = new ArrayList<>();
-            for (int i = 0; i <= logs.size() - 1; i++) {
-                DIDlist.add(DID.getFromHash(Numeric.cleanHexPrefix((((EthLog.LogObject) logs.get(i)).getTopics().get(1)))));
-            }
-            return DIDlist;
-
-        } catch (Exception ex) {
-            log.error("Unable to retrieve assets owned by " + ownerAddress + ex.getMessage());
-            throw new ServiceException("Unable to retrieve assets owned by " + ownerAddress + ex.getMessage());
-        }
-    }
 
 }
