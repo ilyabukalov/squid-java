@@ -9,6 +9,7 @@ import com.oceanprotocol.common.helpers.HttpHelper;
 import com.oceanprotocol.common.helpers.HttpHelper.DownloadResult;
 import com.oceanprotocol.common.helpers.StringsHelper;
 import com.oceanprotocol.common.models.HttpResponse;
+import com.oceanprotocol.squid.models.brizo.ExecuteService;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +49,38 @@ public class BrizoService {
         public void setCode(Integer code) {
             this.code = code;
         }
+    }
+
+    public static class ServiceExecutionResult {
+
+        private Boolean ok;
+        private String executionId;
+        private Integer code;
+
+        public Boolean getOk() {
+            return ok;
+        }
+
+        public void setOk(Boolean ok) {
+            this.ok = ok;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+
+        public String getExecutionId() {
+            return executionId;
+        }
+
+        public void setExecutionId(String executionId) {
+            this.executionId = executionId;
+        }
+
     }
 
 
@@ -167,6 +200,45 @@ public class BrizoService {
 
         return HttpHelper.download(endpoint, isRangeRequest, startRange, endRange);
 
+    }
+
+    /**
+     * Calls a Brizo's endpoint to request the execution of a Compute Service
+     *
+     * @param url     the url
+     * @param payload the payload
+     * @return an object that indicates if Brizo initialized the Execution of the Service correctly
+     */
+    public static ServiceExecutionResult initializeServiceExecution(String url, ExecuteService payload) {
+
+        log.debug("Initializing Execution of Service. Agreement Id: [" + payload.agreementId + "]: " + url);
+
+        ServiceExecutionResult result = new ServiceExecutionResult();
+        HttpResponse response;
+
+        try {
+            String payloadJson = payload.toJson();
+            log.debug(payloadJson);
+
+            response = HttpHelper.httpClientPost(
+                    url, new ArrayList<>(), payloadJson);
+
+            result.setCode(response.getStatusCode());
+
+            if (response.getStatusCode() != 201) {
+                log.debug("Unable to Initialize Execution of the Service: " + response.toString());
+                result.setOk(false);
+                return result;
+            }
+        } catch (Exception e) {
+            log.error("Exception Initializing Execution of the Service: " + e.getMessage());
+            result.setOk(false);
+            return result;
+        }
+
+        result.setOk(true);
+        result.setExecutionId(response.getBody());
+        return result;
     }
 
 }

@@ -31,6 +31,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.brizo.ExecuteService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.ServiceBuilder;
@@ -45,6 +46,7 @@ import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Hash;
 import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
@@ -769,6 +771,42 @@ public class OceanManager extends BaseManager {
 
             log.error(msg + ": " + e.getMessage());
             throw new ConsumeServiceException(msg, e);
+        }
+
+    }
+
+    /**
+     * Executes a remote service associated with an asset and serviceAgreementId
+     * @param agreementId the agreement id
+     * @param did the did
+     * @param index the index of the service
+     * @param workflowId the workflow id
+     * @return an execution id
+     * @throws ServiceException ServiceException
+     */
+    public String executeComputeService(String agreementId, DID did, int index, String workflowId) throws ServiceException {
+
+        DDO ddo = null;
+
+        try {
+
+            ddo = resolveDID(did);
+
+            Service service = ddo.getService(index);
+            String checkConsumerAddress = Keys.toChecksumAddress(getMainAccount().address);
+
+            String hash =  Hash.sha3(EthereumHelper.add0x(agreementId));
+            String signature = EthereumHelper.ethSignMessage(this.getKeeperService().getWeb3(), hash, getMainAccount().address, getMainAccount().password);
+
+            ExecuteService executeService = new ExecuteService(agreementId, workflowId, checkConsumerAddress, signature);
+            BrizoService.ServiceExecutionResult result = BrizoService.initializeServiceExecution(service.serviceEndpoint, executeService);
+            if (!result.getOk())
+                throw new ServiceException("There was a problem initializing the execution of the service. HTTP Code: " + result.getCode());
+
+            return result.getExecutionId();
+
+        } catch (DDOException|IOException e) {
+            throw new ServiceException("There was an error resolving the DID ", e);
         }
 
     }
