@@ -146,6 +146,9 @@ public interface ServiceBuilder {
      *
      * @param did   the did
      * @param price the price
+     * @param escrowRewardAddress  the address of EscrowReward Contract
+     * @param lockRewardConditionAddress the address of LockReward Contract
+     * @param accessSecretStoreConditionAddress the address of AccessSecretStoreCondition Contract
      * @return a Map with the params of the Access ConditionStatusMap
      */
     public static  Map<String, Object> getAccessConditionParams(String did, String price,  String escrowRewardAddress, String lockRewardConditionAddress, String accessSecretStoreConditionAddress) {
@@ -168,6 +171,9 @@ public interface ServiceBuilder {
      *
      * @param did   the did
      * @param price the price
+     * @param escrowRewardAddress  the address of EscrowReward Contract
+     * @param lockRewardConditionAddress the address of LockReward Contract
+     * @param execComputeConditionAddress the address of ExecComputeCondition
      * @return a Map with the params of the Access ConditionStatusMap
      */
     public static  Map<String, Object> getComputingConditionParams(String did, String price,  String escrowRewardAddress, String lockRewardConditionAddress, String execComputeConditionAddress) {

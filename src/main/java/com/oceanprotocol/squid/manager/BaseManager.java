@@ -179,7 +179,6 @@ public abstract class BaseManager {
      *
      * @param did the did
      * @return DDO
-     * @throws EthereumException EthereumException
      * @throws DDOException      DDOException
      */
     public DDO resolveDID(DID did) throws DDOException {

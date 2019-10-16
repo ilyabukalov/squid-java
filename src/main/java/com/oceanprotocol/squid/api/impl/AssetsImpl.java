@@ -40,6 +40,7 @@ public class AssetsImpl implements AssetsAPI {
      *
      * @param oceanManager  the oceanManager
      * @param assetsManager the assetsManager
+     * @param agreementsManager  the agreements manager
      */
     public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager, AgreementsManager agreementsManager) {
 
