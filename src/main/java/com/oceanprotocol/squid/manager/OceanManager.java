@@ -12,6 +12,7 @@ import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
 import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceComputingAgreementHandler;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.DIDRegisterException;
 import com.oceanprotocol.squid.exceptions.DDOException;
@@ -277,20 +278,24 @@ public class OceanManager extends BaseManager {
 
 
             // Initialize conditions
-            ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
+            ServiceAgreementHandler sla = null;
             List<Condition> conditions;
             Map<String, Object> conditionParams = null;
 
-            if (service instanceof AccessService)
+            if (service instanceof AccessService) {
+                sla = new ServiceAccessAgreementHandler();
                 conditionParams = ServiceBuilder.getAccessConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
                         escrowReward.getContractAddress(),
                         lockRewardCondition.getContractAddress(),
                         accessSecretStoreCondition.getContractAddress());
-            else if (service instanceof ComputingService)
+            }
+            else if (service instanceof ComputingService) {
+                sla = new ServiceComputingAgreementHandler();
                 conditionParams = ServiceBuilder.getComputingConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
                         escrowReward.getContractAddress(),
                         lockRewardCondition.getContractAddress(),
                         computeExecutionCondition.getContractAddress());
+            }
             try {
                 conditions = sla.initializeConditions(conditionParams);
             }catch (InitializeConditionsException  e) {
@@ -454,7 +459,6 @@ public class OceanManager extends BaseManager {
         if (!isTemplateApproved)
             throw new ServiceAgreementException(serviceAgreementId, "The template " + service.templateId + " is not approved");
 
-        AccessService accessService = ddo.getAccessService(serviceIndex);
         Boolean result = false;
 
         try {
@@ -466,14 +470,14 @@ public class OceanManager extends BaseManager {
                         ddo,
                         conditionsId,
                         Keys.toChecksumAddress(getMainAccount().getAddress()),
-                        accessService
+                        service
                 );
             else if  (service.type.equals(Service.ServiceTypes.computing.name()))
                 result = this.agreementsManager.createComputeAgreement(serviceAgreementId,
                         ddo,
                         conditionsId,
                         Keys.toChecksumAddress(getMainAccount().getAddress()),
-                        accessService
+                        service
                 );
             else
                 throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
