@@ -249,11 +249,11 @@ public interface AssetsAPI {
      * @param agreementId the agreement id
      * @param did the did
      * @param index the index of the service
-     * @param workflowId the workflow id
+     * @param workflowDID the workflow id
      * @return an execution id
      * @throws ServiceException ServiceException
      */
-    public String execute(String agreementId, DID did, int index, String workflowId) throws ServiceException;
+    public String execute(String agreementId, DID did, int index, String workflowDID) throws ServiceException;
 
     /**
      * Return the owner of the asset.

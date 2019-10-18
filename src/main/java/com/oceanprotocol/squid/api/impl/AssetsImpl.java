@@ -171,8 +171,8 @@ public class AssetsImpl implements AssetsAPI {
     }
 
     @Override
-    public String execute(String agreementId, DID did, int index, String workflowId) throws ServiceException {
-        return oceanManager.executeComputeService(agreementId, did, index, workflowId);
+    public String execute(String agreementId, DID did, int index, String workflowDID) throws ServiceException {
+        return oceanManager.executeComputeService(agreementId, did, index, workflowDID);
     }
 
     @Override
