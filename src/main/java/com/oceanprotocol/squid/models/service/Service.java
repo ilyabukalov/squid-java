@@ -54,6 +54,12 @@ public class Service extends AbstractModel implements FromJsonToModel {
     @JsonIgnore
     public static final String URL_PARAM = "url";
 
+    @JsonIgnore
+    public static final String WORKFLOWID_PARAM = "workflowDID";
+
+    @JsonIgnore
+    public static final String SIGNATURE_PARAM = "signature";
+
 
     @JsonIgnore
     public static final int DEFAULT_METADATA_INDEX = 0;

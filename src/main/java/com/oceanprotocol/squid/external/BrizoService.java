@@ -5,6 +5,8 @@
 
 package com.oceanprotocol.squid.external;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oceanprotocol.common.helpers.HttpHelper;
 import com.oceanprotocol.common.helpers.HttpHelper.DownloadResult;
 import com.oceanprotocol.common.helpers.StringsHelper;
@@ -205,13 +207,21 @@ public class BrizoService {
     /**
      * Calls a Brizo's endpoint to request the execution of a Compute Service
      *
-     * @param url     the url
+     * @param serviceEndpoint the serviceEndpoint
      * @param payload the payload
      * @return an object that indicates if Brizo initialized the Execution of the Service correctly
      */
-    public static ServiceExecutionResult initializeServiceExecution(String url, ExecuteService payload) {
+    public static ServiceExecutionResult initializeServiceExecution(String serviceEndpoint, ExecuteService payload) {
 
-        log.debug("Initializing Execution of Service. Agreement Id: [" + payload.agreementId + "]: " + url);
+        log.debug("Initializing Execution of Service. Agreement Id: [" + payload.agreementId + "]: " + serviceEndpoint);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(Service.CONSUMER_ADDRESS_PARAM, payload.consumerAddress);
+        parameters.put(Service.SERVICE_AGREEMENT_PARAM, payload.agreementId);
+        parameters.put(Service.WORKFLOWID_PARAM, payload.workflowId);
+        parameters.put(Service.SIGNATURE_PARAM, payload.signature);
+
+        String endpoint = StringsHelper.formUrl(serviceEndpoint, parameters);
 
         ServiceExecutionResult result = new ServiceExecutionResult();
         HttpResponse response;
@@ -221,24 +231,34 @@ public class BrizoService {
             log.debug(payloadJson);
 
             response = HttpHelper.httpClientPost(
-                    url, new ArrayList<>(), payloadJson);
+                    endpoint, new ArrayList<>(), payloadJson);
 
             result.setCode(response.getStatusCode());
 
-            if (response.getStatusCode() != 201) {
+            if (response.getStatusCode() != 200) {
                 log.debug("Unable to Initialize Execution of the Service: " + response.toString());
                 result.setOk(false);
                 return result;
             }
+
+            result.setOk(true);
+            result.setExecutionId(getExecutionId(response.getBody()));
+            return result;
+
         } catch (Exception e) {
             log.error("Exception Initializing Execution of the Service: " + e.getMessage());
             result.setOk(false);
             return result;
         }
 
-        result.setOk(true);
-        result.setExecutionId(response.getBody());
-        return result;
+
+    }
+
+    private static String getExecutionId(String bodyResponse) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> responseMap = mapper.readValue(bodyResponse, new TypeReference<Map<String, String>>(){});
+
+        return responseMap.get("workflowId");
     }
 
 }
