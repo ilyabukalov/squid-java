@@ -18,7 +18,7 @@ public interface ServiceBuilder {
 
         switch (serviceType) {
             case access: return accessServiceBuilder();
-            case computing: return computingServiceBuilder();
+            case compute: return computingServiceBuilder();
             default: throw new ServiceException("Invalid Service definition");
 
         }

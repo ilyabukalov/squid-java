@@ -214,7 +214,7 @@ public class OceanManager extends BaseManager {
 
             Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, metadata.attributes.main.price, getMainAccount().address);
             Service computingService = ServiceBuilder
-                    .getServiceBuilder(Service.ServiceTypes.computing)
+                    .getServiceBuilder(Service.ServiceTypes.compute)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, computingService, threshold);
@@ -367,7 +367,7 @@ public class OceanManager extends BaseManager {
 
                             if (service.type.equals(Service.ServiceTypes.access.name()))
                                 conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(accessSecretStoreCondition, serviceAgreementId);
-                            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+                            else if  (service.type.equals(Service.ServiceTypes.compute.name()))
                                 conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(computeExecutionCondition, serviceAgreementId);
                             else
                                 throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -412,7 +412,7 @@ public class OceanManager extends BaseManager {
             conditionsAddresses.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
             service = (AccessService)service;
         }
-        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+        else if  (service.type.equals(Service.ServiceTypes.compute.name()))
         {
             conditionsAddresses.put("computeExecutionConditionAddress", computeExecutionCondition.getContractAddress());
             service = (ComputingService)service;
@@ -472,7 +472,7 @@ public class OceanManager extends BaseManager {
                         Keys.toChecksumAddress(getMainAccount().getAddress()),
                         service
                 );
-            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+            else if  (service.type.equals(Service.ServiceTypes.compute.name()))
                 result = this.agreementsManager.createComputeAgreement(serviceAgreementId,
                         ddo,
                         conditionsId,
@@ -496,7 +496,7 @@ public class OceanManager extends BaseManager {
 
         if (service.type.equals(Service.ServiceTypes.access.name()))
             executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowAccessSecretStoreTemplate, serviceAgreementId);
-        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+        else if  (service.type.equals(Service.ServiceTypes.compute.name()))
             executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowComputeExecutionTemplate, serviceAgreementId);
         else
             throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -578,7 +578,7 @@ public class OceanManager extends BaseManager {
                 conditionAddress =  accessSecretStoreCondition.getContractAddress();
                 conditionName = "accessSecretStore";
             }
-            else if  (service.type.equals(Service.ServiceTypes.computing.name())) {
+            else if  (service.type.equals(Service.ServiceTypes.compute.name())) {
                 conditionAddress =  computeExecutionCondition.getContractAddress();
                 conditionName = "computeExecution";
             }

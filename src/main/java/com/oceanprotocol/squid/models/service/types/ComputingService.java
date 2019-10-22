@@ -107,17 +107,17 @@ public class ComputingService extends Service {
 
     public ComputingService() {
         this.index = DEFAULT_INDEX;
-        type= ServiceTypes.computing.toString();
+        type= ServiceTypes.compute.toString();
     }
 
     public ComputingService(String serviceEndpoint, int serviceDefinitionId, String templateId) {
-        super(ServiceTypes.computing, serviceEndpoint, serviceDefinitionId);
+        super(ServiceTypes.compute, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
 
     }
 
     public ComputingService(String serviceEndpoint, int serviceDefinitionId, ServiceAgreementTemplate serviceAgreementTemplate, String templateId) {
-        super(ServiceTypes.computing, serviceEndpoint, serviceDefinitionId);
+        super(ServiceTypes.compute, serviceEndpoint, serviceDefinitionId);
         this.templateId = templateId;
         this.attributes.serviceAgreementTemplate = serviceAgreementTemplate;
     }

@@ -68,7 +68,7 @@ public class AgreementsImpl implements AgreementsAPI {
                         Keys.toChecksumAddress(consumerAddress),
                         service
                 );
-            else if (service.type.equals(Service.ServiceTypes.computing.name()))
+            else if (service.type.equals(Service.ServiceTypes.compute.name()))
                 return agreementsManager.createComputeAgreement(agreementId,
                         ddo,
                         conditionsId,
@@ -105,7 +105,7 @@ public class AgreementsImpl implements AgreementsAPI {
             service = (AccessService) service;
             conditionsAddresses.put("accessSecretStoreConditionAddress",  this.agreementsManager.getAccessSecretStoreCondition().getContractAddress());
         }
-        else if (service.type.equals(Service.ServiceTypes.computing.name())) {
+        else if (service.type.equals(Service.ServiceTypes.compute.name())) {
             service = (ComputingService) service;
             conditionsAddresses.put("computeExecutionCondition", this.agreementsManager.getComputeExecutionCondition().getContractAddress());
         }

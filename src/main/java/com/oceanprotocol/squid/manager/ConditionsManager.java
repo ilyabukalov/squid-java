@@ -121,7 +121,7 @@ public class ConditionsManager extends BaseManager {
 
         if (service.type.equals(Service.ServiceTypes.access.name())) {
             agreementData = escrowAccessSecretStoreTemplate.getAgreementData(EncodingHelper.hexStringToBytes(agreementId)).send();
-        } else if (service.type.equals(Service.ServiceTypes.computing.name())) {
+        } else if (service.type.equals(Service.ServiceTypes.compute.name())) {
             agreementData = escrowComputeExecutionTemplate.getAgreementData(EncodingHelper.hexStringToBytes(agreementId)).send();
         }
 
