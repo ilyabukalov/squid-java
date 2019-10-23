@@ -30,7 +30,7 @@
     ]
   },
   {
-    "name": "computeExecution",
+    "name": "execCompute",
     "timelock": 0,
     "timeout": 0,
     "contractName": "ComputeExecutionCondition",

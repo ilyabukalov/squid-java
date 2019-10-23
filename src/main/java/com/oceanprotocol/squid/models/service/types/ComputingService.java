@@ -142,7 +142,7 @@ public class ComputingService extends Service {
 
     public String generateComputeExecutionConditionId(String serviceAgreementId, String consumerAddress, String computeExecutionConditionAddress) throws UnsupportedEncodingException {
 
-        Condition accessSecretStoreCondition = this.getConditionbyName("computeExecution");
+        Condition accessSecretStoreCondition = this.getConditionbyName("execCompute");
 
         Condition.ConditionParameter documentId = accessSecretStoreCondition.getParameterByName("_documentId");
         Condition.ConditionParameter grantee = accessSecretStoreCondition.getParameterByName("_grantee");
