@@ -203,7 +203,7 @@ public class OceanManager extends BaseManager {
      *
      * @param metadata       the metadata
      * @param providerConfig the service Endpoints
-     * @param computingProvider
+     * @param computingProvider the data relative to the provider
      * @param threshold      secret store threshold
      * @return an instance of the DDO created
      * @throws DDOException DDOException

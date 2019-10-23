@@ -339,7 +339,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
      * @param publisherAddress                  the address of the publisher of the asset
      * @param conditionsAddresses               addresses of the conditions
      * @return Hash
-     * @throws IOException if the hash function fails
+     * @throws ServiceAgreementException if the hash function fails
      */
     public String generateServiceAgreementHash(String serviceAgreementId, String consumerAddress, String publisherAddress,
                                                Map<String, String> conditionsAddresses ) throws ServiceAgreementException {
