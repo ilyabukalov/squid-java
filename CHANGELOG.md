@@ -1,6 +1,11 @@
 History
 =======
 
+0.8.0 (October, 2019)
+-------------------------
+
+* Implementing OEP12. Compute use case
+
 0.7.0 (August, 2019)
 -------------------------
 DDO Breaking changes included:
