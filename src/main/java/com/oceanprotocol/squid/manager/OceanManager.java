@@ -12,6 +12,7 @@ import com.oceanprotocol.squid.core.sla.functions.FulfillEscrowReward;
 import com.oceanprotocol.squid.core.sla.functions.FulfillLockReward;
 import com.oceanprotocol.squid.core.sla.handlers.ServiceAccessAgreementHandler;
 import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceComputingAgreementHandler;
 import com.oceanprotocol.squid.exceptions.DIDFormatException;
 import com.oceanprotocol.squid.exceptions.DIDRegisterException;
 import com.oceanprotocol.squid.exceptions.DDOException;
@@ -31,6 +32,7 @@ import com.oceanprotocol.squid.models.DID;
 import com.oceanprotocol.squid.models.Order;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
+import com.oceanprotocol.squid.models.brizo.ExecuteService;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.oceanprotocol.squid.models.service.Service;
 import com.oceanprotocol.squid.models.service.ServiceBuilder;
@@ -45,6 +47,7 @@ import io.reactivex.Flowable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.crypto.CipherException;
+import org.web3j.crypto.Hash;
 import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
@@ -200,7 +203,7 @@ public class OceanManager extends BaseManager {
      *
      * @param metadata       the metadata
      * @param providerConfig the service Endpoints
-     * @param computingProvider the provider of the compute service
+     * @param computingProvider the data relative to the provider
      * @param threshold      secret store threshold
      * @return an instance of the DDO created
      * @throws DDOException DDOException
@@ -211,7 +214,7 @@ public class OceanManager extends BaseManager {
 
             Map<String, Object> configuration = buildBasicComputingServiceConfiguration(providerConfig, computingProvider, metadata.attributes.main.price, getMainAccount().address);
             Service computingService = ServiceBuilder
-                    .getServiceBuilder(Service.ServiceTypes.computing)
+                    .getServiceBuilder(Service.ServiceTypes.compute)
                     .buildService(configuration);
 
             return registerAsset(metadata, providerConfig, computingService, threshold);
@@ -275,20 +278,24 @@ public class OceanManager extends BaseManager {
 
 
             // Initialize conditions
-            ServiceAgreementHandler sla = new ServiceAccessAgreementHandler();
+            ServiceAgreementHandler sla = null;
             List<Condition> conditions;
             Map<String, Object> conditionParams = null;
 
-            if (service instanceof AccessService)
+            if (service instanceof AccessService) {
+                sla = new ServiceAccessAgreementHandler();
                 conditionParams = ServiceBuilder.getAccessConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
                         escrowReward.getContractAddress(),
                         lockRewardCondition.getContractAddress(),
                         accessSecretStoreCondition.getContractAddress());
-            else if (service instanceof ComputingService)
+            }
+            else if (service instanceof ComputingService) {
+                sla = new ServiceComputingAgreementHandler();
                 conditionParams = ServiceBuilder.getComputingConditionParams(ddo.getDid().toString(), metadata.attributes.main.price,
                         escrowReward.getContractAddress(),
                         lockRewardCondition.getContractAddress(),
                         computeExecutionCondition.getContractAddress());
+            }
             try {
                 conditions = sla.initializeConditions(conditionParams);
             }catch (InitializeConditionsException  e) {
@@ -360,7 +367,7 @@ public class OceanManager extends BaseManager {
 
                             if (service.type.equals(Service.ServiceTypes.access.name()))
                                 conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(accessSecretStoreCondition, serviceAgreementId);
-                            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+                            else if  (service.type.equals(Service.ServiceTypes.compute.name()))
                                 conditionFulilledEvent = ServiceAgreementHandler.listenForFulfilledEvent(computeExecutionCondition, serviceAgreementId);
                             else
                                 throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -405,7 +412,7 @@ public class OceanManager extends BaseManager {
             conditionsAddresses.put("accessSecretStoreConditionAddress", accessSecretStoreCondition.getContractAddress());
             service = (AccessService)service;
         }
-        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+        else if  (service.type.equals(Service.ServiceTypes.compute.name()))
         {
             conditionsAddresses.put("computeExecutionConditionAddress", computeExecutionCondition.getContractAddress());
             service = (ComputingService)service;
@@ -452,7 +459,6 @@ public class OceanManager extends BaseManager {
         if (!isTemplateApproved)
             throw new ServiceAgreementException(serviceAgreementId, "The template " + service.templateId + " is not approved");
 
-        AccessService accessService = ddo.getAccessService(serviceIndex);
         Boolean result = false;
 
         try {
@@ -464,14 +470,14 @@ public class OceanManager extends BaseManager {
                         ddo,
                         conditionsId,
                         Keys.toChecksumAddress(getMainAccount().getAddress()),
-                        accessService
+                        service
                 );
-            else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+            else if  (service.type.equals(Service.ServiceTypes.compute.name()))
                 result = this.agreementsManager.createComputeAgreement(serviceAgreementId,
                         ddo,
                         conditionsId,
                         Keys.toChecksumAddress(getMainAccount().getAddress()),
-                        accessService
+                        service
                 );
             else
                 throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -490,7 +496,7 @@ public class OceanManager extends BaseManager {
 
         if (service.type.equals(Service.ServiceTypes.access.name()))
             executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowAccessSecretStoreTemplate, serviceAgreementId);
-        else if  (service.type.equals(Service.ServiceTypes.computing.name()))
+        else if  (service.type.equals(Service.ServiceTypes.compute.name()))
             executeAgreementFlowable = ServiceAgreementHandler.listenExecuteAgreement(escrowComputeExecutionTemplate, serviceAgreementId);
         else
             throw new ServiceAgreementException(serviceAgreementId, "Service type not supported");
@@ -572,7 +578,7 @@ public class OceanManager extends BaseManager {
                 conditionAddress =  accessSecretStoreCondition.getContractAddress();
                 conditionName = "accessSecretStore";
             }
-            else if  (service.type.equals(Service.ServiceTypes.computing.name())) {
+            else if  (service.type.equals(Service.ServiceTypes.compute.name())) {
                 conditionAddress =  computeExecutionCondition.getContractAddress();
                 conditionName = "computeExecution";
             }
@@ -769,6 +775,42 @@ public class OceanManager extends BaseManager {
 
             log.error(msg + ": " + e.getMessage());
             throw new ConsumeServiceException(msg, e);
+        }
+
+    }
+
+    /**
+     * Executes a remote service associated with an asset and serviceAgreementId
+     * @param agreementId the agreement id
+     * @param did the did
+     * @param index the index of the service
+     * @param workflowId the workflow id
+     * @return an execution id
+     * @throws ServiceException ServiceException
+     */
+    public String executeComputeService(String agreementId, DID did, int index, String workflowId) throws ServiceException {
+
+        DDO ddo = null;
+
+        try {
+
+            ddo = resolveDID(did);
+
+            Service service = ddo.getService(index);
+            String checkConsumerAddress = Keys.toChecksumAddress(getMainAccount().address);
+
+            String hash =  Hash.sha3(EthereumHelper.add0x(agreementId));
+            String signature = EthereumHelper.ethSignMessage(this.getKeeperService().getWeb3(), hash, getMainAccount().address, getMainAccount().password);
+
+            ExecuteService executeService = new ExecuteService(agreementId, workflowId, checkConsumerAddress, signature);
+            BrizoService.ServiceExecutionResult result = BrizoService.initializeServiceExecution(service.serviceEndpoint, executeService);
+            if (!result.getOk())
+                throw new ServiceException("There was a problem initializing the execution of the service. HTTP Code: " + result.getCode());
+
+            return result.getExecutionId();
+
+        } catch (DDOException|IOException e) {
+            throw new ServiceException("There was an error resolving the DID ", e);
         }
 
     }

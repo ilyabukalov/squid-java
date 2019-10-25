@@ -37,7 +37,7 @@ public class Service extends AbstractModel implements FromJsonToModel {
     /**
      * Type of service in the DDO
      */
-    public enum ServiceTypes {access, metadata, authorization, computing, provenance}
+    public enum ServiceTypes {access, metadata, authorization, compute, provenance}
 
     /**
      * Type of Asset. Represented in the base.type attribute
@@ -53,6 +53,12 @@ public class Service extends AbstractModel implements FromJsonToModel {
 
     @JsonIgnore
     public static final String URL_PARAM = "url";
+
+    @JsonIgnore
+    public static final String WORKFLOWID_PARAM = "workflowDID";
+
+    @JsonIgnore
+    public static final String SIGNATURE_PARAM = "signature";
 
 
     @JsonIgnore

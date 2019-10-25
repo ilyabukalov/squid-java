@@ -159,6 +159,30 @@ public class AssetsApiIT {
     }
 
     @Test
+    public void orderComputingService() throws Exception {
+
+        metadataBaseAlgorithm.attributes.main.dateCreated = new Date();
+        String computeServiceEndpoint =   config.getString("brizo.url") + "/api/v1/brizo/services/exec";
+        providerConfig.setAccessEndpoint(computeServiceEndpoint);
+        DDO ddo = oceanAPI.getAssetsAPI().createComputingService(metadataBaseAlgorithm, providerConfig, computingProvider);
+
+        DID did = new DID(ddo.id);
+        DDO resolvedDDO = oceanAPI.getAssetsAPI().resolve(did);
+        assertEquals(ddo.id, resolvedDDO.id);
+        assertTrue(resolvedDDO.services.size() == 4);
+
+        Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_COMPUTING_INDEX);
+        TimeUnit.SECONDS.sleep(2l);
+
+        OrderResult result = response.blockingFirst();
+        assertNotNull(result.getServiceAgreementId());
+        assertEquals(true, result.isAccessGranted());
+
+    }
+
+
+
+    @Test
     public void order() throws Exception {
 
 

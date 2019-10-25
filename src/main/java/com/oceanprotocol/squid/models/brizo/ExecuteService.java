@@ -8,13 +8,7 @@ public class ExecuteService extends AbstractModel implements FromJsonToModel {
 
 
     @JsonProperty
-    public String did;
-
-    @JsonProperty
     public String agreementId;
-
-    @JsonProperty
-    public String serviceIndex;
 
     @JsonProperty
     public String workflowId;
@@ -22,12 +16,14 @@ public class ExecuteService extends AbstractModel implements FromJsonToModel {
     @JsonProperty
     public String consumerAddress;
 
+    @JsonProperty
+    public String signature;
+
     public ExecuteService() {}
 
-    public ExecuteService(String agreementId, String did, String index, String workflowId, String consumerAddress) {
-        this.did = did;
+    public ExecuteService(String agreementId, String workflowId, String consumerAddress, String signature) {
+        this.signature = signature;
         this.agreementId = agreementId;
-        this.serviceIndex = index;
         this.workflowId = workflowId;
         this.consumerAddress = consumerAddress;
     }
@@ -35,11 +31,10 @@ public class ExecuteService extends AbstractModel implements FromJsonToModel {
     @Override
     public String toString() {
         return "ExecuteService{" +
-                "did='" + did + '\'' +
-                ", agreementId='" + agreementId + '\'' +
-                ", serviceIndex='" + serviceIndex + '\'' +
+                " agreementId='" + agreementId + '\'' +
                 ", workflowId='" + workflowId + '\'' +
                 ", consumerAddress='" + consumerAddress + '\'' +
+                ", signature='" + signature + '\'' +
                 '}';
     }
 

@@ -40,7 +40,7 @@ public class AssetsImpl implements AssetsAPI {
      *
      * @param oceanManager  the oceanManager
      * @param assetsManager the assetsManager
-     * @param agreementsManager  the agreements manager
+     * @param agreementsManager the agreements Manager
      */
     public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager, AgreementsManager agreementsManager) {
 
@@ -169,6 +169,11 @@ public class AssetsImpl implements AssetsAPI {
     @Override
     public List<DID> consumerAssets(String consumerAddress) throws ServiceException {
         return agreementsManager.getConsumerAssets(consumerAddress);
+    }
+
+    @Override
+    public String execute(String agreementId, DID did, int index, String workflowDID) throws ServiceException {
+        return oceanManager.executeComputeService(agreementId, did, index, workflowDID);
     }
 
     @Override

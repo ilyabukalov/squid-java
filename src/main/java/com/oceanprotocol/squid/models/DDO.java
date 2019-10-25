@@ -268,7 +268,7 @@ public class DDO extends AbstractModel implements FromJsonToModel {
                         this.services.add(getMapperInstance().convertValue(service, ProvenanceService.class));
                     } else if (service.get("type").equals(Service.ServiceTypes.access.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AccessService.class));
-                    } else if (service.get("type").equals(Service.ServiceTypes.computing.toString())) {
+                    } else if (service.get("type").equals(Service.ServiceTypes.compute.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, ComputingService.class));
                     } else if (service.get("type").equals(Service.ServiceTypes.authorization.toString())) {
                         this.services.add(getMapperInstance().convertValue(service, AuthorizationService.class));

@@ -245,6 +245,17 @@ public interface AssetsAPI {
     Flowable<OrderResult> order(DID did, int serviceDefinitionId) throws OrderException;
 
     /**
+     * Executes a remote service associated with an asset and serviceAgreementId
+     * @param agreementId the agreement id
+     * @param did the did
+     * @param index the index of the service
+     * @param workflowDID the workflow id
+     * @return an execution id
+     * @throws ServiceException ServiceException
+     */
+    public String execute(String agreementId, DID did, int index, String workflowDID) throws ServiceException;
+
+    /**
      * Return the owner of the asset.
      *
      * @param did the did

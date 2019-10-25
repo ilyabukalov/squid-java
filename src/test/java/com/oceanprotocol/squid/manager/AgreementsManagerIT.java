@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
@@ -120,6 +121,7 @@ public class AgreementsManagerIT {
         Flowable<OrderResult> response = oceanAPIConsumer.getAssetsAPI().order(did, Service.DEFAULT_ACCESS_INDEX);
 
         OrderResult orderResult = response.blockingFirst();
+        TimeUnit.SECONDS.sleep(5l);
         agreementsManager.getAgreement(orderResult.getServiceAgreementId());
         AgreementStatus status = agreementsManager.getStatus(orderResult.getServiceAgreementId());
         assertEquals(orderResult.getServiceAgreementId(), status.agreementId);

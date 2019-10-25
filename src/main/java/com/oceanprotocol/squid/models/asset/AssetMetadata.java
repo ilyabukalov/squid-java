@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 @JsonPropertyOrder(alphabetic = true)
 public class AssetMetadata extends AbstractModel {
 
-    public enum assetTypes {dataset, algorithm, container, workflow, other};
-
     @JsonProperty
     public Service.Attributes attributes;
 
