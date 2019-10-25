@@ -2,7 +2,7 @@ package com.oceanprotocol.squid.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.oceanprotocol.squid.api.config.OceanConfig;
-import com.oceanprotocol.squid.core.sla.ServiceAgreementHandler;
+import com.oceanprotocol.squid.core.sla.handlers.ServiceAgreementHandler;
 import com.oceanprotocol.squid.models.DDO;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.AgreementStatus;
@@ -41,12 +41,12 @@ public class ConditionsApiIT {
         }, METADATA_JSON_CONTENT);
 
         String metadataUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
+        String provenanceUrl = config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl = config.getString("brizo.url") + "/api/v1/brizo/services/consume";
-        String purchaseEndpoint = config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint = config.getString("secretstore.url");
         String providerAddress = config.getString("provider.address");
 
-        providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
+        providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
         oceanAPIConsumer = OceanAPI.getInstance(config);
         Properties properties = new Properties();
         properties.put(OceanConfig.KEEPER_URL, config.getString("keeper.url"));
@@ -57,9 +57,9 @@ public class ConditionsApiIT {
         properties.put(OceanConfig.AQUARIUS_URL, config.getString("aquarius.url"));
         properties.put(OceanConfig.SECRETSTORE_URL, config.getString("secretstore.url"));
         properties.put(OceanConfig.CONSUME_BASE_PATH, config.getString("consume.basePath"));
-        properties.put(OceanConfig.MAIN_ACCOUNT_ADDRESS, config.getString("account.parity.address"));
-        properties.put(OceanConfig.MAIN_ACCOUNT_PASSWORD, config.getString("account.parity.password"));
-        properties.put(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE, config.getString("account.parity.file"));
+        properties.put(OceanConfig.MAIN_ACCOUNT_ADDRESS, config.getString("account.parity.address2"));
+        properties.put(OceanConfig.MAIN_ACCOUNT_PASSWORD, config.getString("account.parity.password2"));
+        properties.put(OceanConfig.MAIN_ACCOUNT_CREDENTIALS_FILE, config.getString("account.parity.file2"));
         properties.put(OceanConfig.DID_REGISTRY_ADDRESS, config.getString("contract.DIDRegistry.address"));
         properties.put(OceanConfig.AGREEMENT_STORE_MANAGER_ADDRESS, config.getString("contract.AgreementStoreManager.address"));
         properties.put(OceanConfig.CONDITION_STORE_MANAGER_ADDRESS, config.getString("contract.ConditionStoreManager.address"));
@@ -90,7 +90,7 @@ public class ConditionsApiIT {
     public void executeConditions() throws Exception {
         DDO ddo = oceanAPI.getAssetsAPI().create(metadataBase, providerConfig);
         String agreementId = ServiceAgreementHandler.generateSlaId();
-        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, "1",  oceanAPIConsumer.getMainAccount().address));
+        assertTrue(oceanAPI.getAgreementsAPI().create(ddo.getDid(), agreementId, 1, oceanAPIConsumer.getMainAccount().address));
         AgreementStatus initialStatus = oceanAPI.getAgreementsAPI().status(agreementId);
         assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("lockReward"));
         assertEquals(BigInteger.ONE, initialStatus.conditions.get(0).conditions.get("accessSecretStore"));

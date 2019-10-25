@@ -5,12 +5,12 @@
 
 package com.oceanprotocol.squid.api.helper;
 
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.keeper.contracts.*;
 import com.oceanprotocol.secretstore.core.EvmDto;
 import com.oceanprotocol.secretstore.core.SecretStoreDto;
 import com.oceanprotocol.squid.api.config.OceanConfig;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.*;
 import org.web3j.crypto.CipherException;
 
@@ -351,6 +351,41 @@ public class OceanInitializationHelper {
     public AccessSecretStoreCondition loadAccessSecretStoreCondition(KeeperService keeper) throws IOException, CipherException {
         return AccessSecretStoreCondition.load(
                 oceanConfig.getAccessSsConditionsAddress(),
+                keeper.getWeb3(),
+//                keeper.getCredentials(),
+                keeper.getTxManager(),
+                keeper.getContractGasProvider()
+        );
+    }
+
+    /**
+     * Loads the EscrowComputeExecutionTemplate contract from Keeper
+     *
+     * @param keeper the keeper Service
+     * @return an instance of EscrowComputeExecutionTemplate contract deployed in keeper
+     * @throws IOException     IOException
+     * @throws CipherException CipherException
+     */
+    public EscrowComputeExecutionTemplate loadEscrowComputeExecutionTemplate(KeeperService keeper) throws IOException, CipherException {
+        return EscrowComputeExecutionTemplate.load(
+                oceanConfig.getEscrowComputeExecutionTemplateAddress(),
+                keeper.getWeb3(),
+//                keeper.getCredentials(),
+                keeper.getTxManager(),
+                keeper.getContractGasProvider());
+    }
+
+    /**
+     * Loads the ComputeExecutionCondition contract from Keeper
+     *
+     * @param keeper the keeper Service
+     * @return an instance of ComputeExecutionCondition contract deployed in keeper
+     * @throws IOException     IOException
+     * @throws CipherException CipherException
+     */
+    public ComputeExecutionCondition loadComputeExecutionCondition(KeeperService keeper) throws IOException, CipherException {
+        return ComputeExecutionCondition.load(
+                oceanConfig.getComputeExecutionConditionAddress(),
                 keeper.getWeb3(),
 //                keeper.getCredentials(),
                 keeper.getTxManager(),

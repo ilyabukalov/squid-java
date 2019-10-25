@@ -19,11 +19,13 @@ import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -34,6 +36,8 @@ import static org.junit.Assert.assertTrue;
 public class OceanManagerIT {
 
     private static final Logger log = LogManager.getLogger(OceanManagerIT.class);
+
+    private static final String OEP7_DATASET_EXAMPLE_URL = "https://raw.githubusercontent.com/oceanprotocol/OEPs/master/8/v0.4/ddo-example-access.json";
 
     private static final String DDO_JSON_SAMPLE = "src/test/resources/examples/ddo-example.json";
     private static String DDO_JSON_CONTENT;
@@ -155,15 +159,20 @@ public class OceanManagerIT {
 
     private DDO newRegisteredAsset() throws Exception {
 
-        metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, METADATA_JSON_CONTENT);
+        String OEP7_DATASET_EXAMPLE_CONTENT = IOUtils.toString(new URI(OEP7_DATASET_EXAMPLE_URL), "utf-8");
+
+        DDO completeDDO = DDO.fromJSON(new TypeReference<DDO>() {
+        }, OEP7_DATASET_EXAMPLE_CONTENT);
+
+        metadataBase = DDO.fromJSON(new TypeReference<AssetMetadata>() {}, completeDDO.services.get(0).toJson());
 
         String metadataUrl= config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
+        String provenanceUrl= config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl= config.getString("brizo.url") + "/api/v1/brizo/services/consume";
-        String purchaseEndpoint= config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint= config.getString("secretstore.url");
         String providerAddress= config.getString("provider.address");
 
-        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
+        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
 
         return managerPublisher.registerAccessServiceAsset(metadataBase,
                 providerConfig,
@@ -175,24 +184,24 @@ public class OceanManagerIT {
     public void registerAsset() throws Exception {
 
         String metadataUrl= config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/ddo/{did}";
+        String provenanceUrl= config.getString("aquarius-internal.url") + "/api/v1/aquarius/assets/provenance/{did}";
         String consumeUrl= config.getString("brizo.url") + "/api/v1/brizo/services/consume";
-        String purchaseEndpoint= config.getString("brizo.url") + "/api/v1/brizo/services/access/initialize";
         String secretStoreEndpoint= config.getString("secretstore.url");
         String providerAddress= config.getString("provider.address");
 
 
-        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, purchaseEndpoint, metadataUrl, secretStoreEndpoint, providerAddress);
+        ProviderConfig providerConfig = new ProviderConfig(consumeUrl, metadataUrl, provenanceUrl, secretStoreEndpoint, providerAddress);
 
         DDO ddo= managerPublisher.registerAccessServiceAsset(metadataBase,
                 providerConfig,
                 0);
 
-        DID did= new DID(ddo.id);
+        DID did= ddo.getDid();
         DDO resolvedDDO= managerPublisher.resolveDID(did);
 
         assertEquals(ddo.id, resolvedDDO.id);
         assertEquals(metadataUrl.replace("{did}", did.toString()), resolvedDDO.services.get(0).serviceEndpoint);
-        assertTrue( resolvedDDO.services.size() == 3);
+        assertTrue( resolvedDDO.services.size() == 4);
 
     }
 

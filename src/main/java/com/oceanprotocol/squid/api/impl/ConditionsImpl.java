@@ -32,6 +32,11 @@ public class ConditionsImpl implements ConditionsAPI {
     }
 
     @Override
+    public boolean grantServiceExecution(String agreementId, DID did, String grantee) throws Exception {
+        return conditionsManager.grantCompute(agreementId, did, grantee);
+    }
+
+    @Override
     public boolean releaseReward(String agreementId, BigInteger amount) throws Exception {
         return conditionsManager.releaseReward(agreementId, amount);
     }

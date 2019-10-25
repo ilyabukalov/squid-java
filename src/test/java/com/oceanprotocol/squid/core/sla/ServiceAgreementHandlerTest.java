@@ -10,7 +10,7 @@ import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.manager.ManagerHelper;
 import com.oceanprotocol.squid.models.Account;
 import com.oceanprotocol.squid.models.DDO;
-import com.oceanprotocol.squid.models.service.AccessService;
+import com.oceanprotocol.squid.models.service.types.AccessService;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +22,8 @@ import org.web3j.crypto.Hash;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -96,7 +98,12 @@ public class ServiceAgreementHandlerTest {
         AccessService accessService= (AccessService) ddo.services.get(1);
         accessService.templateId = "0x044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d";
 
-        String hash= accessService.generateServiceAgreementHash(agreementId, consumerAddress, publisherAddress, lockRewardConditionAddress, accessSecretStoreConditionAddress, escrowRewardConditionAddress);
+        Map<String, String> conditionsAddresses = new HashMap<>();
+        conditionsAddresses.put("escrowRewardAddress", escrowRewardConditionAddress);
+        conditionsAddresses.put("lockRewardConditionAddress", lockRewardConditionAddress);
+        conditionsAddresses.put("accessSecretStoreConditionAddress", accessSecretStoreConditionAddress);
+
+        String hash= accessService.generateServiceAgreementHash(agreementId, consumerAddress, publisherAddress,conditionsAddresses);
         assertEquals("0xa25575970920e439cc076f1489e0b820cb2fd91b7a8643165fd26d296fa69ee6", hash);
 
     }
@@ -108,8 +115,12 @@ public class ServiceAgreementHandlerTest {
 
         AccessService accessService= (AccessService) ddo.services.get(1);
 
-        String hash= accessService.generateServiceAgreementHash(SERVICEAGREEMENT_ID, "consumerAddress", "publisherAddress", "lockRewardAddress",
-                "accessSecretStoreADdress", "escrowRewardAddredd");
+        Map<String, String> conditionsAddresses = new HashMap<>();
+        conditionsAddresses.put("escrowRewardAddress", "escrowRewardAddredd");
+        conditionsAddresses.put("lockRewardConditionAddress", "lockRewardAddress");
+        conditionsAddresses.put("accessSecretStoreConditionAddress", "accessSecretStoreADdress");
+
+        String hash= accessService.generateServiceAgreementHash(SERVICEAGREEMENT_ID, "consumerAddress", "publisherAddress",  conditionsAddresses);
         String signature= accessService.generateServiceAgreementSignatureFromHash(keeper.getWeb3(), keeper.getAddress(), account.password, hash);
 
         final String hashTemplateId= Hash.sha3(TEMPLATE_ID);

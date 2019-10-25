@@ -7,6 +7,7 @@ package com.oceanprotocol.squid.api.impl;
 
 import com.oceanprotocol.squid.api.AssetsAPI;
 import com.oceanprotocol.squid.exceptions.*;
+import com.oceanprotocol.squid.manager.AgreementsManager;
 import com.oceanprotocol.squid.manager.AssetsManager;
 import com.oceanprotocol.squid.manager.OceanManager;
 import com.oceanprotocol.squid.models.DDO;
@@ -15,6 +16,7 @@ import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 import io.reactivex.Flowable;
 
 import java.io.InputStream;
@@ -28,6 +30,7 @@ public class AssetsImpl implements AssetsAPI {
 
     private OceanManager oceanManager;
     private AssetsManager assetsManager;
+    private AgreementsManager agreementsManager;
 
     private static final int DEFAULT_OFFSET = 20;
     private static final int DEFAULT_PAGE = 1;
@@ -37,11 +40,13 @@ public class AssetsImpl implements AssetsAPI {
      *
      * @param oceanManager  the oceanManager
      * @param assetsManager the assetsManager
+     * @param agreementsManager the agreements Manager
      */
-    public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager) {
+    public AssetsImpl(OceanManager oceanManager, AssetsManager assetsManager, AgreementsManager agreementsManager) {
 
         this.oceanManager = oceanManager;
         this.assetsManager = assetsManager;
+        this.agreementsManager = agreementsManager;
     }
 
 
@@ -53,6 +58,16 @@ public class AssetsImpl implements AssetsAPI {
     @Override
     public DDO create(AssetMetadata metadata, ProviderConfig providerConfig) throws DDOException {
         return this.create(metadata, providerConfig, 0);
+    }
+
+    @Override
+    public DDO createComputingService(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider, int threshold) throws DDOException {
+        return oceanManager.registerComputingServiceAsset(metadata, providerConfig, computingProvider, threshold);
+    }
+
+    @Override
+    public DDO createComputingService(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider) throws DDOException {
+        return this.createComputingService(metadata, providerConfig, computingProvider,0);
     }
 
     @Override
@@ -96,48 +111,48 @@ public class AssetsImpl implements AssetsAPI {
 
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException {
         return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, false, -1, basePath, threshold);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath) throws ConsumeServiceException {
         return this.consume(serviceAgreementId, did, serviceDefinitionId, basePath, 0);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId,  Integer index, String basePath) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath) throws ConsumeServiceException {
         return this.consume(serviceAgreementId, did, serviceDefinitionId, index, basePath, 0);
     }
 
     @Override
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId,  Integer index, String basePath, int threshold) throws ConsumeServiceException {
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath, int threshold) throws ConsumeServiceException {
         return oceanManager.consume(serviceAgreementId, did, serviceDefinitionId, true, index, basePath, threshold);
     }
 
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index) throws ConsumeServiceException{
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index) throws ConsumeServiceException{
         return this.consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, 0);
     }
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException{
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException{
         return oceanManager.consumeBinary(serviceAgreementId, did, serviceDefinitionId,  index, threshold);
     }
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException {
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException {
         return this.consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, rangeStart, rangeEnd, 0);
     }
 
     @Override
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException{
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException{
         return oceanManager.consumeBinary(serviceAgreementId, did, serviceDefinitionId, index, true, rangeStart, rangeEnd, threshold);
     }
 
     @Override
-    public Flowable<OrderResult> order(DID did, String serviceDefinitionId) throws OrderException{
+    public Flowable<OrderResult> order(DID did, int serviceDefinitionId) throws OrderException{
         return oceanManager.purchaseAsset(did, serviceDefinitionId);
     }
 
@@ -148,21 +163,46 @@ public class AssetsImpl implements AssetsAPI {
 
     @Override
     public List<DID> ownerAssets(String ownerAddress) throws ServiceException {
-        return oceanManager.getOwnerAssets(ownerAddress);
+        return assetsManager.getOwnerAssets(ownerAddress);
     }
 
     @Override
     public List<DID> consumerAssets(String consumerAddress) throws ServiceException {
-        return oceanManager.getConsumerAssets(consumerAddress);
+        return agreementsManager.getConsumerAssets(consumerAddress);
+    }
+
+    @Override
+    public String execute(String agreementId, DID did, int index, String workflowDID) throws ServiceException {
+        return oceanManager.executeComputeService(agreementId, did, index, workflowDID);
     }
 
     @Override
     public String owner(DID did) throws Exception {
-        return oceanManager.getDIDOwner(did);
+        return assetsManager.getDIDOwner(did);
     }
 
     @Override
     public Boolean validate(AssetMetadata metadata) throws DDOException {
         return assetsManager.validateMetadata(metadata);
+    }
+
+    @Override
+    public Boolean transferOwnership(DID did, String newOwnerAddress) throws DDOException {
+        return assetsManager.transferOwnership(did, newOwnerAddress);
+    }
+
+    @Override
+    public Boolean delegatePermissions(DID did, String subjectAddress) throws DDOException {
+        return assetsManager.grantPermission(did, subjectAddress);
+    }
+
+    @Override
+    public Boolean revokePermissions(DID did, String subjectAddress) throws DDOException {
+        return assetsManager.revokePermission(did, subjectAddress);
+    }
+
+    @Override
+    public Boolean getPermissions(DID did, String subjectAddress) throws DDOException {
+        return assetsManager.getPermission(did, subjectAddress);
     }
 }

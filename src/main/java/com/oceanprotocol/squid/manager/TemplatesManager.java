@@ -5,9 +5,9 @@
 
 package com.oceanprotocol.squid.manager;
 
+import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.exceptions.EthereumException;
 import com.oceanprotocol.squid.external.AquariusService;
-import com.oceanprotocol.common.web3.KeeperService;
 import com.oceanprotocol.squid.models.service.template.TemplateSEA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -3,7 +3,7 @@ language: java
 jdk:
 - openjdk11
 
-sudo: false
+sudo: true
 
 services:
 - docker
@@ -13,40 +13,43 @@ cache:
   - "$HOME/.cache"
 
 before_install:
-- git clone https://github.com/oceanprotocol/barge
-- cd barge
-- export KEEPER_VERSION=v0.10.3
-- export BRIZO_VERSION=v0.3.12
-- export AQUARIUS_VERSION=v0.3.7
-- bash -x start_ocean.sh --latest --no-pleuston --local-spree-node 2>&1 > start_ocean.log &
-- cd ..
-- sleep 60
-- echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-- echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-- sudo apt-get install jq
-- wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
-- |
-    for i in $(seq 1 50); do
-      sleep 5
-      [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
-    done
-    ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
+  - git clone https://github.com/oceanprotocol/barge
+  - cd barge
+  - export KEEPER_VERSION=v0.12.0
+  - export BRIZO_VERSION=v0.6.0
+  - export AQUARIUS_VERSION=v0.4.2
+  - export EVENTS_HANDLER_VERSION=v0.3.0
+  - sudo bash -x start_ocean.sh --no-commons --local-spree-node 2>&1 > start_ocean.log &
+  - cd ..
+  - sleep 60
+  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+  - sudo apt-get install jq
+  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
+  - |
+      for i in $(seq 1 150); do
+        sleep 5
+        echo "Iteration: ${i}"
+        [ -f "${HOME}/.ocean/keeper-contracts/artifacts/ready" ] && break
+      done
+      ls -la "${HOME}/.ocean/keeper-contracts/artifacts/"
 
-    /bin/bash src/test/resources/scripts/updateConfAddresses.sh
 
 install:
-#- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # Unit tests only
-- mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
-- mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
-- export project_version=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
+  #- mvn --settings .maven.xml install -P dev -Dgpg.skip -Dmaven.javadoc.skip=true -B -V # Unit tests only
+  - ls -R ${HOME}/.ocean/keeper-contracts/
+  - /bin/bash src/test/resources/scripts/updateConfAddresses.sh
+  - mvn --settings .maven.xml install -P integration-test -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+  - mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]'
+  - export project_version=$(mvn help:evaluate -Dexpression=project.version | grep -e '^[^\[]')
 
 script:
 #- mvn clean verify -P dev
 #- mvn clean verify -P all-test # TODO: uncomment this when barge run properly in travis
 
 after_success:
-- java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/jacoco/jacoco.xml
-- mvn javadoc:javadoc
+  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r target/site/jacoco/jacoco.xml
+  - mvn javadoc:javadoc
 
 deploy:
 - provider: releases

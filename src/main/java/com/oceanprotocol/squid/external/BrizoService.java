@@ -5,10 +5,13 @@
 
 package com.oceanprotocol.squid.external;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oceanprotocol.common.helpers.HttpHelper;
 import com.oceanprotocol.common.helpers.HttpHelper.DownloadResult;
 import com.oceanprotocol.common.helpers.StringsHelper;
 import com.oceanprotocol.common.models.HttpResponse;
+import com.oceanprotocol.squid.models.brizo.ExecuteService;
 import com.oceanprotocol.squid.models.brizo.InitializeAccessSLA;
 import com.oceanprotocol.squid.models.service.Service;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +51,38 @@ public class BrizoService {
         public void setCode(Integer code) {
             this.code = code;
         }
+    }
+
+    public static class ServiceExecutionResult {
+
+        private Boolean ok;
+        private String executionId;
+        private Integer code;
+
+        public Boolean getOk() {
+            return ok;
+        }
+
+        public void setOk(Boolean ok) {
+            this.ok = ok;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+
+        public String getExecutionId() {
+            return executionId;
+        }
+
+        public void setExecutionId(String executionId) {
+            this.executionId = executionId;
+        }
+
     }
 
 
@@ -167,6 +202,63 @@ public class BrizoService {
 
         return HttpHelper.download(endpoint, isRangeRequest, startRange, endRange);
 
+    }
+
+    /**
+     * Calls a Brizo's endpoint to request the execution of a Compute Service
+     *
+     * @param serviceEndpoint the serviceEndpoint
+     * @param payload the payload
+     * @return an object that indicates if Brizo initialized the Execution of the Service correctly
+     */
+    public static ServiceExecutionResult initializeServiceExecution(String serviceEndpoint, ExecuteService payload) {
+
+        log.debug("Initializing Execution of Service. Agreement Id: [" + payload.agreementId + "]: " + serviceEndpoint);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(Service.CONSUMER_ADDRESS_PARAM, payload.consumerAddress);
+        parameters.put(Service.SERVICE_AGREEMENT_PARAM, payload.agreementId);
+        parameters.put(Service.WORKFLOWID_PARAM, payload.workflowId);
+        parameters.put(Service.SIGNATURE_PARAM, payload.signature);
+
+        String endpoint = StringsHelper.formUrl(serviceEndpoint, parameters);
+
+        ServiceExecutionResult result = new ServiceExecutionResult();
+        HttpResponse response;
+
+        try {
+            String payloadJson = payload.toJson();
+            log.debug(payloadJson);
+
+            response = HttpHelper.httpClientPost(
+                    endpoint, new ArrayList<>(), payloadJson);
+
+            result.setCode(response.getStatusCode());
+
+            if (response.getStatusCode() != 200) {
+                log.debug("Unable to Initialize Execution of the Service: " + response.toString());
+                result.setOk(false);
+                return result;
+            }
+
+            result.setOk(true);
+            result.setExecutionId(getExecutionId(response.getBody()));
+            return result;
+
+        } catch (Exception e) {
+            log.error("Exception Initializing Execution of the Service: " + e.getMessage());
+            result.setOk(false);
+            return result;
+        }
+
+
+    }
+
+    private static String getExecutionId(String bodyResponse) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> responseMap = mapper.readValue(bodyResponse, new TypeReference<Map<String, String>>(){});
+
+        return responseMap.get("workflowId");
     }
 
 }

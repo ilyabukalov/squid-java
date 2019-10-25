@@ -42,7 +42,7 @@ public class OrderExecutor extends BaseOceanExecutor{
         OceanAPI oceanAPI = getNextOceanApi();
         log.info("Using OceanAPI Instance with the main Address: " + oceanAPI.getMainAccount().address);
 
-        Flowable<OrderResult> result = oceanAPI.getAssetsAPI().order(ddo.getDid(), "1");
+        Flowable<OrderResult> result = oceanAPI.getAssetsAPI().order(ddo.getDid(), 1);
         OrderResult orderResult = result.blockingFirst();
 
         log.info("Result of the order flow. AccessGranted: " + orderResult.isAccessGranted() + ". ServiceAgreementId: " + orderResult.getServiceAgreementId());

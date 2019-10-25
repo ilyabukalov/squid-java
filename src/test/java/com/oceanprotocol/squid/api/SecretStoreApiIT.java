@@ -65,7 +65,7 @@ public class SecretStoreApiIT {
     @Ignore
     public void encrypt() throws Exception{
 
-        String filesJson = metadataBase.toJson(metadataBase.base.files);
+        String filesJson = metadataBase.toJson(metadataBase.attributes.main.files);
         String did = DID.builder().getHash();
 
         String encryptedDocument = oceanAPIPublisher.getSecretStoreAPI().encrypt(did, filesJson, 0);

@@ -12,6 +12,7 @@ import com.oceanprotocol.squid.models.aquarius.SearchResult;
 import com.oceanprotocol.squid.models.asset.AssetMetadata;
 import com.oceanprotocol.squid.models.asset.OrderResult;
 import com.oceanprotocol.squid.models.service.ProviderConfig;
+import com.oceanprotocol.squid.models.service.types.ComputingService;
 import io.reactivex.Flowable;
 
 import java.io.InputStream;
@@ -43,6 +44,32 @@ public interface AssetsAPI {
      * @throws DDOException DDOException
      */
     public DDO create(AssetMetadata metadata, ProviderConfig providerConfig) throws DDOException;
+
+
+
+    /**
+     * Creates a new ComputingService DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     *
+     * @param metadata       the metadata of the DDO
+     * @param providerConfig the endpoints of the DDO's services
+     * @param computingProvider the computing provider configuration
+     * @param threshold      the secret store threshold
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO createComputingService(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider, int threshold) throws DDOException;
+
+    /**
+     * Creates a new ComputingService DDO, registering it on-chain through DidRegistry contract and off-chain in Aquarius
+     *
+     * @param metadata       the metadata of the DDO
+     * @param providerConfig the endpoints of the DDO's services
+     * @param computingProvider the computing provider configuration
+     * @return an instance of the DDO created
+     * @throws DDOException DDOException
+     */
+    public DDO createComputingService(AssetMetadata metadata, ProviderConfig providerConfig, ComputingService.Provider computingProvider) throws DDOException;
+
 
     /**
      * Gets a DDO from a DID
@@ -114,7 +141,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, String basePath, int threshold) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath, int threshold) throws ConsumeServiceException;
 
     /**
      *  Downloads a single file of an Asset previously ordered through a Service Agreement
@@ -126,7 +153,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, String basePath) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, String basePath) throws ConsumeServiceException;
 
     /**
      * Downloads an Asset previously ordered through a Service Agreement
@@ -139,7 +166,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath, int threshold) throws ConsumeServiceException;
 
     /**
      * Downloads an Asset previously ordered through a Service Agreement
@@ -151,7 +178,7 @@ public interface AssetsAPI {
      * @return a flag that indicates if the consume flow was executed correctly
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public Boolean consume(String serviceAgreementId, DID did, String serviceDefinitionId, String basePath) throws ConsumeServiceException;
+    public Boolean consume(String serviceAgreementId, DID did, int serviceDefinitionId, String basePath) throws ConsumeServiceException;
 
 
     /**
@@ -163,7 +190,7 @@ public interface AssetsAPI {
      * @return the input stream wit the binary content of the file
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index) throws ConsumeServiceException;
 
     /**
      * Gets the input stream of one file of the asset
@@ -175,7 +202,7 @@ public interface AssetsAPI {
      * @return the input stream wit the binary content of the file
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, int threshold) throws ConsumeServiceException;
 
 
     /**
@@ -189,7 +216,7 @@ public interface AssetsAPI {
      * @return                    the input stream wit the binary content of the specified range
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd) throws ConsumeServiceException;
 
 
     /**
@@ -204,7 +231,7 @@ public interface AssetsAPI {
      * @return                    the input stream wit the binary content of the specified range
      * @throws ConsumeServiceException ConsumeServiceException
      */
-    public InputStream consumeBinary(String serviceAgreementId, DID did, String serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException;
+    public InputStream consumeBinary(String serviceAgreementId, DID did, int serviceDefinitionId, Integer index, Integer rangeStart, Integer rangeEnd, int threshold) throws ConsumeServiceException;
 
 
     /**
@@ -215,7 +242,18 @@ public interface AssetsAPI {
      * @return a Flowable instance over an OrderResult to get the result of the flow in an asynchronous fashion
      * @throws OrderException OrderException
      */
-    Flowable<OrderResult> order(DID did, String serviceDefinitionId) throws OrderException;
+    Flowable<OrderResult> order(DID did, int serviceDefinitionId) throws OrderException;
+
+    /**
+     * Executes a remote service associated with an asset and serviceAgreementId
+     * @param agreementId the agreement id
+     * @param did the did
+     * @param index the index of the service
+     * @param workflowDID the workflow id
+     * @return an execution id
+     * @throws ServiceException ServiceException
+     */
+    public String execute(String agreementId, DID did, int index, String workflowDID) throws ServiceException;
 
     /**
      * Return the owner of the asset.
@@ -261,5 +299,45 @@ public interface AssetsAPI {
      * @throws DDOException DDOException
      */
     public Boolean validate(AssetMetadata metadata) throws DDOException;
+
+
+    /**
+     * Given a DID, transfer the ownership to a new owner. This function only will work if is called by the DID owner.
+     * @param did the did
+     * @param newOwnerAddress the address of the new ownership
+     * @return  a flag that indicates if the action was executed correctly
+     * @throws DDOException DDOException
+     */
+    public Boolean transferOwnership(DID did, String newOwnerAddress) throws DDOException;
+
+
+    /**
+     *  For a existing asset, the owner of the asset delegate to a subject read or access permiss
+     * @param did the did
+     * @param subjectAddress the address we want to delegate to
+     * @return a flag that indicates if the action was executed correctly
+     * @throws DDOException DDOException
+     */
+    public Boolean delegatePermissions(DID did, String subjectAddress) throws DDOException;
+
+    /**
+     * For a existing asset, the owner of the asset revoke the access grants of a subject.
+     * @param did the did
+     * @param subjectAddress the address we want to revoke to
+     * @return a flag that indicates if the action was executed correctly
+     * @throws DDOException DDOException
+     */
+    public Boolean revokePermissions(DID did, String subjectAddress) throws DDOException;
+
+
+    /**
+     * Check if an user has permissions in a specific DID
+     * @param did  the did
+     * @param subjectAddress the address
+     * @return a flag that indicates if the subject address has permissions
+     * @throws DDOException DDOException
+     */
+    public Boolean getPermissions(DID did, String subjectAddress) throws DDOException;
+
 
 }
